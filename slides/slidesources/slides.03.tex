@@ -5,12 +5,12 @@
   \begin{block}{Basic idea} 
     We build \blue{virtual processors} in software, on top of physical processors:
     \begin{description}
-    \item[\red{Processor}:] Provides a set of instructions along with the capability of automatically
+    \item[\textbf{Processor}:] Provides a set of instructions along with the capability of automatically
       executing a series of those instructions.
-    \item[\red{Thread}:] A minimal software processor in whose \blue{context} a series of instructions can be
+    \item[\textbf{Thread}:] A minimal software processor in whose \blue{context} a series of instructions can be
       executed. Saving a thread context implies stopping the current execution and saving all the data needed
       to continue the execution at a later stage.
-    \item[\red{Process}:] A software processor in whose context one or more threads may be executed. Executing
+    \item[\textbf{Process}:] A software processor in whose context one or more threads may be executed. Executing
       a thread, means executing a series of instructions in the context of that thread.
     \end{description}
   \end{block}
@@ -18,12 +18,12 @@
 \begin{slide}{Context switching}
   \begin{block}{Contexts}
     \begin{itemize}
-    \item<1->\red{Processor context}: The minimal collection of values stored in the registers of a processor
+    \item \textbf{Processor context}: The minimal collection of values stored in the registers of a processor
       used for the execution of a series of instructions (e.g., stack pointer, addressing registers, program
       counter).
-    \item<2->\red{Thread context}: The minimal collection of values stored in registers and memory, used for
+    \item \textbf{Thread context}: The minimal collection of values stored in registers and memory, used for
       the execution of a series of instructions (i.e., processor context, state).
-    \item<3->\red{Process context}: The minimal collection of values stored in registers and memory, used for
+    \item \textbf{Process context}: The minimal collection of values stored in registers and memory, used for
       the execution of a thread (i.e., thread context, but now also at least MMU register values).
     \end{itemize}
   \end{block}
