@@ -41,6 +41,9 @@
 \usepackage{url}
 \usepackage{xmpmulti}
 
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
 \definecolor{keywords}{RGB}{255,0,90}
 \definecolor{comments}{RGB}{0,150,0}
 \definecolor{blue}{rgb}{0.2,0.2,0.7}
@@ -63,8 +66,10 @@
 }
 \lstset{keepspaces=true,basewidth={0.5em,0.45em}}
 
+\usepackage[english]{babel}
 \usetheme{Warsaw}
 \usecolortheme{dolphin}
+
 
 \setbeamertemplate{itemize items}[circle]
 \setbeamertemplate{navigation symbols}{}
@@ -214,10 +219,11 @@
 
 %----------------------------------------------------------
 
-\title{\textbf{Distributed Systems} \\ {\small (4th edition, version 01)}}
-\author{}
-\date{}
-\institute{}
+\title{\textbf{Principles of Distributed Systems} \\ {\small inft-3507}}
+\author{Dr. J.Burns}
+\date{Autumn 2025}
+\institute{\textbf{ADA University} \\ 
+{\tiny Lectures are based on: https://www.distributed-systems.net/index.php/books/ds4/}}
 
 \begin{document}
 
@@ -233,7 +239,7 @@
     \ifthenelse{\equal{00}{\chap}}{\ }{\ }
     \ifthenelse{\equal{01}{\chap}}{\begin{center} Chapter 01: \ci    \end{center}}{}
     \ifthenelse{\equal{02}{\chap}}{\begin{center} Chapter 02: \cii   \end{center}}{}
-    \ifthenelse{\equal{03}{\chap}}{\begin{center} Chapter 03: \ciii  \end{center}}{}
+    \ifthenelse{\equal{03}{\chap}}{\begin{center} \ciii  \end{center}}{}
     \ifthenelse{\equal{04}{\chap}}{\begin{center} Chapter 04: \civ   \end{center}}{}
     \ifthenelse{\equal{05}{\chap}}{\begin{center} Chapter 05: \cv    \end{center}}{}
     \ifthenelse{\equal{06}{\chap}}{\begin{center} Chapter 06: \cvi   \end{center}}{}
