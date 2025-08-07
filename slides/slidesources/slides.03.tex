@@ -94,42 +94,42 @@
       \end{columns}
     \end{block}
   \end{slide}
-\begin{slide}{A simple example in Python}
-  \begin{centerfig}
-    \includelisting{03-03/mp} 
-  \end{centerfig}
-  \begin{tabular}{l}
-    \small\code{40:23 eve is going to sleep for 14 seconds} \\
-    \small\code{40:23 bob is going to sleep for 4 seconds} \\
-    \small\code{40:27 bob has woken up} \\
-    \small\code{40:37 eve has woken up}
-  \end{tabular}
-\end{slide}
-\begin{slide}{A simple example in Python}
-  \begin{centerfig}
-    \includelisting{03-04/mpthread-slide} 
-  \end{centerfig}
-\end{slide}
-\begin{slide}{A simple example in Python}
-  \begin{tabular}{l}
-    \small\code{eve sees shared x being 71} \\
-    \small\code{53:21 eve 0 is going to sleep for 20 seconds} \\
-    \small\code{bob sees shared x being 84} \\
-    \small\code{53:21 eve 1 is going to sleep for 15 seconds} \\
-    \small\code{53:21 eve 2 is going to sleep for 3 seconds} \\
-    \small\code{53:21 bob 0 is going to sleep for 8 seconds} \\
-    \small\code{53:21 bob 1 is going to sleep for 16 seconds} \\
-    \small\code{53:21 bob 2 is going to sleep for 8 seconds} \\
-    \small\code{53:24 eve 2 has woken up, seeing shared x being 72} \\
-    \small\code{53:29 bob 0 has woken up, seeing shared x being 85} \\
-    \small\code{53:29 bob 2 has woken up, seeing shared x being 86} \\
-    \small\code{53:36 eve 1 has woken up, seeing shared x being 73} \\
-    \small\code{53:37 bob 1 has woken up, seeing shared x being 87} \\
-    \small\code{bob sees shared x being 87} \\
-    \small\code{53:41 eve 0 has woken up, seeing shared x being 74} \\
-    \small\code{eve sees shared x being 74} 
-  \end{tabular}
-\end{slide}
+% \begin{slide}{A simple example in Python}
+%   \begin{centerfig}
+%     \includelisting{03-03/mp} 
+%   \end{centerfig}
+%   \begin{tabular}{l}
+%     \small\code{40:23 eve is going to sleep for 14 seconds} \\
+%     \small\code{40:23 bob is going to sleep for 4 seconds} \\
+%     \small\code{40:27 bob has woken up} \\
+%     \small\code{40:37 eve has woken up}
+%   \end{tabular}
+% \end{slide}
+% \begin{slide}{A simple example in Python}
+%   \begin{centerfig}
+%     \includelisting{03-04/mpthread-slide} 
+%   \end{centerfig}
+% \end{slide}
+% \begin{slide}{A simple example in Python}
+%   \begin{tabular}{l}
+%     \small\code{eve sees shared x being 71} \\
+%     \small\code{53:21 eve 0 is going to sleep for 20 seconds} \\
+%     \small\code{bob sees shared x being 84} \\
+%     \small\code{53:21 eve 1 is going to sleep for 15 seconds} \\
+%     \small\code{53:21 eve 2 is going to sleep for 3 seconds} \\
+%     \small\code{53:21 bob 0 is going to sleep for 8 seconds} \\
+%     \small\code{53:21 bob 1 is going to sleep for 16 seconds} \\
+%     \small\code{53:21 bob 2 is going to sleep for 8 seconds} \\
+%     \small\code{53:24 eve 2 has woken up, seeing shared x being 72} \\
+%     \small\code{53:29 bob 0 has woken up, seeing shared x being 85} \\
+%     \small\code{53:29 bob 2 has woken up, seeing shared x being 86} \\
+%     \small\code{53:36 eve 1 has woken up, seeing shared x being 73} \\
+%     \small\code{53:37 bob 1 has woken up, seeing shared x being 87} \\
+%     \small\code{bob sees shared x being 87} \\
+%     \small\code{53:41 eve 0 has woken up, seeing shared x being 74} \\
+%     \small\code{eve sees shared x being 74} 
+%   \end{tabular}
+% \end{slide}
 \begin{slide}{Threads and operating systems}
   \begin{alertblock}{Main issue} 
     Should an OS kernel provide threads, or should they be implemented as user-level packages?
@@ -147,23 +147,12 @@
     \end{itemize}
   \end{block}
 \end{slide}
-\begin{slide}{Threads and operating systems}
-  \begin{block}{Kernel solution}
-    The whole idea is to have the kernel contain the implementation of a thread package. This means that
-    \blue{all} operations return as system calls:
-    \begin{itemize}
-    \item Operations that block a thread are no longer a problem: the \blue{kernel schedules another available
-      thread} within the same process.
-    \item handling external events is simple: the \blue{kernel} (which catches all events) \blue{schedules the
-      thread associated with the event}.
-    \item The problem is (or used to be) the \blue{loss of efficiency} because each thread
-      operation requires a trap to the kernel.
-    \end{itemize}
-  \end{block}
-  \begin{alertblock}{Conclusion -- but} 
-    Try to mix user-level and kernel-level threads into a single concept, however, performance gain has not
-    turned out to generally outweigh the increased complexity.
-  \end{alertblock}
+\begin{slide}{Linux Kernel Threads}
+\begin{itemize}
+  \item \textbf{Task Struct Representation}: In the Linux kernel, threads are implemented as lightweight processes, each represented by a \texttt{task\_struct} (defined in \texttt{include/linux/sched.h}), sharing memory but maintaining separate execution contexts for scheduling.
+  \item \textbf{Scheduling with CFS}: The Completely Fair Scheduler (CFS) in \texttt{kernel/sched/fair.c} manages kernel threads, treating them as virtual processors and allocating CPU time fairly using a red-black tree.
+  \item \textbf{POSIX Threads Integration}: User-space threads (e.g., via \texttt{pthread\_create}) map to kernel threads, enabling Java’s 1:1 threading model to leverage Linux’s scheduling for efficient concurrency.
+\end{itemize}
 \end{slide}
   \begin{slide}{Combining user-level and kernel-level threads}
     \begin{block}{Basic idea} 
@@ -179,14 +168,14 @@
   \begin{slide}{User and kernel threads combined}
     \begin{block}{Principle operation}
       \begin{itemize}%\tightlist
-      \item<2-> User thread does system call \mathexpr{\Rightarrow} \red{the kernel thread that is
+      \item User thread does system call \mathexpr{\Rightarrow} \red{the kernel thread that is
         executing that user thread, blocks}. The user thread remains \blue{bound} to the kernel thread.
-      \item<3-> The kernel can \red{schedule another kernel thread having a runnable user thread bound to
+      \item The kernel can \red{schedule another kernel thread having a runnable user thread bound to
         it}. Note: this user thread can switch to \blue{any} other runnable user thread currently in user
         space.
-      \item<4-> A user thread calls a blocking user-level operation \mathexpr{\Rightarrow} do context switch
+      \item A user thread calls a blocking user-level operation \mathexpr{\Rightarrow} do context switch
         to a runnable user thread, (then bound to the same kernel thread).
-      \item<5-> When there are no user threads to schedule, a kernel thread may remain idle, and may even be
+      \item When there are no user threads to schedule, a kernel thread may remain idle, and may even be
         removed (destroyed) by the kernel.
       \end{itemize}
     \end{block}
