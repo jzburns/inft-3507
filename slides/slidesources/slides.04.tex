@@ -1,0 +1,622 @@
+\part{Communication}
+\section{Foundations}
+\subsection{Layered Protocols}
+\begin{slide}{Basic networking model}
+  \begin{block}{}
+    \begin{center}
+      \includefigure[0.71]{04-01}
+    \end{center}
+  \end{block}
+  \begin{block}{Drawbacks}
+    \begin{itemize}\tightlist
+    \item Focus on message-passing only
+    \item Often unneeded or unwanted functionality 
+    \item Violates access transparency
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Low-level layers}
+  \begin{block}{Recap}
+    \begin{itemize}\tightlist
+    \item \blue{Physical layer}: contains the specification and implementation of bits, and their transmission
+      between sender and receiver
+    \item \blue{Data link layer}: prescribes the transmission of a series of bits into a frame to allow for
+      error and flow control
+    \item \blue{Network layer}: describes how packets in a network of computers are to be \red{routed}.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Observation} 
+    For many distributed systems, the lowest-level interface is that of the network layer. 
+  \end{block}
+\end{slide}
+\begin{slide}{Transport Layer}
+  \begin{alertblock}{Important} 
+    The transport layer provides the actual communication facilities for most distributed systems.
+  \end{alertblock}
+  \begin{block}{Standard Internet protocols}
+    \begin{itemize}\tightlist
+    \item TCP: connection-oriented, reliable, stream-oriented communication
+    \item UDP: unreliable (best-effort) datagram communication
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Middleware layer}
+  \begin{block}{Observation} 
+    Middleware is invented to provide \blue{common} services and protocols that can be used by many
+    \blue{different} applications
+    \begin{itemize}\tightlist
+    \item A rich set of \blue{communication protocols}
+    \item \blue{(Un)marshaling} of data, necessary for integrated systems
+    \item \blue{Naming protocols}, to allow easy sharing of resources
+    \item \blue{Security protocols} for secure communication
+    \item \blue{Scaling mechanisms}, such as for replication and caching
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Note} 
+    What remains are truly \blue{application-specific} protocols... \red{such as?}
+  \end{alertblock}
+\end{slide}
+\begin{slide}{An adapted layering scheme}
+  \begin{block}{}
+    \begin{center}
+      \includefigure{04-03}
+    \end{center}
+  \end{block}
+\end{slide}
+\subsection{Types of Communication}
+\begin{slide}{Types of communication}
+  \begin{block}{Distinguish...}
+    \begin{center}
+      \includefigure{04-04}
+    \end{center}
+    \begin{itemize}\tightlist
+    \item \blue{Transient} versus \blue{persistent} communication
+    \item \blue{Asynchronous} versus \blue{synchronous} communication
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Types of communication}
+  \begin{block}{Transient versus persistent}
+    \begin{center}
+      \includefigure{04-04}
+    \end{center}
+    \begin{itemize}\tightlist
+    \item \red{Transient communication:} Comm.\ server discards message when it cannot be delivered at the
+      next server, or at the receiver.
+    \item \red{Persistent communication:} A message is stored at a communication server as long as it takes to
+      deliver it.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Types of communication}
+  \begin{block}{Places for synchronization}
+    \begin{center}
+      \includefigure{04-04}
+    \end{center}
+    \begin{itemize}\tightlist
+    \item At \blue{request submission}
+    \item At \blue{request delivery}
+    \item After \blue{request processing}
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Client/Server}
+  \begin{block}{Some observations}
+    Client/Server computing is generally based on a model of \blue{transient synchronous communication}:
+    \begin{itemize}\tightlist
+    \item Client and server have to be active at the time of communication
+    \item Client issues request and blocks until it receives reply
+    \item Server essentially waits only for incoming requests, and subsequently processes them
+    \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{block}{Drawbacks synchronous communication}
+    \begin{itemize}\tightlist
+    \item Client cannot do any other work while waiting for reply
+    \item Failures have to be handled immediately: the client is waiting
+    \item The model may simply not be appropriate (mail, news)
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Messaging}
+  \begin{block}{Message-oriented middleware}
+    Aims at high-level \blue{persistent asynchronous communication}:
+    \begin{itemize}\tightlist
+    \item Processes send each other messages, which are queued
+    \item Sender need not wait for immediate reply, but can do other things
+    \item Middleware often ensures  fault tolerance
+    \end{itemize}
+  \end{block}
+\end{slide}
+\section{Remote procedure call}
+\subsection{Basic RPC operation}
+\begin{slide}{Basic RPC operation}
+  \begin{block}{Observations}
+    \begin{itemize}\tightlist
+    \item Application developers are familiar with simple procedure model
+    \item Well-engineered procedures operate in isolation (black box)
+    \item There is no fundamental reason not to execute procedures on separate machine
+    \end{itemize}
+  \end{block}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{alertblock}{Conclusion} 
+        Communication between caller \& callee can be hidden by using procedure-call mechanism.
+      \end{alertblock}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \includefigure{04-06}
+    \end{column}
+  \end{columns}
+\end{slide}
+\begin{slide}{Basic RPC operation}
+  \begin{block}{}
+    \begin{center}
+      \includefigure{04-07}
+    \end{center}
+  \end{block}
+    {\scriptsize
+      \begin{tabular}{@{}ll}
+        \begin{minipage}{0.45\textwidth}
+          \begin{enumerate}\tightlist
+          \item Client procedure calls client stub.
+          \item Stub builds message; calls local OS.
+          \item OS sends message to remote OS.
+          \item Remote OS gives message to stub.
+          \item Stub unpacks parameters; calls server.
+          \end{enumerate}
+        \end{minipage} &
+        \begin{minipage}{0.55\textwidth}
+          \begin{enumerate}\tightlist\setcounter{enumi}{5}
+          \item Server does local call; returns result to stub.
+          \item Stub builds message; calls  OS.
+          \item OS sends message to client's OS.
+          \item Client's OS gives message to stub.
+          \item Client stub unpacks result; returns to client.
+          \end{enumerate}
+        \end{minipage}
+      \end{tabular}
+    }
+\end{slide}
+\subsection{Parameter passing}
+\begin{slide}{RPC: Parameter passing}
+  \begin{block}{There's more than just wrapping parameters into a message}
+    \begin{itemize}\tightlist
+    \item Client and server machines may have \blue{different data representations} (think of byte ordering)
+    \item Wrapping a parameter means \blue{transforming a value into a sequence of bytes}
+    \item Client and server have to \blue{agree on the same encoding}:
+    \end{itemize}
+    \begin{itemize}\tightlist
+    \item How are \blue{basic data values} represented (integers, floats, characters)
+    \item How are \blue{complex data values} represented (arrays, unions)
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Conclusion}
+    Client and server need to \blue{properly interpret messages}, transforming them into machine-dependent
+    representations. 
+  \end{alertblock}
+\end{slide}
+\begin{slide}{RPC: Parameter passing}
+  \begin{block}{Some assumptions}
+      \begin{itemize}\tightlist
+      \item \blue{Copy in/copy out} semantics: while procedure is executed, nothing can be assumed about parameter
+        values.
+      \item \blue{All} data that is to be operated on is passed by parameters. Excludes passing
+        \blue{references to (global) data}.
+      \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{Conclusion} 
+    Full access transparency cannot be realized.
+  \end{alertblock}
+  \onslide<3->
+  \begin{block}{A \blue{remote reference} mechanism enhances access transparency}
+    \begin{itemize}\tightlist
+    \item Remote reference offers \blue{unified access} to remote data
+    \item Remote references can be \blue{passed as parameter} in RPCs
+    \item \red{Note}: stubs can sometimes be used as such references
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{RPC-based application support}
+\subsection{Variations on RPC}
+\begin{slide}{Asynchronous RPCs}
+  \begin{block}{Essence} 
+    Try to get rid of the strict request-reply behavior, but let the client continue without waiting for an
+    answer from the server.
+  \end{block}
+  \begin{block}{}
+    \begin{center}
+      \includefigure{04-15}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Sending out multiple RPCs}
+  \begin{block}{Essence}
+    Sending an RPC request to a group of servers.
+  \end{block}
+  \begin{block}{}
+    \begin{center}
+      \includefigure{04-16}
+    \end{center}
+  \end{block}
+\end{slide}
+\section{Message-oriented communication}
+\subsection{Simple transient messaging with sockets}
+\begin{slide}{Transient messaging: sockets}
+  \begin{block}{Berkeley socket interface}\scriptsize
+    \begin{center}
+      \renewcommand{\arraystretch}{1}
+      \begin{tabular}{|l|>{\RRCOL}p{0.7\textwidth}|} \hline
+        \textbf{Operation} & \textbf{Description} \\ \whline
+        \code{socket}  & Create a new communication end point   \\
+        \code{bind}    & Attach a local address to a socket   \\
+        \code{listen}  & Tell operating system what the maximum number of pending connection requests should be \\
+        \code{accept}  & Block caller until a connection request arrives   \\
+        \code{connect} & Actively attempt to establish a connection   \\
+        \code{send}    & Send some data over the connection   \\
+        \code{receive} & Receive some data over the connection   \\
+        \code{close}   & Release the connection  \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+  \begin{block}{}
+    \begin{center}
+      \includefigure{04-18}
+    \end{center}
+  \end{block}
+\end{slide}
+  \begin{slide}{Sockets: Python code}
+    \vspace*{-6pt}
+    \begin{block}{Server}
+      \begin{tabular}{@{\hspace*{1em}}l}
+        \includelisting{04-19/server-book}
+      \end{tabular}
+    \end{block}
+    \begin{block}{Client}
+      \begin{tabular}{@{\hspace*{1em}}l}
+        \includelisting{04-19/client-book}
+      \end{tabular}
+    \end{block}
+  \end{slide}
+\subsection{Advanced transient messaging}
+\begin{slide}{Making sockets easier to work with}
+  \begin{block}{Observation}
+    Sockets are rather low level and programming mistakes are easily made. However, the way that they are used
+    is often the same (such as in a client-server setting).
+  \end{block}
+  \begin{block}{Alternative: ZeroMQ}
+    Provides a higher level of expression by \red{pairing} sockets: one for sending messages at process \id{P}
+    and a corresponding one at process \id{Q} for receiving messages. All communication is \red{asynchronous}.
+  \end{block}
+  \begin{block}{Three patterns}
+    \begin{itemize}\tightlist
+    \item Request-reply
+    \item Publish-subscribe
+    \item Pipeline
+    \end{itemize}
+  \end{block}
+\end{slide}
+  \begin{slide}{Request-reply}
+    \begin{centerfig}
+      \includelisting{04-21/run-book}
+    \end{centerfig}
+  \end{slide}
+  \begin{slide}{Publish-subscribe}
+    \begin{centerfig}
+      \includelisting{04-22/run-book}
+    \end{centerfig}
+  \end{slide}
+  \begin{slide}{Pipeline}
+    \begin{centerfig}
+      \includelisting{04-23/run-book}
+    \end{centerfig}
+  \end{slide}
+\begin{slide}{MPI: When lots of flexibility is needed}
+  \begin{block}{Representative operations}
+    \begin{center}
+      \begin{tabular}{|l|>{\RRCOL}p{0.7\textwidth}|} \hline
+        \textbf{Operation} & \textbf{Description} \\ \whline
+        \code{MPI\_BSEND}    & Append outgoing message to a local send buffer \\
+        \code{MPI\_SEND}     & Send a message and wait until copied to local or remote buffer \\
+        \code{MPI\_SSEND}    & Send a message and wait until transmission starts \\
+        \code{MPI\_SENDRECV} & Send a message and wait for reply \\
+        \code{MPI\_ISEND}    & Pass reference to outgoing message, and continue \\
+        \code{MPI\_ISSEND}   & Pass reference to outgoing message, and wait until receipt starts \\
+        \code{MPI\_RECV}     & Receive a message; block if there is none \\
+        \code{MPI\_IRECV}    & Check if there is an incoming message, but do not block \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\subsection{Message-oriented persistent communication}
+\begin{slide}{Queue-based messaging}
+  \begin{block}{Four possible combinations}
+    \begin{center}
+      \newcommand{\hs}{\hspace*{1.5cm}}
+      \begin{tabular}{c@{\hs}c@{\hs}c@{\hs}c}
+        \includefigure{04-25a} &
+        \includefigure{04-25b} &
+        \includefigure{04-25c} &
+        \includefigure{04-25d} 
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Message-oriented middleware}
+  \begin{block}{Essence} 
+    Asynchronous persistent communication through support of middleware-level \blue{queues}. Queues
+    correspond to buffers at communication servers.
+  \end{block}
+  \begin{block}{Operations}
+    \begin{center}
+      \begin{tabular}{|l|>{\RRCOL}p{0.7\textwidth}|} \hline
+        \textbf{Operation} & \textbf{Description} \\ \whline
+        \code{PUT}    & Append a message to a specified queue \\
+        \code{GET}    & Block until the specified queue is nonempty, and remove the first message \\
+        \code{POLL}   & Check a specified queue for messages, and remove the first. Never block \\
+        \code{NOTIFY} & Install a handler to be called when a message is put into the specified queue \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{General model}
+  \begin{block}{Queue managers}
+    Queues are managed by \red{queue managers}. An application can put messages only into a \blue{local}
+    queue. Getting a message is possible by extracting it from a \blue{local} queue only
+    \mathexpr{\Rightarrow} queue managers need to \blue{route} messages.
+  \end{block}
+  \begin{block}{Routing}
+    \begin{center}
+      \includefigure{04-27}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Message broker}
+  \begin{block}{Observation} 
+    Message queuing systems assume a \blue{common messaging protocol}: all applications agree on message
+    format (i.e., structure and data representation)
+  \end{block}
+  \begin{block}{Broker handles application heterogeneity in an MQ system}
+    \begin{itemize}\tightlist
+    \item Transforms incoming messages to target format
+    \item Very often acts as an \blue{application gateway}
+    \item May provide \blue{subject-based} routing capabilities (i.e., \blue{publish-subscribe} capabilities)
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Message broker: general architecture}
+  \begin{centerfig}
+    \includefigure{04-28}
+  \end{centerfig}
+\end{slide}
+\subsection{Example: Advanced Message Queuing Protocol (AMQP)}
+\begin{slide}{Example: AMQP}
+  \begin{block}{Lack of standardization}
+    \blue{Advanced Message-Queuing Protocol} was intended to play the same role as, for example, TCP in
+    networks: a protocol for high-level messaging with different implementations.
+  \end{block}
+  \begin{centerfig}
+    \includefigure{04-29}
+  \end{centerfig}
+  \begin{block}{Basic model}
+    Client sets up a (stable) \blue{connection}, which is a container for serveral (possibly ephemeral)
+    \blue{one-way channels}. Two one-way channels can form a \blue{session}. A \blue{link} is akin to a
+    socket, and maintains state about message transfers.
+  \end{block}
+\end{slide}
+\begin{slide}{Example: AMQP-based producer}
+  \begin{centerfig}
+    \includelisting{04-30/producer-book}
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Example: AMQP-based consumer}
+  \begin{centerfig}
+    \includelisting{04-30/consumer-book}
+  \end{centerfig}
+\end{slide}
+\section{Multicast communication}
+\subsection{Application-level tree-based multicasting}
+\begin{slide}{Application-level multicasting}
+  \begin{block}{Essence} 
+    Organize nodes of a distributed system into an \blue{overlay network} and use that network to disseminate
+    data:
+    \begin{itemize}\tightlist
+    \item Oftentimes a \red{tree}, leading to unique paths
+    \item Alternatively, also \red{mesh networks}, requiring a form of \blue{routing}
+    \end{itemize}
+  \end{block}
+\end{slide}
+  \begin{slide}{Application-level multicasting in Chord}
+    \begin{block}{Basic approach}
+      \begin{enumerate}\tightlist
+      \item Initiator generates a \blue{multicast identifier} \id{mid}.
+      \item Lookup \blue{\id{succ(mid)}}, the node responsible for \id{mid}.
+      \item Request is routed to \id{succ(mid)}, which will become the \blue{root}.
+      \item If \id{P} wants to join, it sends a \blue{join} request to the root.
+      \item When request arrives at \id{Q}:
+      
+        \begin{itemize}\tightlist
+	    \item \id{Q} has not seen a join request before \mathexpr{\Rightarrow} it becomes \blue{forwarder};
+          \id{P} becomes child of \id{Q}. \red{Join request continues to be forwarded}.
+	    \item \id{Q} knows about tree \mathexpr{\Rightarrow} \id{P} becomes child of \id{Q}. \red{No need to
+          forward join request anymore}.
+        \end{itemize}
+      \end{enumerate}
+    \end{block}
+  \end{slide}
+\begin{slide}{ALM: Some costs}
+  \begin{block}{Different metrics}
+    \begin{center}
+      \includefigure{04-31}
+    \end{center}
+    \begin{itemize}\tightlist
+    \item \red{Link stress}: How often does an ALM message cross the same physical link? \blue{Example:}
+      message from \id{A} to \id{D} needs to cross \mathexpr{\langle \id{Ra},\id{Rb} \rangle} twice.
+    \item \red{Stretch}: Ratio in delay between ALM-level path and network-level path. \blue{Example:}
+      messages \id{B} to \id{C} follow path of length 73 at ALM, but 47 at network level
+      \mathexpr{\Rightarrow} stretch = 73/47.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Flooding-based multicasting}
+\begin{slide}{Flooding}
+  \begin{block}{Essence}
+    \id{P} simply sends a message \id{m} to each of its neighbors. Each neighbor will forward that
+    message, except to \id{P}, and only if it had not seen \id{m} before.
+  \end{block}
+  \begin{centerfig}
+    \includefigure[0.71]{04-32}
+  \end{centerfig}
+  \onslide<2->
+  \begin{block}{Variation}
+    Let \id{Q} forward a message with a certain probability \mathexpr{p_{flood}}, possibly even dependent
+    on its own number of neighbors (i.e., \red{node degree}) or the degree of its neighbors.
+  \end{block}
+\end{slide}
+\subsection{Gossip-based data dissemination}
+\begin{slide}{Epidemic protocols}
+  \begin{block}{Assume there are no write--write conflicts}
+    \begin{itemize}\tightlist
+    \item Update operations are performed at a single server
+    \item A replica passes updated state to only a few neighbors
+    \item Update propagation is lazy, i.e., not immediate
+    \item Eventually, each update should reach every replica
+    \end{itemize}
+  \end{block}
+  \begin{block}{Two forms of epidemics}
+    \begin{itemize}\tightlist
+    \item \red{Anti-entropy}: Each replica regularly chooses another replica at random, and exchanges state
+      differences, leading to identical states at both afterwards
+    \item \red{Rumor spreading}: A replica which has just been updated (i.e., has been \blue{contaminated}),
+      tells several other replicas about its update (contaminating them as well).
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Anti-entropy}
+  \begin{block}{Principle operations}
+    \begin{itemize}\tightlist
+    \item A node \id{P} selects another node \id{Q} from the system at random.
+    \item \red{Pull}: \id{P} only pulls in new updates from \id{Q}
+    \item \red{Push}: \id{P} only pushes its own updates to \id{Q}
+    \item \red{Push-pull}: \id{P} and \id{Q} send updates to each other
+    \end{itemize}
+  \end{block}
+  \begin{block}{Observation} 
+    For push-pull it takes \mathexpr{{\cal O} (log(N))} rounds to disseminate updates to all \mathexpr{N}
+    nodes (\red{round} = when every node has taken the initiative to start an exchange).
+  \end{block}
+\end{slide}
+  \begin{slide}{Anti-entropy: analysis}
+    \begin{block}{Basics}
+      Consider a single source, propagating its update. Let \mathexpr{p_i} be the probability that a node has
+      not received the update after the \mathexpr{i^{\mbox{\scriptsize\itshape th}}} round.
+    \end{block}
+    \begin{block}{Analysis: staying ignorant}
+      \begin{itemize}\firmlist
+      \item With \blue{pull}, \mathexpr{p_{i+1} = (p_i)^2}: the node was not updated during the
+        \mathexpr{i^{\mbox{\scriptsize\itshape th}}} round and should contact another ignorant node during the
+        next round.
+      \item With \blue{push}, \mathexpr{p_{i+1} = p_i(1 - \frac{1}{N-1})^{(N-1)(1-p_i)} \approx p_i e^{-1}} (for
+        small \mathexpr{p_i} and large \mathexpr{N}): the node was ignorant during the
+        \mathexpr{i^{\mbox{\scriptsize\itshape th}}} round and no updated node chooses to contact it during
+        the next round.
+      \item With \blue{push-pull}: \mathexpr{(p_i)^2 \cdot (p_i e^{-1})}
+      \end{itemize}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Anti-entropy performance}
+    \begin{centerfig}
+      \begin{tabular}{c}
+        \includefigure[0.71]{04-35a} \\
+        \includefigure[0.71]{04-35b} 
+      \end{tabular}
+    \end{centerfig}
+  \end{slide}
+\begin{slide}{Rumor spreading}
+  \newcommand{\pstop}{p_{\mbox{\scriptsize\itshape stop}}}
+  \begin{block}{Basic model} 
+    A server \id{S} having an update to report, contacts other servers. If a server is contacted to which the
+    update has already propagated, \id{S} stops contacting other servers with probability \mathexpr{\pstop}.
+  \end{block}
+  \begin{block}{Observation}
+    If \mathexpr{s} is the fraction of ignorant servers (i.e., which are unaware of the update), it can be
+    shown that with many servers
+    \[ s = e^{-(1/{\pstop} + 1)(1 - s)}\]
+  \end{block}
+\end{slide}
+  \begin{slide}{Formal analysis}
+    \newcommand{\pstop}{p_{\mbox{\scriptsize\itshape stop}}}
+    \begin{block}{Notations}
+      Let \red{\mathexpr{s}} denote fraction of nodes that have not yet been updated (i.e.,
+      \blue{susceptible}; \red{\mathexpr{i}} the fraction of updated (\blue{infected}) and active nodes; and
+      \red{\mathexpr{r}} the fraction of updated nodes that gave up (\blue{removed}).
+    \end{block}
+    \begin{block}{From theory of epidemics}
+      \[\begin{array}{llcl}
+      (1) & {ds}/{dt} & = & -s \cdot i \\
+      (2) & {di}/{dt} & = & s \cdot i - \pstop \cdot (1-s) \cdot  i \\ 
+      \Rightarrow & di/ds & = & -(1 + \pstop) + \frac{\pstop}{s} \\
+      \Rightarrow & i(s) & = & -(1 + \pstop) \cdot s  + \pstop \cdot \ln(s) + C
+      \end{array}
+      \]
+    \end{block}
+    \begin{block}{Wrap up}
+      \mathexpr{i(1) = 0 \Rightarrow C = 1 + \pstop \Rightarrow i(s) = (1+\pstop) \cdot (1-s) + \pstop \cdot
+        \ln(s)}. We are looking for the case \mathexpr{i(s) = 0}, which leads to
+      \mathexpr{s = e^{-(1/\pstop + 1)(1-s)}}
+    \end{block}
+  \end{slide}
+\begin{slide}{Rumor spreading}
+  \begin{block}{The effect of stopping}
+    \begin{columns}
+      \begin{column}{0.4\textwidth}
+        \includefigure[0.71]{04-36}
+      \end{column}
+      \begin{column}{0.4\textwidth}
+        \newcommand{\pstop}{p_{\mbox{\scriptsize\itshape stop}}}
+        \footnotesize
+        \[
+        \begin{array}{|lcr|} \hline
+	      \multicolumn{3}{|c|}{\mbox{Consider 10,000 nodes}} \\ \hline
+	      1/\pstop   &   s         & N_s \\ \hline
+	      1          &   0.203188  & 2032 \\
+	      2          &   0.059520  & 595 \\
+	      3          &   0.019827  & 198 \\
+	      4          &   0.006977  & 70 \\
+	      5          &   0.002516  & 25 \\ 
+	      6          &   0.000918  & 9 \\
+	      7          &   0.000336  & 3 \\ \hline
+	    \end{array}
+        \]
+      \end{column}
+    \end{columns}
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{Note}
+    If we really have to ensure that all servers are eventually updated, rumor spreading alone is not enough
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Deleting values}
+  \begin{alertblock}{Fundamental problem} 
+    We cannot remove an old value from a server and expect the removal to propagate. Instead, mere removal
+    will be undone in due time using epidemic algorithms
+  \end{alertblock}
+  \begin{block}{Solution} 
+    Removal has to be registered as a special update by inserting a \blue{death certificate}
+  \end{block}
+\end{slide}
+\begin{slide}{Deleting values}
+  \begin{block}{When to remove a death certificate (it is not allowed to stay for ever)}
+    \begin{itemize}\tightlist
+    \item Run a global algorithm to detect whether the removal is known everywhere, and then collect the death
+      certificates (looks like garbage collection)
+    \item Assume death certificates propagate in finite time, and associate a maximum lifetime for a
+      certificate (can be done at risk of not reaching all servers)
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Note} 
+    It is necessary that a removal actually reaches all servers.
+  \end{alertblock}
+\end{slide}
+\section{Summary}

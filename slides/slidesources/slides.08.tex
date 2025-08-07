@@ -1,0 +1,1085 @@
+\part{Fault tolerance}
+\section{Introduction to fault tolerance}
+\subsection{Basic concepts}
+\begin{slide}{Dependability}
+  \begin{block}{Basics}
+    A \blue{component} provides \blue{services} to \blue{clients}.  To provide services, the component may
+    require the services from other components \mathexpr{\Rightarrow} a component may \red{depend} on some
+    other component.
+  \end{block}
+  \begin{block}{Specifically}
+    A component \id{C} depends on \id{C^*} if the \blue{correctness} of \id{C}'s behavior depends on the
+    correctness of \id{C^*}'s behavior. (Components are processes or channels.)
+  \end{block}
+  \onslide<2->
+  \begin{block}{Requirements related to dependability}
+    \begin{center}
+      \begin{tabular}{|l|l|}\hline
+        \textbf{Requirement} & \textbf{Description} \\ \whline
+        \red{Availability}	 & Readiness for usage 							\\ \hline
+        \red{Reliability}    & Continuity of service delivery				\\ \hline
+        \red{Safety}	     & Very low probability of catastrophes			\\ \hline
+        \red{Maintainability} & How easy can a failed system be repaired    \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+  \begin{slide}{Reliability versus availability}
+    \begin{block}{Reliability \mathexpr{R(t)} of component \id{C}}
+      Conditional probability that \id{C} has been functioning correctly during \mathexpr{[0,t)} given
+        \id{C} was functioning correctly at time \mathexpr{T=0}.
+    \end{block}
+
+    \begin{block}{Traditional metrics}
+      \begin{itemize}\tightlist
+      \item \red{Mean Time To Failure} (\blue{\MTTF}): The average time until a component fails.
+      \item \red{Mean Time To Repair} (\blue{\MTTR}): The average time needed to repair a component.
+      \item \red{Mean Time Between Failures} (\blue{\MTBF}): Simply \MTTF\ + \MTTR.
+      \end{itemize}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Reliability versus availability}
+    \begin{block}{Availability \mathexpr{A(t)} of component \id{C}}
+      \blue{Average fraction} of time that \id{C} has been up-and-running in interval \mathexpr{[0,t)}.
+
+        \begin{itemize}
+        \item Long-term availability \mathexpr{A}: \mathexpr{A(\infty)}
+        \item \red{Note:} \mathexpr{A = \frac{\MTTF}{\MTBF} = \frac{\MTTF}{\MTTF + \MTTR}}
+        \end{itemize}
+    \end{block}
+
+    \begin{alertblock}{Observation}
+      \blue{Reliability} and \blue{availability} make sense only if we have an accurate notion of what a
+      \red{failure} actually is.
+    \end{alertblock}
+  \end{slide}
+\begin{slide}{Terminology}
+  \begin{block}{Failure, error, fault}
+    \begin{center}
+      \begin{tabular}{|l|>{\RRCOL}p{0.4\textwidth}|>{\RRCOL}p{0.3\textwidth}|}\hline
+        \textbf{Term} & \textbf{Description} & \textbf{Example} \\ \whline
+        \red{Failure} & A component is not living up to its specifications & Crashed program \\ \hline
+        \red{Error}   & Part of a component that can lead to a failure     & Programming bug \\ \hline
+        \red{Fault}   & Cause of an error                                  & Sloppy programmer \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Terminology}
+  \begin{block}{Handling faults}
+    \begin{center}
+      \begin{tabular}{|>{\RRCOL}p{0.2\textwidth}|>{\RRCOL}p{0.3\textwidth}|>{\RRCOL}p{0.3\textwidth}|}\hline
+        \textbf{Term} & \textbf{Description} & \textbf{Example} \\ \whline
+        \red{Fault prevention} 
+        & Prevent the occurrence of a fault 
+        & Don't hire sloppy programmers \\ \hline
+        \red{Fault tolerance}  
+        & Build a component such that it can mask the occurrence of a fault 
+        & Build each component by two independent programmers \\ \hline
+        \red{Fault removal}
+        & Reduce the presence, number, or seriousness of a fault
+        & Get rid of sloppy programmers \\ \hline
+        \red{Fault forecasting} 
+        & Estimate current presence, future incidence, and consequences of faults
+        & Estimate how a recruiter is doing when it comes to hiring sloppy programmers \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\subsection{Failure models}
+\begin{slide}{Failure models}
+  \begin{block}{Types of failures}
+    \begin{center}
+      \begin{tabular}{|l|p{0.6\linewidth}|}\hline
+        \textbf{Type}                         & \textbf{Description of server's behavior} \\ \whline
+        \red{Crash failure}                   & Halts, but is working correctly until it halts \\ \hline
+        \red{Omission failure}                & Fails to respond to incoming requests \\
+        \hspace*{12pt}\emph{Receive omission} & Fails to receive incoming messages \\
+        \hspace*{12pt}\emph{Send omission}    & Fails to send messages \\  \hline
+        \red{Timing failure}                  & Response lies outside a specified time interval \\ \hline
+        \red{Response failure}                & Response is incorrect \\
+        \hspace*{12pt}\emph{Value failure}    & The value of the response is wrong \\
+        \hspace*{12pt}\emph{State-transition failure} & Deviates from the correct flow of control \\ \hline
+        \red{Arbitrary failure}               & May produce arbitrary responses at arbitrary times \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+  \begin{slide}{Dependability versus security}
+    \begin{block}{Omission versus commission}
+      Arbitrary failures are sometimes qualified as \blue{malicious}. It is better to make the following
+      distinction:
+      \begin{itemize}
+      \item \red{Omission failures}: a component fails to take an action that it should have taken
+      \item \red{Commission failure}: a component takes an action that it should not have taken
+      \end{itemize}
+    \end{block}
+    \onslide<2->
+    \begin{alertblock}{Observation}
+      Note that \blue{deliberate} failures, be they omission or commission failures, are typically security
+      problems. Distinguishing between deliberate failures and unintentional ones is, in general, impossible.
+    \end{alertblock}
+  \end{slide}
+\begin{slide}{Halting failures}
+  \begin{block}{Scenario}
+    \id{C} no longer perceives any activity from \id{C^*} --- a \blue{halting failure}?  Distinguishing
+    between a \blue{crash} or \blue{omission/timing failure} may be impossible.
+  \end{block}
+  \begin{block}{Asynchronous versus synchronous systems}
+    \begin{itemize}
+    \item \red{Asynchronous system:} no assumptions about process execution speeds or message delivery times
+      \mathexpr{\rightarrow} \blue{cannot reliably detect crash failures}.
+    \item \red{Synchronous system:} process execution speeds and message delivery times are bounded
+      \mathexpr{\rightarrow} \blue{we can reliably detect omission and timing failures}.
+    \item In practice we have \red{partially synchronous systems:} most of the time, we can assume the system
+      to be synchronous, yet there is no bound on the time that a system is asynchronous
+      \mathexpr{\rightarrow} \blue{can normally reliably detect crash failures}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Halting failures}
+  \begin{block}{Assumptions we can make}
+    \begin{center}
+      \begin{tabular}{|l|p{0.6\linewidth}|}\hline
+        \textbf{Halting type}                 & \textbf{Description} \\ \whline
+        \red{Fail-stop}       & Crash failures, but reliably detectable \\ \hline
+        \red{Fail-noisy}      & Crash failures, eventually reliably detectable \\ \hline
+        \red{Fail-silent}     & Omission or crash failures: clients cannot tell what went wrong \\ \hline
+        \red{Fail-safe}       & Arbitrary, yet benign failures (i.e., they cannot do any harm) \\ \hline
+        \red{Fail-arbitrary}  & Arbitrary, with malicious failures \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\subsection{Failure masking by redundancy}
+\begin{slide}{Redundancy for failure masking}
+  \begin{block}{Types of redundancy}
+    \begin{itemize}
+    \item \red{Information redundancy}: Add extra bits to data units so that errors can recovered when
+      bits are garbled.
+    \item \red{Time redundancy}: Design a system such that an action can be performed again if anything went
+      wrong. Typically used when faults are transient or intermittent.
+    \item \red{Physical redundancy}: add equipment or processes in order to allow one or more components to
+      fail. This type is extensively used in distributed systems.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\section{Process resilience}
+\subsection{Resilience by process groups}
+\begin{slide}{Process resilience}
+  \begin{block}{Basic idea}
+    Protect against malfunctioning processes through \red{process replication}, organizing multiple processes
+    into a \red{process group}. Distinguish between \blue{flat groups} and \blue{hierarchical groups}.
+  \end{block}
+  \begin{center}
+    \begin{tabular}{cc}
+      \includefigure{08-04a} &
+      \includefigure{08-04b}
+    \end{tabular}
+  \end{center}
+\end{slide}
+\subsection{Failure masking and replication}
+\begin{slide}{Groups and failure masking}
+  \begin{block}{\mathexpr{k}-fault tolerant group}
+    When a group can mask any \mathexpr{k} concurrent member failures (\mathexpr{k} is called \blue{degree of
+      fault tolerance}).
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{How large does a \mathexpr{k}-fault tolerant group need to be?}
+    \begin{itemize}
+    \item With \red{halting failures} (crash/omission/timing failures): we need a total of \mathexpr{k+1}
+      members as \blue{no member will produce an incorrect result, so the result of one member is good
+        enough}.
+    \item With \red{arbitrary failures}: we need \mathexpr{2k+1} members so that the correct result can be
+      obtained through a majority vote.
+    \end{itemize}
+  \end{alertblock}
+  \onslide<3->
+  \begin{block}{Important assumptions}
+    \begin{itemize}\tightlist
+    \item All members are identical
+    \item All members process commands in the same order 
+    \end{itemize}
+    \red{Result}: We can now be sure that all processes do exactly the same thing.
+  \end{block}
+\end{slide}
+\subsection{Consensus in faulty systems with crash failures}
+\begin{slide}{Consensus}
+  \begin{block}{Prerequisite}
+    In a fault-tolerant process group, each nonfaulty process executes the same commands, and in the same
+    order, as every other nonfaulty process.
+  \end{block}
+  \begin{alertblock}{Reformulation}
+    Nonfaulty group members need to reach \red{consensus} on which command to execute next.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Flooding-based consensus}
+  \begin{block}{System model}
+    \begin{itemize}
+    \item A process group \mathexpr{\set{P} = \{\id{P_1},\ldots,\id{P_n}\}}
+    \item \red{Fail-stop} failure semantics, i.e., with \blue{reliable failure detection}
+    \item A client contacts a \id{P_i} requesting it to execute a command
+    \item Every \id{P_i} maintains a list of proposed commands
+    \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{block}{Basic algorithm (based on rounds)}
+    \begin{enumerate}
+    \item In \red{round} \mathexpr{r}, \id{P_i} multicasts its known set of commands \mathexpr{\set{C^r_i}} to
+      all others
+    \item At the end of \mathexpr{r}, each \id{P_i} merges all received commands into a new
+      \mathexpr{\set{C^{r+1}_i}}.
+    \item Next command \id{cmd_i} selected through a \blue{globally shared, deterministic function}:
+      \mathexpr{\id{cmd_i} \leftarrow \mathit{select}(\set{C_i^{r+1}})}.
+    \end{enumerate}
+  \end{block}
+\end{slide}
+\begin{slide}{Flooding-based consensus: Example}
+  \centering\includefigure{08-05}
+  \begin{block}{Observations}
+    \begin{itemize}
+    \item \id{P_2} received all proposed commands from all other processes \mathexpr{\Rightarrow} 
+      \red{makes decision}.
+    \item \id{P_3} may have detected that \id{P_1} crashed, but does not know if \id{P_2} received anything,
+      i.e., \id{P_3} cannot know \blue{if it has the same information} as \id{P_2} \mathexpr{\Rightarrow}
+      \red{cannot make decision} (same for \id{P_4}).
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Raft}
+  \begin{block}{Developed for understandability}
+    \begin{itemize}
+    \item Uses a fairly straightforward \blue{leader-election} algorithm (see Chp.~5). The current leader
+      operates during the \red{current} \blue{term}.
+    \item Every server (typically, five) keeps a \blue{log} of operations, some of which have been
+      committed. \red{A backup will not vote for a new leader if its own log is more up to date}.
+    \item All committed operations have the same position in the log of each respective server.
+    \item The leader decides which pending operation is to be committed next \mathexpr{\Rightarrow} a
+      \blue{primary-backup approach}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Raft}
+  \begin{block}{When submitting an operation}
+    \begin{itemize}
+    \item A client submits a request for operation \id{o}.
+    \item The leader appends the request \mathexpr{\langle \id{o}, \id{t}, \rangle} to its own log
+      (registering the current term \id{t} and length of ).
+    \item The log is (conceptually) broadcast to the other servers.
+    \item The others (conceptually) copy the log and acknowledge the receipt.
+    \item When a majority of acks arrives, the leader commits \id{o}.
+    \end{itemize}
+  \end{block}
+
+  \onslide<2->
+  \begin{alertblock}{Note}
+    In practice, only updates are broadcast. At the end, every server has the same view and knows about the
+    \id{c} committed operations. Note that effectively, any information at the backups is overwritten.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Raft: when a leader crashes}
+  \begin{centerfig}
+    \includefigure[0.83]{08-06}
+  \end{centerfig}
+  \begin{alertblock}{Crucial observations}
+    \begin{itemize}
+    \item The new leader has the most committed operations in its log.
+    \item Any missing commits will eventually be sent to the other backups.
+    \end{itemize}
+  \end{alertblock}
+\end{slide}
+\subsection{Example: Paxos}
+\begin{slide}{Realistic consensus: Paxos}
+  \begin{block}{Assumptions (rather weak ones, and realistic)}
+    \begin{itemize}
+    \item A \blue{partially synchronous} system (in fact, it may even be asynchronous).
+    \item \blue{Communication} between processes may be \blue{unreliable}: messages may be lost, duplicated,
+      or reordered.
+    \item \blue{Corrupted message can be detected} (and thus subsequently ignored).
+    \item All \blue{operations are deterministic}: once an execution is started, it is known exactly what it
+      will do.
+    \item Processes may exhibit \blue{crash failures}, but \red{not arbitrary failures}.
+    \item Processes \red{do not collude}.
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Understanding Paxos}
+    We will build up Paxos from scratch to understand where many consensus algorithms actually come from.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Paxos essentials}
+  \begin{block}{Starting point}
+    \begin{itemize}
+    \item We assume a client-server configuration, with initially one \red{primary server}.
+    \item To make the server more robust, we start with adding a \red{backup server}.
+    \item To ensure that all commands are executed in the same order at both servers, the primary assigns
+      \blue{unique sequence numbers} to all commands. In Paxos, the primary is called the \red{leader}.
+    \item Assume that actual commands can always be restored (either from clients or servers)
+      \mathexpr{\Rightarrow} we consider only \blue{control messages}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Two-server situation}
+  \begin{center}
+    \includefigure{08-08}
+  \end{center}
+\end{slide}
+\begin{slide}{Handling lost messages}
+  \begin{block}{Some Paxos terminology}
+    \begin{itemize}
+    \item The leader sends an \red{accept} message \mathexpr{\msg{accept}\id{(o},t)} to backups when assigning
+      a timestamp \mathexpr{t} to command \id{o}.
+    \item A backup responds by sending a \red{learn} message: \mathexpr{\msg{learn}\id{(o},t)}
+    \item When the leader notices that operation \id{o} has not yet been learned, it retransmits
+      \mathexpr{\msg{accept}\id{(o},t)} with the original timestamp.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Two servers and one crash: problem}
+  \centering\includefigure{08-09a}
+  \begin{block}{Problem}
+    Primary crashes after executing an operation, but the backup never received the accept message.
+  \end{block}
+\end{slide}
+\begin{slide}{Two servers and one crash: solution}
+  \centering\includefigure{08-09b}
+  \begin{block}{Solution}
+    Never execute an operation before it is clear that is has been learned.
+  \end{block}
+\end{slide}
+\begin{slide}{Three servers and two crashes: still a problem?}
+  \begin{center}
+    \includefigure{08-10}
+  \end{center}
+  \onslide<2->
+  \begin{exampleblock}{Scenario}
+    What happens when \mathexpr{\msg{learn}(\id{o^1})} as sent by \id{S_2} to \id{S_1} is lost?
+  \end{exampleblock}
+  \onslide<3->
+  \begin{block}{Solution}
+    \id{S_2} will also have to wait until it knows that \id{S_3} has learned \id{o^1}.
+  \end{block}
+\end{slide}
+\begin{slide}{Paxos: fundamental rule}
+  \begin{alertblock}{General rule}
+      In Paxos, a server \id{S} cannot execute an operation \id{o} until it has received a
+      \mathexpr{\msg{learn}(\id{o})} from all other nonfaulty servers.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Failure detection}
+  \begin{block}{Practice}
+    \blue{Reliable failure detection} is practically impossible. A \red{solution} is to set timeouts, but take
+    into account that a detected failure may be \blue{false}. 
+  \end{block}
+  \onslide<2->
+  \begin{center}
+    \includefigure{08-11}
+  \end{center}
+\end{slide}
+\begin{slide}{Required number of servers}
+  \begin{alertblock}{Observation}
+    Paxos needs at least three servers
+  \end{alertblock}
+  \onslide<2->
+  \begin{alertblock}{Adapted fundamental rule}
+    In Paxos with three servers, a server \id{S} cannot execute an operation \id{o} until it has received at
+    least one (other) \mathexpr{\msg{learn}(\id{o})} message, so that it knows that a majority of servers will
+    execute \id{o}.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Required number of servers}
+  \begin{block}{Assumptions before taking the next steps}
+    \begin{itemize}\tightlist
+    \item Initially, \id{S_1} is the leader. 
+    \item A server can \blue{reliably detect it has missed a message}, and recover from that miss.
+    \item When a new leader needs to be elected, the remaining servers follow a \blue{strictly deterministic
+      algorithm}, such as \id{S_1} \mathexpr{\rightarrow} \id{S_2} \mathexpr{\rightarrow} \id{S_3}.
+    \item A client \blue{cannot be asked to help the servers} to resolve a situation.
+    \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{Observation}
+    If either one of the backups (\id{S_2} or \id{S_3}) crashes, Paxos will behave correctly: operations at
+      nonfaulty servers are executed in the same order.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Leader crashes after executing \id{o^1}}
+  \onslide<2->
+  \begin{block}{\id{S_3} is completely ignorant of any activity by \id{S_1}}
+    \begin{itemize}
+    \item \id{S_2} received \mathexpr{\msg{accept}(\id{o},1)}, detects crash, and becomes leader.
+    \item \id{S_3} even never received \mathexpr{\msg{accept}(\id{o},1)}. 
+    \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^2},2) \Rightarrow} \id{S_3} sees unexpected timestamp
+      and tells \id{S_2} that it missed \id{o^1}. 
+    \item \id{S_2} retransmits \mathexpr{\msg{accept}(\id{o^1},1)}, allowing \id{S_3} to catch up.
+    \end{itemize}
+  \end{block}
+  \onslide<3->
+  \begin{block}{\id{S_2} missed \mathexpr{\msg{accept}(\id{o^1},1)}}
+    \begin{itemize}
+    \item \id{S_2} did detect crash and became new leader
+    \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^1},1) \Rightarrow} \id{S_3} retransmits
+      \mathexpr{\msg{learn}(\id{o^1})}. 
+    \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^2},1) \Rightarrow} \id{S_3} tells \id{S_2} that it
+      apparently missed \mathexpr{\msg{accept}(\id{o^1},1)} from \id{S_1}, so that \id{S_2} can catch up. 
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Leader crashes after sending \mathexpr{\msg{accept}(\id{o^1},1)}}
+  \begin{block}{\id{S_3} is completely ignorant of any activity by \id{S_1}}
+    As soon as \id{S_2} announces that \id{o^2} is to be accepted, \id{S_3} will notice that it missed an
+    operation and can ask \id{S_2} to help recover.
+  \end{block}
+  \begin{block}{\id{S_2} had missed \mathexpr{\msg{accept}(\id{o^1},1)}}
+    As soon as \id{S_2} proposes an operation, it will be using a stale timestamp, allowing \id{S_3} to tell
+    \id{S_2} that it missed operation \id{o^1}.
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{Observation}
+    Paxos (with three servers) behaves correctly when a single server crashes, regardless when that crash took
+    place.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{False crash detections}
+  \centering\includefigure{08-12}
+  \begin{block}{Problem and solution}
+    \id{S_3} receives \mathexpr{\msg{accept}(\id{o^1},1)}, but much later than
+    \mathexpr{\msg{accept}(\id{o^2},1)}. If it knew who the \blue{current} leader was, it could safely reject
+    the delayed accept message \mathexpr{\Rightarrow} leaders should include their ID in messages.
+  \end{block}
+\end{slide}
+\begin{slide}{But what about progress?}
+  \centering\includefigure{08-13}
+  \onslide<2->
+  \begin{block}{Essence of solution}
+    When \id{S_2} takes over, it needs to make sure that any \blue{outstanding operations} initiated by
+    \id{S_1} have been properly \blue{flushed}, i.e., executed by enough servers. This requires an
+    \red{explicit leadership takeover} by which other servers are informed before sending out new accept
+    messages.
+  \end{block}
+\end{slide}
+\subsection{Consensus in faulty systems with arbitrary failures}
+\begin{slide}{Consensus under arbitrary failure semantics}
+  \begin{block}{Essence}
+    We consider process groups in which communication between process is \blue{inconsistent}.
+  \end{block}
+  \begin{center}
+    \begin{tabular}{c@{\hspace{48pt}}c}
+      \includefigure{08-14a} &
+      \includefigure{08-14b} \\
+      Improper forwarding & Different messages
+    \end{tabular}
+  \end{center}
+\end{slide}
+\begin{slide}{Consensus under arbitrary failure semantics}
+  \begin{block}{System model}
+    \begin{itemize}\tightlist
+    \item We consider a \red{primary} \id{P} and \mathexpr{n-1} \red{backups}
+      \mathexpr{\id{B_1},\ldots,\id{B_{n-1}}}.
+    \item A client sends \mathexpr{\id{v} \in \{\id{T},\id{F}\}} to \id{P}
+    \item Messages may be \blue{lost}, but this can be detected.
+    \item Messages \blue{cannot be corrupted} beyond detection.
+    \item A receiver of a message can \blue{reliably detect its sender}.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Byzantine agreement: requirements}
+    \begin{description}[BA2:]\tightlist
+    \item[BA1:] Every nonfaulty backup process stores the same value.
+    \item[BA2:] If the primary is nonfaulty then every nonfaulty backup process stores exactly what the primary
+      had sent.
+    \end{description}
+  \end{block}
+  \begin{alertblock}{Observation}
+    \begin{itemize}\tightlist
+    \item Primary faulty \mathexpr{\Rightarrow} BA1 says that backups may store the same, but different (and
+      thus wrong) value than originally sent by the client. 
+    \item Primary not faulty \mathexpr{\Rightarrow} satisfying BA2 implies that BA1 is satisfied.
+    \end{itemize}
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Why having \mathexpr{\mathbf{3k}} processes is not enough}
+  \begin{center}
+    \renewcommand{\arraystretch}{6}
+    \begin{tabular}{c@{\hspace*{1cm}}c}
+      \multicolumn{2}{c}{\includefigure{08-15l}} \\
+      \includefigure{08-15a} &
+      \includefigure{08-15b} \\
+    \end{tabular}
+  \end{center}
+\end{slide}
+\begin{slide}{Why having \mathexpr{\mathbf{3k+1}} processes is enough}
+  \begin{center}
+    \renewcommand{\arraystretch}{6}
+    \begin{tabular}{c@{\hspace*{1cm}}c}
+      \multicolumn{2}{c}{\includefigure{08-16l}} \\
+      \includefigure{08-16a} &
+      \includefigure{08-16b} \\
+    \end{tabular}
+  \end{center}
+\end{slide}
+\begin{slide}{Practical Byzantine Fault Tolerance (PBFT)}
+  \begin{block}{Background}
+    One of the first solutions that managed to Byzantine fault tolerance while keeping performance
+    acceptable. Popularity has increased with the introduction of \blue{permissioned blockchains}.
+  \end{block}
+
+  \begin{block}{Assumptions}
+    \begin{itemize}
+    \item A server may exhibit arbitrary failures
+    \item Messages may be lost, delayed, and received out of order
+    \item Messages have an \blue{identifiable sender} (i.e., they are \blue{signed})
+    \item \blue{Partially synchronous} execution model
+    \end{itemize}
+  \end{block}
+
+  \begin{alertblock}{Essence}
+    A \blue{primary-backup approach} with \mathexpr{3k+1} replica servers.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{PBFT: four phases}
+  \begin{centerfig}
+    \includefigure{08-18}
+  \end{centerfig}
+  \begin{itemize}\tightlist
+  \item \id{C} is the client
+  \item \id{P} is the primary
+  \item \id{B_1}, \id{B_2}, \id{B_3} are backups
+  \item Assume \id{B_2} is faulty
+  \end{itemize}
+\end{slide}
+\begin{slide}{PBFT: four phases}
+  \begin{centerfig}
+    \includefigure{08-18}
+  \end{centerfig}
+  \begin{itemize}\tightlist
+  \item All servers assume to be working in a current \red{view} \id{v}.
+  \item \id{C} requests operation \id{o} to be executed
+  \item \id{P} \blue{timestamps} \id{o} and sends \red{\mathexpr{\msg{pre-prepare}(t,v,\id{o})}}
+  \item Backup \id{B_i} accepts the pre-prepare message if it is also is in \id{v} and has not accepted a
+    an operation with timestamp \id{t} before.
+  \end{itemize}
+\end{slide}
+\begin{slide}{PBFT: four phases}
+  \begin{centerfig}
+    \includefigure{08-18}
+  \end{centerfig}
+  \begin{itemize}\tightlist
+  \item \id{B_i} broadcasts \mathexpr{\msg{prepare}(t,v,\id{o})} to all (including the primary)
+  \item \red{Note}: a nonfaulty server will eventually log \mathexpr{2k} messages
+    \mathexpr{\msg{prepare}(t,v,\id{o})} (including its own) \mathexpr{\Rightarrow} consensus on the ordering
+    of \id{o}.
+  \item \red{Note}: it doesn't matter what faulty \id{B_2} sends, it cannot affect joint decisions by \id{P},
+    \id{B_1}, \id{B_3}.
+  \end{itemize}
+\end{slide}
+\begin{slide}{PBFT: four phases}
+  \begin{centerfig}
+    \includefigure{08-18}
+  \end{centerfig}
+  \begin{itemize}\tightlist
+  \item All servers broadcast \red{\mathexpr{\msg{commit}(t,v,\id{o})}}
+  \item The commit is needed to also make sure that \id{o} can be executed \blue{now}, that is, in the current
+    view \id{v}.
+  \item When \id{2k} messages have been collected, excluding its own, the server can safely execute \id{o} en
+    reply to the client.
+  \end{itemize}
+\end{slide}
+\begin{slide}{PBFT: when the primary fails}
+  \begin{block}{Issue}
+    When a backup detects the primary failed, it will broadcast a \red{view change} to view \mathexpr{v+1}. We
+    need to ensure that any \blue{outstanding request} is executed \blue{once and only once} by all nonfaulty
+    servers. The operation needs to be handed over to the new view.
+  \end{block}
+
+  \begin{block}{Procedure}
+    \begin{itemize}
+    \item The next primary \id{P^*} is known deterministically
+    \item A backup server broadcasts \red{\mathexpr{\msg{view-change}(v+1,\set{P})}}: \set{P} is the set of
+      prepares it had sent out.
+    \item \id{P^*} waits for \mathexpr{2k+1} view-change messages, with \mathexpr{\set{X} = \bigcup\set{P}}
+      containing all previously sent prepares.
+    \item \id{P^*} sends out \red{\msg{new-view}(v+1,\set{X},\set{O})} with \set{O} a new set of pre-prepare
+      messages.
+    \item \red{Essence}: this allows the nonfaulty backups to \blue{replay} what has gone on in the previous
+      view, if necessary, and bring \id{o} into the new view \id{v+1}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Consensus in blockchain systems}
+\subsection{Some limitations on realizing fault tolerance}
+\begin{slide}{Realizing fault tolerance}
+  \begin{block}{Observation}
+    Considering that the members in a fault-tolerant process group are so tightly coupled, we may bump into
+    considerable performance problems, but perhaps even situations in which realizing fault tolerance is
+    impossible. 
+  \end{block}
+  \begin{block}{Question}
+    Are there limitations to what can be readily achieved?
+    \begin{itemize}
+    \item What is needed to enable reaching consensus?
+    \item What happens when groups are partitioned?
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Distributed consensus: when can it be reached}
+  \begin{centerfig}
+    \includefigure[0.25]{08-19}
+  \end{centerfig}
+  \begin{block}{Formal requirements for consensus}
+    \begin{itemize}\tightlist
+    \item Processes produce the same output value
+    \item Every output value must be valid  
+    \item Every process must eventually provide output
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Consistency, availability, and partitioning}
+  \begin{block}{CAP theorem}
+    Any networked system providing shared data can provide only two of the following three
+    properties:
+    \begin{itemize}
+    \item[\red{C}:] \blue{consistency}, by which a shared and replicated data item appears as a single,
+      up-to-date copy
+    \item[\red{A}:] \blue{availability}, by which updates will always be eventually executed
+    \item[\red{P}:] Tolerant to the \blue{partitioning} of process group.
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Conclusion}
+    In a network subject to communication failures, it is impossible to realize an atomic read/write
+    \blue{shared memory} that guarantees a response to every request.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{CAP theorem intuition}
+  \begin{block}{Simple situation: two interacting processes}
+    \begin{itemize}
+    \item \id{P} and \id{Q} can no longer communicate:
+      \begin{itemize}
+      \item Allow \id{P} and \id{Q} to go ahead \mathexpr{\Rightarrow} no consistency
+      \item Allow only one of \id{P}, \id{Q} to go ahead \mathexpr{\Rightarrow} no availability
+      \end{itemize}
+    \item \id{P} and \id{Q} have to be assumed to continue communication \mathexpr{\Rightarrow} no
+      partitioning allowed.
+    \end{itemize}
+  \end{block}
+
+  \onslide<2->
+  \begin{alertblock}{Fundamental question}
+    What are the practical ramifications of the CAP theorem?
+  \end{alertblock}
+\end{slide}
+\subsection{Failure detection}
+\begin{slide}{Failure detection}
+  \begin{block}{Issue}
+    How can we \red{reliably detect} that a process has \red{actually crashed}?
+  \end{block}
+  \begin{block}{General model}
+    \begin{itemize}
+    \item Each process is equipped with a failure detection module
+    \item A process \id{P} \blue{probes} another process \id{Q} for a reaction
+    \item If \id{Q} reacts: \id{Q} is considered to be alive (by \id{P})
+    \item If \id{Q} does not react with \id{t} time units: \id{Q} is \blue{suspected} to have crashed
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Observation for a \red{synchronous} system}
+    \begin{center}
+      a suspected crash \mathexpr{\equiv} a known crash
+    \end{center}
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Practical failure detection}
+  \begin{block}{Implementation}
+    \begin{itemize}
+    \item If \id{P} did not receive \blue{heartbeat} from \id{Q} within time \mathexpr{t}: \red{\id{P}
+      suspects \id{Q}}.
+    \item If \id{Q} later sends a message (which is received by \id{P}):
+      \begin{itemize}
+      \item \id{P} stops suspecting \id{Q}
+      \item \id{P} increases the timeout value \mathexpr{t}
+      \end{itemize}
+    \item \red{Note}: if \id{Q} did crash, \id{P} will keep suspecting \id{Q}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\section{Reliable client-server communication}
+\subsection{Point-to-point communication}
+\subsection{RPC semantics in the presence of failures}
+\begin{slide}{Reliable remote procedure calls}
+  \begin{block}{What can go wrong?}
+    \begin{enumerate}
+    \item The client is unable to locate the server.
+    \item The request message from the client to the server is lost.
+    \item The server crashes after receiving a request.
+    \item The reply message from the server to the client is lost.
+    \item The client crashes after sending a request.
+    \end{enumerate}
+  \end{block}
+  \onslide<2->
+  \begin{block}{Two ``easy'' solutions}
+    \begin{itemize}
+    \item[1:] (cannot locate server): just report back to client
+    \item[2:] (request was lost): just resend message
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Reliable RPC: server crash}
+  \begin{center}
+    \begin{tabular}{c@{\hspace*{36pt}}c@{\hspace*{36pt}}c}
+      \includefigure{08-20a} &
+      \includefigure{08-20b} &
+      \includefigure{08-20c} \\
+      \\
+      (a) & (b) & (c) \\
+    \end{tabular}
+  \end{center}
+  \begin{block}{Problem}
+    Where (a) is the normal case, situations (b) and (c) require different solutions. However, we don't know
+    what happened. Two approaches:
+    \begin{itemize}
+    \item \red{At-least-once-semantics:} The server guarantees it will carry out an operation at least once,
+      no matter what.
+    \item \red{At-most-once-semantics:} The server guarantees it will carry out an operation at most once.
+    \end{itemize}
+  \end{block}
+\end{slide}
+  \begin{slide}{Why fully transparent server recovery is impossible}
+    \begin{block}{Three type of events at the server}
+      (Assume the server is requested to update a document.)
+      \begin{itemize}\tightlist
+      \item[M:] send the completion message
+      \item[P:] complete the processing of the document
+      \item[C:] crash
+      \end{itemize}
+    \end{block}
+    \begin{block}{Six possible orderings}
+      (Actions between brackets never take place)
+      \begin{enumerate}\tightlist
+      \item \mathexpr{M \rightarrow P \rightarrow C}: Crash after reporting completion.
+      \item \mathexpr{M \rightarrow C \rightarrow P}: Crash after reporting completion, but before the update.
+      \item \mathexpr{P \rightarrow M \rightarrow C}: Crash after reporting completion, and after the update.
+      \item \mathexpr{P \rightarrow C (\rightarrow M)}: Update took place, and then a crash.
+      \item \mathexpr{C (\rightarrow P \rightarrow M)}: Crash before doing anything
+      \item \mathexpr{C (\rightarrow M \rightarrow P)}: Crash before doing anything
+      \end{enumerate}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Why fully transparent server recovery is impossible}
+    \begin{centerfig}
+      \includefigure[0.83]{08-21}
+    \end{centerfig}
+  \end{slide}
+\begin{slide}{Reliable RPC: lost reply messages}
+  \begin{block}{The real issue}
+    What the client notices, is that it is not getting an answer. However, it \blue{cannot decide} whether
+    this is caused by a \blue{lost request}, \blue{a crashed server}, or a \blue{lost response}.
+  \end{block}
+  \begin{block}{Partial solution}
+    Design the server such that its operations are \red{idempotent}: repeating the same operation is the same
+    as carrying it out exactly once:
+    \begin{itemize}\tightlist
+    \item pure read operations
+    \item strict overwrite operations 
+    \end{itemize}
+    Many operations are \blue{inherently nonidempotent}, such as many banking transactions.
+  \end{block}
+\end{slide}
+\begin{slide}{Reliable RPC: client crash}
+  \begin{block}{Problem}
+    The server is doing work and holding resources for nothing (called doing an \red{orphan} computation).
+  \end{block}
+  \begin{block}{Solution}
+    \begin{itemize}
+    \item \blue{Orphan is killed} (or rolled back) by the client when it recovers
+    \item Client broadcasts \blue{new epoch number} when recovering \mathexpr{\Rightarrow} server kills
+      client's orphans
+    \item Require computations to \blue{complete in a \mathexpr{T} time units}. Old ones are simply removed.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\section{Reliable group communication}
+\subsection{Introduction}
+\begin{slide}{Simple reliable group communication}
+  \begin{block}{Intuition}
+    A message sent to a process group \mathexpr{\set{G}} should be delivered to each member of
+    \mathexpr{\set{G}}. \red{Important}: make distinction between receiving and delivering messages.
+  \end{block}
+  \begin{centerfig}
+    \includefigure{08-22}
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Less simple reliable group communication}
+  \begin{block}{Reliable communication in the presence of faulty processes}
+    Group communication is reliable when it can be guaranteed that a message is \blue{received and
+      subsequently delivered} by all \blue{nonfaulty group members}.
+  \end{block}
+  \begin{block}{Tricky part}
+    Agreement is needed on what the group actually looks like before a received message can be delivered.
+  \end{block}
+\end{slide}
+\begin{slide}{Simple reliable group communication}
+  \begin{block}{Reliable communication, but assume nonfaulty processes}
+    Reliable group communication now boils down to \red{reliable multicasting}: is a message received and
+    delivered to each recipient, \blue{as intended by the sender}.
+  \end{block}
+  \begin{centerfig}
+    \begin{tabular}{c}
+      \includefigure{08-24a} \\
+      \includefigure{08-24b} \\
+    \end{tabular}
+  \end{centerfig}
+\end{slide}
+\subsection{Scalability in reliable multicasting}
+\subsection{Atomic multicast}
+\section{Distributed commit}
+\begin{slide}{Distributed commit protocols}
+  \begin{block}{Problem}
+    Have an operation being performed by each member of a process group, or none at all.
+    \begin{itemize}
+    \item \blue{Reliable multicasting}: a message is to be delivered to all recipients.
+    \item \blue{Distributed transaction}: each local transaction must succeed.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Two-phase commit protocol (2PC)}
+  \begin{block}{Essence}
+    The client who initiated the computation acts as \red{coordinator}; processes required
+    to commit are the \blue{participants}.
+    \begin{itemize}
+    \item \red{Phase 1a:} Coordinator sends \msg{vote-request} to participants (also called a \blue{pre-write})
+    \item \red{Phase 1b:} When participant receives \msg{vote-request} it returns either \msg{vote-commit} or
+      \msg{vote-abort} to coordinator. If it sends \msg{vote-abort}, it aborts its local computation
+    \item \red{Phase 2a:} Coordinator collects all votes; if all are \msg{vote-commit}, it sends
+      \msg{global-commit} to all participants, otherwise it sends \msg{global-abort}
+    \item \red{Phase 2b:} Each participant waits for \msg{global-commit} or \msg{global-abort} and handles
+      accordingly.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{2PC - Finite state machines}
+  \begin{centerfig}
+    \begin{tabular}{cc}
+      \includefigure{08-32a} &
+      \includefigure{08-32b} \\
+      Coordinator & Participant \\
+    \end{tabular}
+  \end{centerfig}
+\end{slide}
+\begin{slide}{2PC -- Failing participant}
+  \begin{block}{Analysis: participant crashes in state \id{S}, and recovers to \id{S}}
+    \begin{itemize}
+    \item<1,5> \red{\id{INIT}}: No problem: participant was unaware of protocol
+    \item<2,5> \red{\id{READY}}: Participant is waiting to either commit or abort. After recovery,
+      participant needs to know which state transition it should make \mathexpr{\Rightarrow} log the
+      coordinator's decision
+    \item<3,5> \red{\id{ABORT}}: Merely make entry into abort state \blue{idempotent}, e.g., removing the
+      workspace of results
+    \item<4,5> \red{\id{COMMIT}}: Also make entry into commit state idempotent, e.g., copying workspace to
+      storage.
+    \end{itemize}
+  \end{block}
+  \onslide<5->
+  \begin{alertblock}{Observation} 
+    When distributed commit is required, having participants use temporary workspaces to keep their results
+    allows for simple recovery in the presence of failures.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{2PC -- Failing participant}
+  \begin{block}{Alternative} 
+    When a recovery is needed to \id{READY} state, check state of other participants \mathexpr{\Rightarrow} no
+    need to log coordinator's decision.
+  \end{block}
+  \begin{exampleblock}{Recovering participant \id{P} contacts another participant \id{Q}}
+    \begin{center}\footnotesize
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{|l|l|}\hline
+        \textbf{State of \id{Q}} 	& \textbf{Action by \id{P}} 	\\ \hline
+        \id{COMMIT}	&	Make transition to \id{COMMIT} 			\\ \hline
+        \id{ABORT}	&	Make transition to \id{ABORT}			\\ \hline
+        \id{INIT}	&	Make transition to \id{ABORT}			\\ \hline
+        \id{READY}	&	Contact another participant			\\ \hline
+      \end{tabular}
+    \end{center}
+  \end{exampleblock}
+  \begin{block}{Result}
+    If all participants are in the \id{READY} state, the protocol blocks. Apparently, the coordinator is
+    failing. \red{Note:} The protocol prescribes that we need the decision from the coordinator.
+  \end{block}
+\end{slide}
+\begin{slide}{2PC -- Failing coordinator}
+  \begin{block}{Observation} 
+    The real problem lies in the fact that the coordinator's final decision may not be available for some time
+    (or actually lost).
+  \end{block}
+  \begin{block}{Alternative} 
+    Let a participant \id{P} in the \id{READY} state timeout when it hasn't received the coordinator's
+    decision; \id{P} tries to find out what other participants know (as discussed).
+  \end{block}
+  \begin{block}{Observation} 
+    Essence of the problem is that a recovering participant cannot make a \blue{local} decision: it is
+    dependent on other (possibly failed) processes
+  \end{block}
+\end{slide}
+  \begin{slide}{Coordinator in Python}
+    \begin{tabular}{l}
+      \begin{adjustbox}{scale=0.8}
+        \begin{minipage}{0.8\linewidth}
+          \includelisting{08-34/coordinator-book}
+        \end{minipage}
+      \end{adjustbox}
+    \end{tabular}
+  \end{slide}
+  \begin{slide}{Participant in Python}
+    \begin{tabular}{l}
+      \begin{adjustbox}{scale=0.8}
+        \begin{minipage}{0.8\linewidth}
+          \includelisting{08-34/participant-book}
+        \end{minipage}
+      \end{adjustbox}
+    \end{tabular}
+  \end{slide}
+\section{Recovery}
+\subsection{Introduction}
+\begin{slide}{Recovery: Background}
+  \begin{block}{Essence}
+    When a failure occurs, we need to bring the system into an error-free state:
+    \begin{itemize}
+    \item \red{Forward error recovery}: Find a new state from which the system can continue operation
+    \item \red{Backward error recovery}: Bring the system back into a \blue{previous} error-free state
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Practice} 
+    Use backward error recovery, requiring that we establish \red{recovery points}
+  \end{alertblock}
+  \begin{block}{Observation} 
+    Recovery in distributed systems is complicated by the fact that processes need to cooperate in identifying
+    a \blue{consistent state} from where to recover
+  \end{block}
+\end{slide}
+\subsection{Checkpointing}
+\begin{slide}{Consistent recovery state}
+  \begin{alertblock}{Requirement} 
+    Every message that has been received is also shown to have been sent in the state of the sender.
+  \end{alertblock}
+  \begin{block}{Recovery line} 
+    Assuming processes regularly \blue{checkpoint} their state, the most recent \blue{consistent global
+      checkpoint}.
+  \end{block}
+  \begin{centerfig}
+    \includefigure{08-37}
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Coordinated checkpointing}
+  \begin{block}{Essence} 
+    Each process takes a checkpoint after a globally coordinated action.
+  \end{block}
+  \begin{block}{Simple solution}
+    Use a two-phase blocking protocol:
+    \begin{itemize}\tightlist
+    \item<2-> A coordinator multicasts a \blue{checkpoint request} message
+    \item<3-> When a participant receives such a message, it takes a checkpoint, stops sending (application)
+      messages, and reports back that it has taken a checkpoint
+    \item<4-> When all checkpoints have been confirmed at the coordinator, the latter broadcasts a
+      \blue{checkpoint done} message to allow all processes to continue
+    \end{itemize}
+  \end{block}
+  \onslide<5->
+  \begin{block}{Observation} 
+    It is possible to consider only those processes that depend on the recovery of the coordinator, and ignore
+    the rest
+  \end{block}
+\end{slide}
+\begin{slide}{Cascaded rollback}
+  \begin{block}{Observation} 
+    If checkpointing is done at the ``wrong'' instants, the recovery line may lie at system startup time. We
+    have a so-called \red{cascaded rollback}.
+  \end{block}
+  \begin{centerfig}
+    \includefigure{08-38}
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Independent checkpointing}
+  \begin{block}{Essence}
+    Each process independently takes checkpoints, with the risk of a cascaded rollback to system startup.
+    \begin{itemize}
+    \item<2-> Let \CP{i}{m} denote \mathexpr{m^{\mbox{\scriptsize th}}} checkpoint of process \id{P_i} and
+      \INT{i}{m} the interval between \CP{i}{m-1} and \CP{i}{m}.
+    \item<3-> When process \id{P_i} sends a message in interval \INT{i}{m}, it piggybacks \mathexpr{(i,m)}
+    \item<4-> When process \id{P_j} receives a message in interval \INT{j}{n}, it records the dependency
+      \INT{i}{m} \mathexpr{\rightarrow} \INT{j}{n}.
+    \item<5-> The dependency \INT{i}{m} \mathexpr{\rightarrow} \INT{j}{n} is saved to storage when taking
+      checkpoint \CP{j}{n}.
+    \end{itemize}
+  \end{block}
+  \onslide<6->
+  \begin{block}{Observation} 
+    If process \id{P_i} rolls back to \CP{i}{m-1}, \id{P_j} must roll back to \CP{j}{n-1}. 
+  \end{block}
+\end{slide}
+\subsection{Message logging}
+\begin{slide}{Message logging}
+  \begin{alertblock}{Alternative} 
+    Instead of taking an (expensive) checkpoint, try to \blue{replay} your (communication) behavior from the
+    most recent checkpoint \mathexpr{\Rightarrow} store messages in a log.
+  \end{alertblock}
+  \begin{block}{Assumption}
+    We assume a \red{piecewise deterministic} execution model:
+    \begin{itemize}\tightlist
+    \item The execution of each process can be considered as a sequence of state intervals
+    \item Each state interval starts with a nondeterministic event (e.g., message receipt)
+    \item Execution in a state interval is deterministic
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Conclusion} 
+    If we record nondeterministic events (to replay them later), we obtain a deterministic execution model
+    that will allow us to do a complete replay.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Message logging and consistency}
+  \begin{block}{When should we actually log messages?}
+    Avoid \red{orphan processes}:
+    \begin{itemize}\tightlist
+    \item Process \id{Q} has just received and delivered messages \id{m_1} and \id{m_2}
+    \item Assume that \id{m_2} is never logged.
+    \item After delivering \id{m_1} and \id{m_2}, \id{Q} sends message \id{m_3} to process \id{R}
+    \item Process \id{R} receives and subsequently delivers \id{m_3}: it is an orphan.
+    \end{itemize}
+  \end{block}
+  \begin{centerfig}
+    \includefigure{08-39} 
+  \end{centerfig}
+\end{slide}
+  \begin{slide}{Message-logging schemes}
+    \begin{block}{Notations}
+      \begin{itemize}
+      \item \DEP{m}: processes to which \id{m} has been delivered. If message \id{m^*} is causally dependent
+        on the delivery of \id{m}, and \id{m^*} has been delivered to \id{Q}, then \mathexpr{\id{Q} \in
+          \DEP{m}}.
+      \item \COPY{m}: processes that have a copy of \id{m}, but have not (yet) reliably stored it.
+      \item \FAIL: the collection of crashed processes.
+      \end{itemize}
+    \end{block}
+    \begin{alertblock}{Characterization}
+      \[ 
+      \id{Q} \mbox{\ is orphaned} \Leftrightarrow \exists \id{m}: \id{Q} \in \DEP{m} \mbox{\ and\ } \COPY{m}
+      \subseteq \FAIL
+      \]
+    \end{alertblock}
+  \end{slide}
+  \begin{slide}{Message-logging schemes}
+    \begin{block}{Pessimistic protocol} 
+      For each \blue{nonstable} message \id{m}, there is at most one process dependent on \id{m}, that is
+      \mathexpr{|\DEP{m}| \leq 1}.
+    \end{block}
+    \begin{alertblock}{Consequence} 
+      An unstable message in a pessimistic protocol \blue{must} be made stable before sending a next message.
+    \end{alertblock}
+  \end{slide}
+  \begin{slide}{Message-logging schemes}
+    \begin{block}{Optimistic protocol} 
+      For each unstable message \id{m}, we ensure that if \mathexpr{\COPY{m} \subseteq \FAIL}, then eventually
+      also \mathexpr{\DEP{m} \subseteq \FAIL}.
+    \end{block}
+    \begin{alertblock}{Consequence} 
+      To guarantee that \mathexpr{\DEP{m} \subseteq \FAIL}, we generally roll back each orphan process \id{Q}
+      until \mathexpr{\id{Q} \not\in \DEP{m}}.
+    \end{alertblock}
+  \end{slide}
+\section{Summary}

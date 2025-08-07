@@ -1,0 +1,823 @@
+\part{Security}
+\section{Introduction to security}
+\subsection{Security threats, policies, and mechanisms}
+\begin{slide}{Dependability}
+  \begin{block}{Basics}
+    A dependable system provides availability, reliability, safety, maintainability, confidentiality, and
+    integrity.
+    \begin{itemize}
+    \item \red{Confidentiality}: refers to the property that information is disclosed
+      only to authorized parties.
+    \item \red{Integrity}: alterations to a system's assets can be made only in an authorized way, ensuring
+      accuracy and completeness.
+    \end{itemize}
+  \end{block}
+
+  \onslide<2->
+  \begin{block}{Alternative}
+    We attempt to protect against \blue{security threats}:
+    \begin{enumerate}
+    \item Unauthorized information disclosure (\blue{confidentiality})
+    \item Unauthorized information modification (\blue{integrity})
+    \item Unauthorized denial of use (\blue{availability})
+    \end{enumerate}
+  \end{block}
+\end{slide}
+\begin{slide}{Security mechanisms}
+  \begin{itemize}
+  \item \red{Encryption}: transform data to something an attacker cannot understand, or that can be checked
+    for modificatons.
+  \item \red{Authentication}: verify a claimed identity.
+  \item \red{Authorization}: check an authenticated entity whether it has the proper rights to access resources.
+  \item \red{Monitoring and auditing}: (continuously) trace access to resources
+  \end{itemize}
+\end{slide}
+\subsection{Design issues}
+\begin{slide}{Security principles}
+  \begin{itemize}
+  \item \red{Fail-safe defaults}: defaults should already provide good protection. \green{Infamous example}:
+    the default ``\blue{\emph{admin},\emph{admin}}'' for edge devices. 
+  \item \red{Open design}: \blue{do not} apply security by obscurity: every aspect of a distributed system is
+    open for review.
+  \item \red{Separation of privilege}: ensure that critical aspects of a system can never be fully controlled
+    by just a single entity.
+  \item \red{Least privilege}: a process should operate with the fewest possible privileges.
+  \item\red{Least common mechanism}: if multiple components require the same mechanism, then they should all
+    be offered the same implementation of that mechanism.
+  \end{itemize}
+\end{slide}
+\begin{slide}{Where to implement security mechanisms?}
+  \begin{centerfig}
+    \includefigure{09-01}
+  \end{centerfig}
+
+  \begin{block}{Observation}
+    We are increasingly seeing \red{end-to-end} security, meaning that mechanisms are implemented at the level
+    of applications.
+  \end{block}
+
+  \onslide<2->
+  \begin{block}{Issue: which layer do we trust?}
+    \red{Trusted Computing Base}: The set of all security mechanisms in a (distributed) computer system that
+    are necessary and sufficient to enforce a security policy.
+  \end{block}
+\end{slide}
+\begin{slide}{On privacy}
+  \begin{block}{Observation}
+    Privacy and confidentiality are closely related, yet are different. \red{Privacy} can be \blue{invaded},
+    whereas \red{confidentiality} can be \blue{breached} \mathexpr{\Rightarrow} ensuring confidentiality is
+    not enough to guarantee privacy.
+  \end{block}
+
+  \onslide<2->
+  \begin{block}{Right to privacy}
+    The right to privacy is about ``a right to \blue{appropriate} flow of personal information.'' Control who
+    gets to see what, when, and how \mathexpr{\Rightarrow} a person should be able to stop and revoke a flow
+    of personal information.
+  \end{block}
+
+  \onslide<3->
+  \begin{alertblock}{General Data Protection Regulation (GDPR)}
+    The GDPR is a comprehensive set of regulations aiming to \blue{protect personal data}. 
+  \end{alertblock}
+\end{slide}
+\begin{slide}{GDPR: Database perspective}
+  \footnotesize\sffamily
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{|>{\RRCOL}p{0.5\textwidth}|>{\RRCOL}p{0.2\textwidth}|>{\RRCOL}p{0.22\textwidth}|}\hline
+    \multicolumn{1}{|c|}{\textbf{GDPR regulation}} &
+    \multicolumn{2}{c|}{\textbf{Impact on database systems}} \\ \cline{2-3}
+    & \multicolumn{1}{c|}{\textbf{Attributes}} & \multicolumn{1}{c|}{\textbf{Actions}} \\ \whline
+    Collect data for explicit purposes & Purpose & Metadata indexing \\ \hline
+    Do not store data indefinitely & TTL & Timely deletion \\ \hline
+    Inform customers about GDPR metadata associated with their data & Purpose, TTL, Origin, Sharing &
+    Metadata indexing \\ \hline
+    Allow customers to access their data & Person id & Metadata indexing \\ \hline
+    Allow customers to erase their data & TTL & Timely deletion \\ \hline
+    Do not use data for objected reasons & Objections & Metadata indexing \\ \hline
+    Allow customers to withdraw from algorithmic decision-making & Automated decisions &
+    Metadata indexing \\ \hline
+    Safeguard and restrict access to data & & Access control \\ \hline
+    Do not grant unlimited access to data & & Access control \\ \hline
+    Audit operations on personal data & Audit trail & Monitor and log \\ \hline
+    Implement appropriate data security & & Encryption \\ \hline
+    Share audit trails from affected systems & Audit trail & Monitor and log \\ \hline
+  \end{tabular}
+\end{slide}
+\section{Cryptography}
+\subsection{Basics}
+\begin{slide}{Cryptography}
+  \begin{centerfig}
+    \includefigure{09-03}
+  \end{centerfig}
+  
+  \begin{block}{Basic concepts}
+    \begin{itemize}
+    \item \red{Plaintext}: the original message or data (\id{P})
+    \item \red{Ciphertext}: the encrypted version of the the plaintext (\id{C})
+    \item \red{Encryption key}: input \id{E_K} to a function for encryption: \mathexpr{\id{C} = E_K(\id{P})}
+    \item \red{Decryption key}: input \id{D_K} to a function for decryption: \mathexpr{\id{P} = D_K(\id{C})}
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Symmetric and asymmetric cryptosystems}
+\begin{slide}{Cryptosystems}
+  \begin{description}[Asymmetric]
+  \item[\red{Symmetric}]:
+    \(
+    \mbox{\itshape if\ } \id{P} = D_K(E_K(\id{P})) \mbox{\itshape \ then\ } \id{D_K} = \id{E_K}.
+    \)
+  \item[\red{Asymmetric}]:
+    \(
+    \mbox{\itshape if\ } \id{P} = D_{K}(E_{K}(\id{P})) \mbox{\itshape \ then\ } \id{D_{K}} \neq \id{E_{K}}.
+    \) \\
+    Also called \blue{public-key systems} with a \blue{publicly known} key \id{PK} and \blue{secret key} \id{SK}
+  \end{description}
+  
+  \begin{exampleblock}{Examples}
+    Let \id{PK_X} denote public key of \id{X} and \id{SK_X} the associated secret key.
+    \begin{description}[Authenticated message]
+    \item[\red{Confidential message}]:
+      \(
+      \mbox{\itshape if \id{m} is to be kept private:\ }\id{C} = PK_{receiver}(\id{m}).
+      \)
+    \item[\red{Authenticated message}]:
+      \(
+      \mbox{\itshape if \id{m} is to be authenticated:\ }\id{C} = SK_{sender}(\id{m}).
+      \)
+    \end{description}
+  \end{exampleblock}
+
+  \begin{block}{Homomorphic encryption}
+    Mathematical operations on plaintext can be performed on the corresponding ciphertext: if
+    \mathexpr{x} and \mathexpr{y} are two numbers, then
+    \[
+    E_{K}(x) \star E_{K}(y) = E_{K}( x \star y )
+    \]  
+  \end{block}
+\end{slide}
+\subsection{Hash functions}
+\begin{slide}{Hash functions}
+  \begin{block}{Description}
+    A hash function \mathexpr{H} takes a message \id{m} of arbitrary length as input and produces a
+    bit string \id{h} having a fixed length as output:
+    \[
+    \id{h} = H(\id{m}) \mbox{\itshape \ with length of \id{h} fixed}.
+    \]    
+  \end{block}
+
+  \begin{exampleblock}{Example: digital signature}
+    Alice computes a digest from \id{m}; encrypts the digest with her private key; encrypted digest is sent
+    along with \id{m} to Bob:
+    \[
+    \mbox{Alice:\ \emph{send}\ }[\id{m}, \id{sig}]\mbox{\itshape\ with\ }\id{sig} = SK_A(H(\id{m})).
+    \]
+    Bob decrypts digest with Alice's public key; separately calculates the message digest. If both match, Bob
+    knows the message has been signed by Alice:
+    \[
+    \mbox{Bob:\ \emph{receive}\ }[\id{m}, \id{sig}]\mbox{\itshape,\ compute\ }\id{h^{\prime}} = H(\id{m})
+    \mbox{\itshape\ and verify\ }\id{h^{\prime}} = PK_A(\id{sig}).
+    \]
+  \end{exampleblock}
+\end{slide}
+\subsection{Key management}
+\begin{slide}{Key management}
+  \begin{block}{Essence}
+    How do Alice and Bob get the correct (often shared) keys so that they can set up secure channels?
+  \end{block}
+
+  \begin{block}{Diffie-Hellman key exchange}
+    Assume two large, nonsecret numbers \id{p} and \id{g} (with specific mathematical properties):
+    \begin{centerfig}
+      \includefigure{09-05}
+    \end{centerfig}
+  \end{block}
+  
+\end{slide}
+  \begin{slide}{DH key exchange: example}
+    \begin{block}{Multiparty computation}
+      Can we \blue{protect private data} while \blue{computing statistics}? Who has the highest salary without
+      revealing salaries? Can we compute the number of votes cast for a specific candidate without revealing
+      who voted for whom?
+    \end{block}
+
+    \onslide<2->
+    \begin{alertblock}{Oblivious transfer}
+      Alice has \mathexpr{n} \blue{secret messages} \mathexpr{\id{m_1}, \dots, \id{m_n}}. Bob is interested
+      (and allowed) to \blue{know only message} \id{m_i}. Which message he wants to know should be kept secret
+      to Alice; all messages \mathexpr{\id{m_j} \neq \id{m_i}} should be kept secret to Bob.
+    \end{alertblock}
+
+    \onslide<3->
+    \begin{alertblock}{Solution}
+      Bob generates a number \id{Q} that Alice, in turn, uses to generate \mathexpr{n} different
+      \red{encryption keys \mathexpr{\id{PK_1}, \ldots, \id{PK_n}}}:
+      \(
+      \id{m^*_i} = {PK_i}(\id{m_i})
+      \)
+      
+      Bob uses \id{Q} to generate a \red{decryption key \id{SK_i}} that matches \blue{only}
+      \id{PK_i}. When Bob receives \mathexpr{\id{m^*_1},\ldots,\id{m^*_n}} he can decrypt only
+      \id{m^*_i}. \mathexpr{SK_i(\id{m^*_j})} (with \mathexpr{i \neq j}) will fail.
+    \end{alertblock}
+  \end{slide}
+  \begin{slide}{1-out-of-2 oblivious transfer}
+    \begin{centerfig}
+      \includefigure{09-06}
+    \end{centerfig}
+
+    \begin{block}{Analysis}
+      \begin{itemize}
+      \item \mathexpr{c = 0 \Rightarrow \id{Q} = g^{y}, \id{AK_1} = \id{BK} = g^{xy}, \id{AK_2} = g^{xy-x^2}}.
+      \item \mathexpr{c = 1 \Rightarrow \id{Q} = g^{x+y}, \id{AK_1} = g^{x^2+xy}, \id{AK_2} = \id{BK} = g^{xy}}.
+      \end{itemize}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Example, continued}
+    \begin{block}{Preliminaries}
+      \begin{itemize}
+      \item \id{P_1} and \id{P_2} need to compute \mathexpr{F(a,b)}.
+      \item Parameter \mathexpr{a} is secret and known only to \id{P_1}; secret \mathexpr{b} known only to
+        \idsn{P_2}.
+      \item \mathexpr{a \in \set{X}} and \mathexpr{b \in \set{Y}}; \mathexpr{\set{X}} and
+        \mathexpr{\set{Y}} are finite.
+      \item Construct a \mathexpr{|\set{X}| \times |\set{Y}|} matrix \mathexpr{\set{F}}.
+      \item \mathexpr{\set{F}[i,j] = F(x_i,y_j)} for each pair \mathexpr{(x_i,y_j) \in \set{X} \times \set{Y}}.
+      \end{itemize}
+    \end{block}
+
+    \begin{block}{Solution}
+      \begin{itemize}
+      \item \id{P_1} generates \mathexpr{|\set{X}| \cdot |\set{Y}|} unique key pairs
+        \mathexpr{(\id{K_i},\id{K_j})}
+      \item Construct \mathexpr{\set{F^*}[i,j] = K_i(K_j(F(x_i,x_j)))}. Assume \mathexpr{a = x_i}).
+      \item \id{P_1} permutes \mathexpr{\set{F^*}} and sends it along with \id{K_i} to \id{P_2}
+      \item \id{P_1} sends \id{Q} using a 1-out-of-\mathexpr{|\set{Y}|} oblivious transfer.
+      \item Assume \mathexpr{b = y_j}. Using \id{Q}, \id{P_2} can construct \id{K_j}, and only \id{K_j}
+      \item \id{P_2} decrypts \mathexpr{\set{F^*}[i,j]}, corresponding to
+        \mathexpr{F(a,b)}.
+      \end{itemize}
+    \end{block}
+  \end{slide}
+\begin{slide}{What is needed to distribute keys}
+  \begin{block}{Symmetric-key distribution}
+    \begin{centerfig}
+      \includefigure{09-07a} \\
+    \end{centerfig}
+  \end{block}
+  \begin{alertblock}{Observation}
+    In general, we will need a \red{secure channel} to distribute the secret key to the communicating
+    parties. 
+  \end{alertblock}
+\end{slide}
+\begin{slide}{What is needed to distribute keys}
+  \begin{block}{Public-key distribution}
+    \begin{centerfig}
+      \includefigure{09-07b} \\
+    \end{centerfig}
+  \end{block}
+  \begin{alertblock}{Observation}
+    No need for a scure channel in the case of the public key, but you do need to know that the key is
+    \red{authentic} \mathexpr{\Rightarrow} have the public key be \blue{signed} by a \red{certification
+      authority}. Note, we do need to trust that authority, or otherwise make sure that its signature can be
+    verified as well.
+  \end{alertblock}
+\end{slide}
+\section{Authentication}
+\subsection{Introduction to authentication}
+\begin{slide}{Authentication}
+  \begin{block}{Essence}
+    Verifying the claimed identity of a person, a software component, a device, and so on.
+  \end{block}
+  \begin{block}{Means of authentication}
+    \begin{enumerate}\firmlist
+    \item Based on what a client \blue{knows}, such as a \red{password} or a \red{personal
+      identification number}.
+    \item Based on what a client \blue{has}, such as an \red{ID card}, \red{cell phone}, or \red{software
+      token}.
+    \item Based on what a client \blue{is}, i.e., static biometrics such as a \red{fingerprint} or \red{facial
+      characteristics}.
+    \item Based on what a client \blue{does}, i.e., dynamic biometrics such as \red{voice patterns} or
+      \red{typing patterns}.
+    \end{enumerate}
+  \end{block}
+\end{slide}
+\subsection{Authentication protocols}
+\begin{slide}{Authentication versus message integrity}
+  \begin{alertblock}{Observation}
+    Authentication without integrity (and \emph{vice versa}) is meaningles:
+    \begin{itemize}
+    \item Consider a system that supports authentication but no mechanisms to ensure message integrity. Bob
+      may know for sure that Alice sent \id{m}, but how useful is that if he doesn't know that \id{m} may have
+      been modified?
+    \item Consider a system that guarantees message integrity, but does not provide authentication. Can Bob be
+      happy with a guaranteed unmodified message that states he just won {\dollar}1,000,000?
+    \end{itemize}
+    
+  \end{alertblock}
+  
+\end{slide}
+\begin{slide}{Using a shared secret key}
+  \begin{centerfig}
+    \includefigure{09-08}
+  \end{centerfig}
+  
+  \begin{block}{Steps}
+    \begin{enumerate}
+    \item Alice announces she wants to talk to Bob.
+    \item Bob returns a \red{nonce}.
+    \item Alice encrypts the nonce with the shared key \id{K_{A,B}}, thus proving that she owns \id{K_{A,B}}
+      \mathexpr{\Rightarrow} \blue{Bob knows he's talking to Alice}.
+    \item Alice sends a nonce to Bob.
+    \item Bob returns proof that he owns the shared secret key as well \mathexpr{\Rightarrow} \blue{Alice
+      knows she's talking to Bob}.
+    \end{enumerate}
+  \end{block}
+\end{slide}
+  \begin{slide}{About optimizations}
+    \begin{block}{}
+      \begin{tabular}{p{3cm}l}
+        \vspace*{-3cm}
+        \blue{Let's reduce the number of messages} &
+        \includefigure{09-09}
+      \end{tabular}
+    \end{block}
+    
+    \onslide<2->
+    \begin{block}{}
+      \begin{tabular}{p{3cm}l}
+        \vspace*{-3cm}      
+        \red{We just broke the protocol} &
+        \includefigure{09-10}
+      \end{tabular}
+    \end{block}
+  \end{slide}
+\begin{slide}{Using a Key Distribution Center}
+  \begin{centerfig}
+    \includefigure{09-11}
+  \end{centerfig}
+  \begin{block}{Basics}
+    Every client has a secret key shared with the KDC.
+    \begin{enumerate}
+    \item Alice tells the KDC that she wants to talk to Bob
+    \item The KDC sends a fresh secret key, shared by Alice and Bob 
+    \end{enumerate}
+  \end{block}
+\end{slide}
+\begin{slide}{Using a Key Distribution Center}
+  \begin{centerfig}
+    \includefigure{09-12}
+  \end{centerfig}
+  \begin{block}{Basics}
+    Using a \red{ticket} is practically better:
+    \begin{enumerate}
+    \item Alice tells the KDC that she wants to talk to Bob
+    \item The KDC sends a fresh secret key, shared by Alice and Bob
+    \item Alice tells Bob that she wants to talk, along with the key to be used.
+    \end{enumerate}
+  \end{block}
+  
+\end{slide}
+  \begin{slide}{The Needham-Schroeder protocol}
+    \begin{centerfig}
+      \includefigure{09-13}
+    \end{centerfig}
+
+    \begin{alertblock}{Important observation}
+      In the case of request-response messages, you want to make sure that the received response, is
+      associated with the sent request. Mitigates \red{replay attacks}.
+    \end{alertblock}
+
+    \begin{block}{General principle}
+      Use \red{nonces} to relate any combination of request-response messages.
+    \end{block}
+  \end{slide}
+  \begin{slide}{Mitigate against reuse of keys}
+    \begin{centerfig}
+      \includefigure{09-14}
+    \end{centerfig}
+    \begin{exampleblock}{Some observations}
+      \begin{itemize}
+      \item Note how \id{B1} ties message \#2 to \#5
+      \item Note that by returning \mathexpr{\id{R_{A2}} - 1} in \#6, Bob proves he knows \id{K_{A,B}}
+      \item And, likewise, in the case of Alice in \#6 (by modifying \id{R_{B2}}).
+      \end{itemize}
+    \end{exampleblock}
+  \end{slide}
+\begin{slide}{Using public keys}
+  \begin{centerfig}
+    \includefigure{09-15}
+  \end{centerfig}
+  \begin{block}{Steps}
+    \begin{enumerate}
+    \item Alice tells Bob she wants to talk, sending a nonce \id{R_A}, and encrypting the message with Bob's
+      public key.
+    \item Bob generates a \blue{shared secret} \red{session key} \id{K_{A,B}}, \blue{proves he is the owner}
+      of \id{PK_B} by decrypting \id{R_A}, and challenges Alice to prove she owns \id{PK_A}.
+    \item Alice decrypts the response, and \blue{proves to Bob that she is Alice} by then sending Bob's nonce
+      back encrypted with the generated session key \id{K_{A,B}}.
+    \end{enumerate}
+  \end{block}
+\end{slide}
+\begin{slide}{Practical example: Kerberos}
+  \begin{centerfig}
+    \includefigure{09-16}
+  \end{centerfig}
+  \begin{block}{Essence}
+    \begin{enumerate}
+    \item[1,2] Alice types in her login name.
+    \item[3] The \red{Authentication Service} returns a \red{ticket} \id{K_{AS,TGS}(A,K_{A,TGS})} that she can
+      use with the \red{Ticket Granting Service}. 
+    \item[4,5] To be able to decrypt the message, Alice must type in her password. She is then logged
+      in. Using the AS in this way, we have a \red{single sign-on} system.
+    \item[6,7] Alice wants to talk to Bob, and requests the TGS for a session key.
+    \end{enumerate}
+  \end{block}
+  
+\end{slide}
+\begin{slide}{Transport Layer Security}
+  \begin{centerfig}
+    \includefigure{09-18}
+  \end{centerfig}
+  \begin{itemize}
+  \item \id{G} denotes a specific set of parameter settings, called a \blue{group} (e.g., values for \id{p}
+    and \id{g}).
+  \end{itemize}
+\end{slide}
+\begin{slide}{Transport Layer Security}
+  \begin{centerfig}
+    \includefigure{09-18}
+  \end{centerfig}
+  \begin{itemize}
+  \item The client uses a \red{nonce} \id{R_C}; the server uses \id{R_S}
+  \item \mathexpr{H(\id{m_1}|\id{m_2})} denotes the hash over the concatenation of \id{m_1} and \id{m_2}
+  \end{itemize}
+\end{slide}
+\section{Trust in distributed systems}
+\subsection{Trust in the face of Byzantine failures}
+\begin{slide}{On trust}
+  \begin{alertblock}{Definition}
+    \begin{quote}\itshape
+      Trust is the assurance that one entity holds that another will perform particular actions according to a
+      specific expectation.
+    \end{quote}
+  \end{alertblock}
+
+  \begin{block}{Important observation}
+    \begin{itemize}
+    \item Expectations have been made explicit \mathexpr{\Rightarrow} no need to talk about trust?
+    \item \green{Example}: Consider a Byzantine fault-tolerant process group of size \mathexpr{n}
+      \begin{itemize}
+      \item \blue{Specificiation}: the group can tolerate that at most \mathexpr{k \leq (n-1)/3} processes go
+        rogue.
+      \item \blue{Realisation}: for example PBFT.
+      \item \blue{Consequence}: if more than \mathexpr{k} processes fail, all bets are simply off. 
+      \item \blue{Consequence}: it's not about trust, it's all about meeting specifications.
+      \end{itemize}
+    \item \blue{Observation}: if a process group often does not meet its specifications, one may start to
+      doubt its \red{reliability}, but this is something else than (dis)trusting the system.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Trusting an identity}
+\begin{slide}{Sybil attack}
+  \begin{block}{Essence: Just create multiple identities, but owned by one entity}
+    \begin{itemize}
+    \item In the case of a peer-to-peer network:
+      \begin{centerfig}
+        \includelisting{09-19/sybil}
+      \end{centerfig}
+    \item<2-> In the case of a Web-of-trust:
+      \begin{itemize}
+      \item Endorse a public key without an out-of-band check.
+      \item \id{Bob} checks with \mathexpr{k > 1} others that they have endorsed \id{Alice}'s key.
+      \item \id{Alice} creates \mathexpr{k > 1} identities each stating her key is valid.
+      \end{itemize}
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Eclipse attack}
+  \begin{block}{Essence: Try to isolate a node from the network}
+    \green{Example}: a \blue{hub attack} in the case of a gossip-based service. In this case, when exchanging
+    links to other peers, a colluding node returns links only to other colluders. 
+    \begin{centerfig}
+      \includefigure{05-29}
+    \end{centerfig}
+    Affected node: has links only to colluders.
+  \end{block}
+  \begin{block}{General solution}
+    Use a centralized certification authority.
+  \end{block}
+\end{slide}
+\begin{slide}{Preventing Sybil attacks: Blockchain solutions}
+  \begin{block}{Essence: creating an identity comes at a cost}
+    In the case of \blue{permissionless blockchains}:
+    \begin{itemize}
+    \item \red{Proof-of-Work}: Let validators run a computational race. This approach requires considerable
+      \blue{computational resources}
+    \item \red{Proof-of-Stake}: Pick a validator as a function of the number of tokens it owns. This approach
+      requires risking \blue{loss of tokens}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Preventing Sybil attacks: Decentralized accounting}
+  \begin{exampleblock}{A simple example}
+    \begin{itemize}
+    \item Each node \id{P} maintains a list of nodes interested in doing work for \id{P}: the \red{choice set}
+      of \id{P} (\id{choice(P)}).
+    \item Selecting \mathexpr{\id{Q} \in \id{choice(P)}} depends on \id{Q}'s work for others (i.e., its
+      \red{reputation}).
+    \item \id{P} maintains a (\blue{subjective}) view on reputations. Of course, \id{P} knows precisely what
+      it has done for others, and what others have done for \id{P}.
+    \item \id{P} can compute a \red{capacity} (\id{cap(Q)}:
+      \[
+      \id{cap(Q)} = \max\{MF(\id{Q},\id{P}) - MF(\id{P},\id{Q}),0\}
+      \]
+      with \mathexpr{MF(\id{P},\id{Q})} the amount of work that \id{P} has, or could have contributed to work
+      done for \id{Q}, including the work done by others.
+    \end{itemize}
+  \end{exampleblock}
+\end{slide}
+\begin{slide}{Preventing Sybil attacks: Decentralized accounting}
+  \begin{block}{Essence: Keep track of work that nodes do for each other}
+    \begin{itemize}
+    \item Assume \id{R} directly contributed 3 units of work for \id{Q}, and \id{R} had processed 7 units for
+      \id{P} \mathexpr{\Rightarrow} \id{P} may have contributed 3 units of work for \id{Q}, through \id{R}.
+    \item \blue{Reasoning}: \id{R} may never have been able to work for \id{Q}, if it had not worked for
+      \id{P}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Preventing Sybil attacks: Decentralized accounting}
+  \begin{exampleblock}{How Sybil attacks are prevented}
+    \begin{itemize}
+    \item Let \mathexpr{\id{Q} \in \id{choice(P)}} create \mathexpr{n} Sybil nodes \mathexpr{\id{Q^*_1},
+      \ldots, \id{Q^*_n}}; \mathexpr{\id{Q} = \id{Q^*_0}}
+    \item For work by \id{Q^*_i} for \id{Q^*_j} to increase \id{cap(Q^*_i)}:
+      \begin{enumerate}
+      \item \id{Q^*_j} needs to have worked for some node \id{R}
+      \item \id{R} needs to have worked for \id{P}
+      \end{enumerate}
+      In other words: \id{Q} can successfully attack only if it had worked for honest nodes. Also, honest
+      nodes have to work for \id{Q}: the total capacity \id{Tcap(Q)} of the Sybils must grow, with
+      \[
+      \id{Tcap(Q)} = \sum_{k=0}^n \id{cap(Q^*_k)} 
+      \]
+    \item Assume that \id{P} works 1 unit for \id{Q^*_i} \mathexpr{\Rightarrow MF(\id{P},\id{Q^*_i})}
+      increases by 1 unit \mathexpr{\Rightarrow} \id{cap(Q^*_i)} drops by 1 unit, and so does
+      \id{Tcap(Q)}.
+    \item As soon as \mathexpr{\id{Tcap(Q)}} drops to 0, \id{P} will look at other nodes.
+    \end{itemize}
+  \end{exampleblock}
+\end{slide}
+\subsection{Trusting a system}
+\begin{slide}{Trusting a system: Blockchains}
+  \begin{block}{Essence}
+    One needs to know for sure that the information in a blockchain has not been tampered with: \red{data
+      integrity assurance}. \blue{Solution}: make sure that no change can go unnoticed (recall: a blockchain
+    is an append-only data structure).
+  \end{block}
+  \begin{centerfig}
+    \includefigure{09-20}
+  \end{centerfig}
+  \begin{alertblock}{Observation}
+    Any change of block \id{B_k}, will affect its hash value, and thus that of \id{B_{k+1}}, which would then
+    also need to be changed, in turn affecting the hash value of \id{B_{k+2}}, and so on.
+  \end{alertblock}
+\end{slide}
+\section{Authorization}
+\subsection{General issues in access control}
+\begin{slide}{Access control: General model}
+  \begin{block}{Authorization}
+    Making sure that authenticated entities have only access to specific resources.
+  \end{block}
+  \begin{centerfig}
+    \includefigure{09-21}
+  \end{centerfig}
+  \begin{alertblock}{Observation}
+    The reference monitor needs to be \blue{tamperproof}: it is generally implemented under full control of
+    the operating system, or a secure server.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Protection}
+  \begin{centerfig}
+    \begin{tabular}{cc}
+      \includefigure{09-22a} &
+      \raisebox{12pt}{\includefigure{09-22b}} \\
+      ...against invalid operations &  ...against unauthorized access\\
+      \ \\
+      \multicolumn{2}{c}{\includefigure{09-22c}} \\
+      \multicolumn{2}{c}{...against unauthorized invokers}
+    \end{tabular}
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Access control policies}
+  \begin{enumerate}
+  \item \red{Mandatory access control}: A central administration defines who gets access to what.
+  \item \red{Discretionary access control}: The owner of an object can change access rights, but also who may
+    have access to that object.
+  \item \red{Role-based access control}: Users are not authorized based on their identity, but based on the
+    role they have within an organization.
+  \item \red{Attribute-based access control}: Attributes of users \blue{and} of objects they want to access
+    are considered for deciding on a specific access rule.
+  \end{enumerate}
+  
+\end{slide}
+\begin{slide}{Access control matrix}
+  \begin{block}{Theory}
+    Construct a matrix in which \id{M[s,o]} describes the access rights subject \id{s} has with respect to
+    object \id{o}. \blue{Impractical}, so use \red{access control lists} or \red{capabilities}.
+  \end{block}
+  \vspace*{-6pt}
+  \begin{centerfig}
+    \begin{tabular}{c}
+      \includefigure[0.83]{09-23a} \\
+      {\small Access control list} \\ 
+      \includefigure[0.83]{09-23b} \\
+      {\small Capabilities}
+    \end{tabular}
+  \end{centerfig}
+  
+\end{slide}
+\subsection{Attribute-based access control}
+\begin{slide}{Special case: Attribute-based Access Control}
+  Distinguish different classes of attributes:
+  \begin{itemize}
+  \item \red{User attributes}: name, data of birth, current roles, home address, department, qualifiers
+    obtained, contract status, etc. May also depend on role (e.g., teacher or student).
+  \item \red{Object attributes}: anything -- creator, last-modified time, version number, file type, file
+    size, but also information related to its content.
+  \item \red{Environmental attributes}: describe the current state of the system, e.g., date and time, current
+    workload, maintenance status, storage properties, available services, etc.
+  \item \red{Connection attributes} provide information on the current session, e.g., IP address, session
+    duration, available bandwidth and latency estimates, type and strength of security used.
+  \item \red{Administrative attributes}: reflect global policies, e.g., minimal security settings, general
+    access regulations, and maximum session durations.
+  \end{itemize}
+\end{slide}
+\begin{slide}{Example: the Policy Machine}
+  \begin{block}{Essence}
+    A server maintains sets of (\emph{atrribute},\emph{value}) pairs, distinguishing \blue{users},
+    \blue{applications}, \blue{operations}, and \blue{objects}. At the core, we formulate \red{access control
+      rules}. 
+  \end{block}
+  \begin{block}{Access control rules}
+    \begin{itemize}
+    \item \red{Assignment}: A user \id{u} can be assigned to an attribute \id{ua}: \mathexpr{\id{u}
+      \rightarrow \id{ua}}. An object to an attribute: \mathexpr{\id{o} \rightarrow \id{oa}}; an attribute to
+      an attribute: \mathexpr{\id{ua_1} \rightarrow \id{ua_2}} (meaning that if \mathexpr{\id{u} \rightarrow
+        \id{ua_1}}, then \mathexpr{\id{u} \rightarrow \id{ua_2}}. Leads to rules like
+      \mathexpr{\func{allowed}(\id{ua},\id{ops},\id{oa})}: users assigned to \id{ua} are allowed to execute
+      operations in \id{ops} on objects assigned to \id{oa}.
+    \item \red{Prohibition}: explicitly state what is \blue{not} allowed, such as
+      \mathexpr{\func{denied}(\id{u},\id{ops},\id{os})}. Also:
+      \mathexpr{\func{denied}(\id{u},\id{ops},\lnot\id{os})}, meaning denial when \id{u} wants to perform \id{o}
+      assigned to \id{ops} on an object not in \id{os}.
+    \item \red{Obligation}: automated action upon an event, such as denying copying of information:
+      \begin{center}
+        \code{when} \id{u}\ \code{read}s\ \mathexpr{\id{f}\in \id{fs}} \code{then}\ %
+        \mathexpr{\func{denied}(\id{u},\{\id{write}\},\lnot\id{fs})}.
+      \end{center}
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Delegation}
+\begin{slide}{Delegation}
+  \begin{exampleblock}{What's the issue?}
+    Alice makes use of an e-mail service provider who stores her mailbox. She is required to log in to the
+    provider to access her mail. Alice wants to use her own local mail client. How to allow that mail client
+    to act on behalf of Alice? \red{How to delegate Alice's access rights to her mail client?} 
+  \end{exampleblock}
+
+  \begin{alertblock}{Observation}
+    It is not a good idea to hand over all user credentials to an application: why would the application or
+    the machine be trusted? \mathexpr{\Rightarrow} use a \red{security proxy}.
+  \end{alertblock}
+
+\end{slide}
+\begin{slide}{Security proxy}
+  \begin{centerfig}
+    \includefigure[0.71]{09-24}
+  \end{centerfig}
+
+  \begin{centerfig}
+    \includefigure{09-25}
+  \end{centerfig}
+
+  \begin{block}{How it works}
+    \begin{enumerate}\tightlist
+    \item Alice passes some rights \id{R} to Bob, together with a secret key \id{SK_{proxy}}
+    \item When Bob wants to exercise his rights, he passes the certificate 
+    \item The server wants Bob to prove he knows the secret key
+    \item Bob proves he does, and thus that Alice had delegated \id{R}.
+    \end{enumerate}
+  \end{block}
+\end{slide}
+  \begin{slide}{Example: Open Authorization (OAuth)}
+    \begin{block}{Four different roles}
+      \begin{itemize}\firmlist
+      \item \red{Resource owner}: typically an end user.
+      \item \red{Client}: an application that one would like to act on behalf of the resource owner,
+      \item \red{Resource server}: An interface through which a person would normally access the resource.
+      \item \red{Authorization server}: an entity handing out certificates to a client on behalf of a resource
+        owner.
+      \end{itemize}
+    \end{block}
+
+    \begin{block}{Initial steps}
+      \begin{enumerate}
+      \item The client application registers itself at the authorization server and receives its own identifier,
+        \id{cid}.
+      \item Alice wants to delegate a list \id{R} of rights \mathexpr{\Rightarrow}
+      \[
+      \mbox{Client: \emph{send}\ } \id{[cid, R,}\func{H}(\id{S})\id{]}
+      \]
+      with a hash of a temporary secret \idsn{S}
+      \end{enumerate}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Completing the process}
+    \begin{block}{Final steps}
+      \begin{enumerate}
+        \setcounter{enumi}{2}
+      \item Alice is required to log in and confirm delegation \id{R} to the client.
+      \item Server sends a temporary authorization code \id{AC} to client.
+      \item Client requests a final \red{access token}:
+        \[
+        \mbox{Client:\ \emph{sends}\ } \id{[cid, AC, S]}.
+        \]
+        Sending \id{S} to the authorization server allows the latter to verify the identity of the client (by
+        computing \mathexpr{H(\id{S})}.
+      \end{enumerate}
+      The authorization server has now (1)~verified that Alice wants to delegate access rights to the client,
+      and (2)~has verified the identity of the client \mathexpr{\Rightarrow} it returns an access token to the
+      client.
+    \end{block}
+  \end{slide}
+\subsection{Decentralized authorization: an example}
+\begin{slide}{Example: decentralized authorization}
+  \begin{block}{WAVE (and keeping it very simple)}
+    \red{Essence}: Alice delegates rights to Bob, Bob delegates some of those rights to Chuck.
+    \begin{itemize}
+    \item When Check wants to exercise his rights, there should be no need for Alice or Bob to be online.
+    \item No one but Alice, Bob, and Chuck need to be aware of the delegation.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Essentials}
+    Alice delegates rights \id{R} to Bob, for which he creates a keypair (\mathexpr{PK_{B}^{R}},\mathexpr{SK_B^R}):
+    \[
+    \mbox{\id{A} sends:\ } PK_{B}^{R}( \underbrace{[ \id{R} | \id{SK_A^{R}} ]}_{\id{m_1}}))
+    \]
+    Bob delegates parts of those rights \id{R^{\prime}} to Chuck, assuming he is allowed to do so:
+    \[
+    \mbox{\id{B} sends:\ } PK_{C}^{R^{\prime}}( \underbrace{[ \id{R^{\prime}} | \id{m_1} | \id{SK_B^{R}} ]}_{\id{m_2}})
+    \]
+  \end{block}
+\end{slide}
+\section{Monitoring}
+\subsection{Firewalls}
+\begin{slide}{Firewalls}
+  \begin{block}{Essence}
+    Simply prevent anything nasty coming in, but also preventing unwanted outbound traffic.
+  \end{block}\vspace*{-6pt}
+  \begin{centerfig}
+    \includefigure{09-26}
+  \end{centerfig}
+  \begin{block}{Different types of firewalls}
+    \vspace*{-6pt}
+    \begin{itemize}\tightlist
+    \item \red{Packet-filtering gateway}: operates as a router and makes filters packets based on source and
+      destination address.
+    \item \red{Application-level gateway}: inspects the content of an incoming or outgoing message (e.g.,
+      gateways filtering spam e-mail).
+    \item \red{Proxy gateway}: works as a front end to an application, filtering like an application-level
+      gateway (e.g., Web proxies).
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Intrusion detection: basics}
+\begin{slide}{Intrusion detection systems}
+  \begin{block}{Two flavors}
+    \begin{itemize}
+    \item \red{Signature-based}: matches against patterns of known network-level intrusions. Problematic when
+      series of packets need to be matched, or when new attacks take place.
+    \item \red{Anomaly-based}: assumes that we can model or extract typical behavior to subsequently detect
+      nontypical, or anomalous behavior. Relies heavily on modern artificial-intelligence technologies.
+    \end{itemize}
+  \end{block}
+
+  \onslide<2->
+  \begin{block}{Using sensors}
+    Key idea is to manage \blue{false} and \blue{true positives} (FP/TP) as well as \blue{false} and
+    \blue{true negatives} (FN/TN). Maximize \red{accuracy} and \red{precision}:
+    \[
+    \begin{array}{lc}
+      \mbox{\red{Accuracy}:}  & \displaystyle\frac{\func{TP} +
+        \func{TN}}{\func{TP}+\func{TN}+\func{FP}+\func{FN}} \\ \ \\
+      \mbox{\red{Precision}:} & \displaystyle\frac{\func{TP}}{\func{TP}+\func{FP}} \\ 
+    \end{array}
+    \]
+  \end{block}
+\end{slide}
+\subsection{Collaborative intrusion detection}
+\section{Summary}
