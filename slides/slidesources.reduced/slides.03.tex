@@ -1,0 +1,763 @@
+\part{Processes}
+\section{Threads}
+\subsection{Introduction to threads}
+\begin{slide}{Introduction to threads}
+  \begin{block}{Basic idea} 
+    We build \blue{virtual processors} in software, on top of physical processors:
+    \begin{description}
+    \item[\textbf{Processor}:] Provides a set of instructions along with the capability of automatically
+      executing a series of those instructions.
+    \item[\textbf{Thread}:] A minimal software processor in whose \blue{context} a series of instructions can be
+      executed. Saving a thread context implies stopping the current execution and saving all the data needed
+      to continue the execution at a later stage.
+    \item[\textbf{Process}:] A software processor in whose context one or more threads may be executed. Executing
+      a thread, means executing a series of instructions in the context of that thread.
+    \end{description}
+  \end{block}
+\end{slide}
+\begin{slide}{Context switching}
+  \begin{block}{Contexts}
+    \begin{itemize}
+    \item \textbf{Processor context}: The minimal collection of values stored in the registers of a processor
+      used for the execution of a series of instructions (e.g., stack pointer, addressing registers, program
+      counter).
+    \item \textbf{Thread context}: The minimal collection of values stored in registers and memory, used for
+      the execution of a series of instructions (i.e., processor context, state).
+    \item \textbf{Process context}: The minimal collection of values stored in registers and memory, used for
+      the execution of a thread (i.e., thread context, but now also at least MMU register values).
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Context switching}
+  \begin{block}{Observations}
+    \begin{enumerate}
+    \item Threads share the same address space. Thread context switching can be done entirely independent of
+      the operating system.
+    \item Process switching is generally (somewhat) more expensive as it involves getting the OS in the loop,
+      i.e., trapping to the kernel.
+    \item Creating and destroying threads is much cheaper than doing so for processes.
+    \end{enumerate}
+  \end{block}
+\end{slide}
+\begin{slide}{Why use threads}
+  \begin{block}{Some simple reasons}
+    \begin{itemize}
+    \item \blue{Avoid needless blocking}: a single-threaded process will \red{block} when doing I/O; in a
+      multithreaded process, the operating system can switch the CPU to another thread in that process.
+    \item \blue{Exploit parallelism}: the threads in a multithreaded process can be scheduled to run in
+      parallel on a multiprocessor or multicore processor.
+    \item \blue{Avoid process switching}: structure large applications not as a collection of processes, but
+      through multiple threads.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Avoid process switching}
+  \begin{block}{Avoid expensive context switching}
+    \begin{centerfig}
+      \includefigure{03-01}
+    \end{centerfig}
+  \end{block}
+  \begin{block}{Trade-offs}
+    \begin{itemize}
+    \item Threads use the same address space: more prone to errors
+    \item No support from OS/HW to protect threads using each other's memory
+    \item Thread context switching may be faster than process context switching
+    \end{itemize}
+  \end{block}
+\end{slide}
+  \begin{slide}{The cost of a context switch}
+    \begin{block}{Consider a simple clock-interrupt handler}
+      \begin{itemize}
+        \item \red{direct costs}: actual switch and executing code of the handler
+        \item \red{indirect costs}: other costs, notably caused by messing up the cache
+      \end{itemize}
+    \end{block}
+    \begin{block}{What a context switch may cause: indirect costs}
+      \begin{columns}
+        \begin{column}{0.5\textwidth}
+          \begin{center}
+            \begin{tabular}{c@{\hspace{24pt}}c@{\hspace{24pt}}c}
+              \includefigure{03-02a} &
+              \includefigure{03-02b} &
+              \includefigure{03-02c} \\
+              {\hspace{0.6cm}}(a) & (b) & (c)
+            \end{tabular}
+          \end{center}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+          \begin{itemize}
+          \item[(a)] before the context switch
+          \item[(b)] after the context switch
+          \item[(c)] after accessing block \idsn{D}.
+          \end{itemize}
+        \end{column}
+      \end{columns}
+    \end{block}
+  \end{slide}
+% \begin{slide}{A simple example in Python}
+%   \begin{centerfig}
+%     \includelisting{03-03/mp} 
+%   \end{centerfig}
+%   \begin{tabular}{l}
+%     \small\code{40:23 eve is going to sleep for 14 seconds} \\
+%     \small\code{40:23 bob is going to sleep for 4 seconds} \\
+%     \small\code{40:27 bob has woken up} \\
+%     \small\code{40:37 eve has woken up}
+%   \end{tabular}
+% \end{slide}
+% \begin{slide}{A simple example in Python}
+%   \begin{centerfig}
+%     \includelisting{03-04/mpthread-slide} 
+%   \end{centerfig}
+% \end{slide}
+% \begin{slide}{A simple example in Python}
+%   \begin{tabular}{l}
+%     \small\code{eve sees shared x being 71} \\
+%     \small\code{53:21 eve 0 is going to sleep for 20 seconds} \\
+%     \small\code{bob sees shared x being 84} \\
+%     \small\code{53:21 eve 1 is going to sleep for 15 seconds} \\
+%     \small\code{53:21 eve 2 is going to sleep for 3 seconds} \\
+%     \small\code{53:21 bob 0 is going to sleep for 8 seconds} \\
+%     \small\code{53:21 bob 1 is going to sleep for 16 seconds} \\
+%     \small\code{53:21 bob 2 is going to sleep for 8 seconds} \\
+%     \small\code{53:24 eve 2 has woken up, seeing shared x being 72} \\
+%     \small\code{53:29 bob 0 has woken up, seeing shared x being 85} \\
+%     \small\code{53:29 bob 2 has woken up, seeing shared x being 86} \\
+%     \small\code{53:36 eve 1 has woken up, seeing shared x being 73} \\
+%     \small\code{53:37 bob 1 has woken up, seeing shared x being 87} \\
+%     \small\code{bob sees shared x being 87} \\
+%     \small\code{53:41 eve 0 has woken up, seeing shared x being 74} \\
+%     \small\code{eve sees shared x being 74} 
+%   \end{tabular}
+% \end{slide}
+\begin{slide}{Threads and operating systems}
+  \begin{alertblock}{Main issue} 
+    Should an OS kernel provide threads, or should they be implemented as user-level packages?
+  \end{alertblock}
+  \begin{block}{User-space solution}
+    \begin{itemize}
+    \item All operations can be completely handled \blue{within a single process} \mathexpr{\Rightarrow}
+      implementations can be extremely efficient.
+    \item \blue{All} services provided by the kernel are done \blue{on behalf of the process in which a thread
+      resides} \mathexpr{\Rightarrow} if the kernel decides to block a thread, the entire process will be
+      blocked.
+    \item Threads are used when there are many external events: \blue{threads block on a per-event basis}
+      \mathexpr{\Rightarrow} if the kernel can't distinguish threads, how can it support signaling events to
+      them?
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Linux Kernel Threads}
+\begin{itemize}
+  \item \textbf{Task Struct Representation}: In the Linux kernel, threads are implemented as lightweight processes, each represented by a \texttt{task\_struct} (defined in \texttt{include/linux/sched.h}), sharing memory but maintaining separate execution contexts for scheduling.
+  \item \textbf{Scheduling with CFS}: The Completely Fair Scheduler (CFS) in \texttt{kernel/sched/fair.c} manages kernel threads, treating them as virtual processors and allocating CPU time fairly using a red-black tree.
+  \item \textbf{POSIX Threads Integration}: User-space threads (e.g., via \texttt{pthread\_create}) map to kernel threads, enabling Java’s 1:1 threading model to leverage Linux’s scheduling for efficient concurrency.
+\end{itemize}
+\end{slide}
+  \begin{slide}{Combining user-level and kernel-level threads}
+    \begin{block}{Basic idea} 
+      Introduce a two-level threading approach: \red{kernel threads} that can execute user-level
+      threads.
+    \end{block}
+    \begin{block}{}
+      \begin{center}
+        \includefigure{03-05}
+      \end{center}
+    \end{block}
+  \end{slide}
+  \begin{slide}{User and kernel threads combined}
+    \begin{block}{Principle operation}
+      \begin{itemize}%\tightlist
+      \item User thread does system call \mathexpr{\Rightarrow} \red{the kernel thread that is
+        executing that user thread, blocks}. The user thread remains \blue{bound} to the kernel thread.
+      \item The kernel can \red{schedule another kernel thread having a runnable user thread bound to
+        it}. Note: this user thread can switch to \blue{any} other runnable user thread currently in user
+        space.
+      \item A user thread calls a blocking user-level operation \mathexpr{\Rightarrow} do context switch
+        to a runnable user thread, (then bound to the same kernel thread).
+      \item When there are no user threads to schedule, a kernel thread may remain idle, and may even be
+        removed (destroyed) by the kernel.
+      \end{itemize}
+    \end{block}
+  \end{slide}
+\subsection{Threads in distributed systems}
+\begin{slide}{Using threads at the client side}
+  \begin{block}{Multithreaded web client}
+    Hiding network latencies:
+    \begin{itemize}\tightlist
+    \item Web browser scans an incoming HTML page, and finds that \blue{more files need to be fetched}.
+    \item \blue{Each file is fetched by a separate thread}, each doing a (blocking) HTTP request.
+    \item As files come in, the browser displays them.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Multiple request-response calls to other machines (RPC)}
+    \begin{itemize}\tightlist
+    \item A client does several calls at the same time, each one by a different thread.
+    \item It then waits until all results have been returned.
+    \item Note: if calls are to different servers, we may have a \blue{linear speed-up}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+  \begin{slide}{Multithreaded clients: does it help?}
+    \begin{block}{Thread-level parallelism: TLP}
+      Let \mathexpr{c_i} denote the fraction of time that exactly \mathexpr{i} threads are being executed
+      simultaneously.
+      \[ TLP = \frac{\sum_{i=1}^N i \cdot c_i}{1- c_0} \]
+      with \mathexpr{N} the maximum number of threads that (can) execute at the same time. 
+    \end{block}
+    \onslide<2->
+    \begin{block}{Practical measurements}
+      A typical Web browser has a TLP value between 1.5 and 2.5 \mathexpr{\Rightarrow} threads are primarily
+      used for \blue{logically organizing} browsers.
+    \end{block}
+  \end{slide}
+\begin{slide}{Using threads at the server side}
+  \begin{block}{Improve performance}
+    \begin{itemize}\tightlist
+    \item Starting a thread is cheaper than starting a new process.
+    \item Having a single-threaded server prohibits simple scale-up to a \blue{multiprocessor system}.
+    \item As with clients: \blue{hide network latency} by reacting to next request while previous one is being replied.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Better structure}
+    \begin{itemize}\tightlist
+    \item Most servers have high I/O demands. Using simple, \blue{well-understood blocking calls} simplifies
+      the structure.
+    \item Multithreaded programs tend to be \blue{smaller and easier to understand} due to \blue{simplified
+      flow of control}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Why multithreading is popular: organization}
+  \begin{block}{Dispatcher/worker model}
+    \begin{center}
+      \includefigure{03-06}
+    \end{center}
+  \end{block}
+  \begin{block}{Overview}
+    \begin{center}
+      \begin{tabular}{|l|l|}\hline
+        \multicolumn{1}{|c|}{\textbf{Model}} &  \multicolumn{1}{c|}{\textbf{Characteristics}} \\ \hline
+        Multithreading          & Parallelism, blocking system calls \\ \hline
+        Single-threaded process & No parallelism, blocking system calls \\ \hline
+        Finite-state machine    & Parallelism, nonblocking system calls \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\section{Virtualization}
+\subsection{Principle of virtualization}
+\begin{slide}{Virtualization}
+  \begin{block}{Observation} 
+    \blue{Virtualization} is important:
+    \begin{itemize}\tightlist
+    \item Hardware \blue{changes faster} than software
+    \item Ease of \blue{portability} and code migration
+    \item \blue{Isolation} of failing or attacked components
+    \end{itemize}
+  \end{block}
+  \begin{block}{Principle: mimicking interfaces}
+    \begin{center}
+      \begin{tabular}{c@{\hspace*{24pt}}c}
+        \includefigure{03-08a} & 
+        \includefigure{03-08b} \\
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Mimicking interfaces}
+  \begin{block}{Four types of interfaces at three different levels}
+    \begin{enumerate}\tightlist
+    \item \red{Instruction set architecture}: the set of machine instructions, with two subsets:
+      \begin{itemize}\tightlist
+      \item Privileged instructions: allowed to be executed only by the operating system.
+      \item General instructions: can be executed by any program.
+      \end{itemize}
+    \item \red{System calls} as offered by an operating system.
+    \item \red{Library calls}, known as an \red{application programming interface} (API)
+    \end{enumerate}
+  \end{block}
+\end{slide}
+\begin{slide}{Ways of virtualization}
+  \begin{center}
+    \begin{tabular}{ccc}
+      \includefigure{03-10a} &
+      \includefigure{03-10b} &
+      \includefigure{03-10c} \\
+      \blue{(a) Process VM} & \blue{(b) Native VMM} & \blue{(c) Hosted VMM}
+    \end{tabular}
+  \end{center}
+  \begin{block}{Differences}
+    \begin{itemize}\tightlist
+    \item[(a)] Separate set of instructions, an interpreter/emulator, running atop an OS.
+    \item[(b)] Low-level instructions, along with bare-bones minimal operating system
+    \item[(c)] Low-level instructions, but delegating most work to a full-fledged OS.
+    \end{itemize}
+  \end{block}
+\end{slide}
+  \begin{slide}{Zooming into VMs: performance}
+    \begin{block}{Refining the organization}
+      \begin{tabular}{@{}ll}
+        \includefigure[0.71]{03-11}
+        \begin{minipage}[b]{0.4\textwidth}
+          \begin{itemize}\tightlist
+          \item \red{Privileged instruction}: if and only if executed in user mode, it causes a \blue{trap}
+            to the operating system
+          \item \red{Nonpriviliged instruction}: the rest
+          \end{itemize}
+        \end{minipage}
+      \end{tabular}
+    \end{block}
+    \begin{block}{Special instructions}
+      \begin{itemize}
+      \item \red{Control-sensitive instruction}: may affect configuration of a machine (e.g., one affecting
+        relocation register or interrupt table).
+      \item \red{Behavior-sensitive instruction}: effect is partially determined by context (e.g., \code{POPF}
+        sets an interrupt-enabled flag, but only in system mode).
+      \end{itemize}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Condition for virtualization}
+    \begin{alertblock}{Necessary condition}
+      \itshape For any conventional computer, a virtual machine monitor may be constructed if the set of
+      sensitive instructions for that computer is a subset of the set of privileged instructions.
+    \end{alertblock}
+    \begin{block}{Problem: condition is not always satisfied}
+      There may be sensitive instructions that are executed in user mode without causing a trap to the
+      operating system.
+    \end{block}
+    \begin{block}{Solutions}
+      \begin{itemize}
+      \item Emulate all instructions
+      \item Wrap nonprivileged sensitive instructions to divert control to VMM
+      \item \red{Paravirtualization}: modify guest OS, either by preventing nonprivileged sensitive
+        instructions, or making them nonsensitive (i.e., changing the context).
+      \end{itemize}
+    \end{block}
+  \end{slide}
+\subsection{Containers}
+\begin{slide}{Containers}
+  \begin{centerfig}
+    \includefigure{03-12}
+  \end{centerfig}
+
+  \begin{itemize}\tightlist
+  \item \blue{Namespaces}: a collection of processes in a container is given their own view of identifiers
+  \item \blue{Union file system:} combine several file systems into a layered fashion with only the highest
+    layer allowing for \code{write} operations (and the one being part of a container).
+  \item \blue{Control groups}: resource restrictions can be imposed upon a collection of processes.
+  \end{itemize}
+\end{slide}
+  \begin{slide}{Example: PlanetLab}
+    \begin{block}{Essence} 
+      Different organizations contribute machines, which they subsequently \blue{share} for various experiments.
+    \end{block}
+    \begin{alertblock}{Problem} 
+      We need to ensure that different distributed applications do not get into each other's way
+      \mathexpr{\Rightarrow} \blue{virtualization}
+    \end{alertblock}
+  \end{slide}
+  \begin{slide}{PlanetLab basic organization}
+    \begin{centerfig}
+      \includefigure{03-13}
+    \end{centerfig}
+  \begin{block}{Vserver}
+    Independent and protected environment with its own libraries, server versions, and so on. Distributed
+    applications are assigned a \blue{collection of vservers} \red{distributed across multiple machines}
+  \end{block}
+  \end{slide}
+  \begin{slide}{PlanetLab Vservers and slices}
+    \begin{block}{Essence}
+      \begin{itemize}\tightlist
+      \item Each Vserver operates in its own environment (cf.\ \code{chroot}). 
+      \item Linux enhancements include proper adjustment of process IDs (e.g., \code{init} having ID 0). 
+      \item Two processes in different Vservers may have same user ID, but does not imply the same user.
+      \end{itemize}
+    \end{block}
+    \begin{block}{Separation leads to slices}
+      \begin{center}
+        \includefigure[1]{03-14}
+      \end{center}
+    \end{block}
+  \end{slide}
+\subsection{Comparing virtual machines and containers}
+\subsection{Application of virtual machines to distributed systems}
+\begin{slide}{VMs and cloud computing}
+  \begin{block}{Three types of cloud services}
+    \begin{itemize}\tightlist
+    \item \red{Infrastructure-as-a-Service} covering the basic infrastructure
+    \item \red{Platform-as-a-Service} covering system-level services
+    \item \red{Software-as-a-Service} containing actual applications
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{IaaS}
+    Instead of renting out a physical machine, a cloud provider will rent out a VM (or VMM) that may be
+    sharing a physical machine with other customers \mathexpr{\Rightarrow} almost complete isolation between
+    customers (although performance isolation may not be reached).
+  \end{alertblock}
+\end{slide}
+\section{Clients}
+\subsection{Networked user interfaces}
+\begin{slide}{Client-server interaction}
+  \begin{block}{Distinguish application-level and middleware-level solutions}
+    \begin{center}
+      \begin{tabular}{@{}cc}
+        \includefigure{03-15a} &
+        \includefigure{03-15b} \\
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Example: The X Window system}
+  \begin{block}{Basic organization}
+    \begin{center}
+      \includefigure{03-16}
+    \end{center}
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{X client and server}
+    The application acts as a \red{client} to the X-kernel, the latter running as a \red{server} on the
+    client's machine.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Improving X}
+  \begin{block}{Practical observations}
+    \begin{itemize}\tightlist
+    \item There is often no clear separation between application logic and user-interface commands
+    \item Applications tend to operate in a tightly synchronous manner with an X kernel
+    \end{itemize}
+  \end{block}
+  \begin{block}{Alternative approaches}
+    \begin{itemize}
+    \item Let applications control the display \blue{completely}, up to the pixel level (e.g., \red{VNC})
+    \item Provide only a few high-level display operations (dependent on local video drivers), allowing more
+      efficient display operations.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Virtual desktop environment}
+\begin{slide}{Virtual desktop environment}
+  \begin{block}{Logical development}
+    With an increasing number of cloud-based applications, the question is how to use those applications from
+    a user's premise?
+    \begin{itemize}\firmlist
+    \item \red{Issue}: develop the ultimate networked user interface
+    \item \red{Answer}: use a Web browser to establish a seamless experience
+    \end{itemize}
+  \end{block}
+  \begin{centerfig}
+    \includefigure[0.18]{chrome-book} \\
+    The Google Chromebook
+  \end{centerfig}
+\end{slide}
+\begin{slide}{The anatomy of a Web browser}
+  \begin{centerfig}
+    \includefigure[0.83]{03-17}
+  \end{centerfig}
+\end{slide}
+\subsection{Client-side software for distribution transparency}
+\begin{slide}{Client-side software}
+  \begin{block}{Generally tailored for distribution transparency}
+    \begin{itemize}\tightlist
+    \item \blue{Access transparency}: client-side stubs for RPCs
+    \item \blue{Location/migration transparency}: let client-side software keep track of actual location
+    \item \blue{Replication transparency}: multiple invocations handled by client stub:
+      \begin{center}
+        \includefigure{03-18}
+      \end{center}
+    \item \blue{Failure transparency}: can often be placed only at client (we're trying to mask server and
+      communication failures).
+    \end{itemize}
+  \end{block}
+\end{slide}
+\section{Servers}
+\subsection{General design issues}
+\begin{slide}{Servers: General organization}
+  \begin{block}{Basic model} 
+    A process implementing a specific service on behalf of a collection of clients. It waits for an incoming
+    request from a client and subsequently ensures that the request is taken care of, after which it waits for
+    the next incoming request.
+  \end{block}
+  \onslide<2->
+  \begin{block}{Two basic types}
+    \begin{itemize}
+    \item \red{Iterative server}: Server handles the request before attending a next request.
+    \item \red{Concurrent server}: Uses a \blue{dispatcher}, which picks up an incoming request that is then
+      passed on to a separate thread/process.
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Observation}
+    Concurrent servers are the norm: they can easily handle multiple requests, notably in the presence of
+    blocking operations (to disks or other servers).
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Contacting a server}
+  \begin{block}{Observation: most services are tied to a specific port}
+    \begin{center}
+      \renewcommand{\arraystretch}{1.1}
+      \begin{tabular}{|lrl|}\hline
+        ftp-data    &     20 &    File Transfer [Default Data]				\\ 
+        ftp         &     21 &    File Transfer [Control]					\\ 
+        telnet      &     23 &    Telnet									\\ 
+        smtp        &     25 &    Simple Mail Transfer						\\ 
+        www         &     80 &    Web (HTTP)                                \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+  \begin{block}{Dynamically assigning an end point: two approaches}
+    \begin{center}
+      \begin{tabular}{@{}c@{}c}
+        \includefigure[0.65]{03-19a} &
+        \includefigure[0.65]{03-19b} \\
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Out-of-band communication}
+  \begin{block}{Issue} 
+    Is it possible to \blue{interrupt} a server once it has accepted (or is in the process of accepting) a
+    service request?
+  \end{block}
+  \onslide<2->
+  \begin{block}{Solution~1: Use a separate port for urgent data}
+    \begin{itemize}\tightlist
+    \item Server has a separate thread/process for urgent messages
+    \item Urgent message comes in \mathexpr{\Rightarrow} \blue{associated request is put on hold}
+    \item Note: we require \blue{OS supports priority-based scheduling}
+    \end{itemize}
+  \end{block}
+  \onslide<3->
+  \begin{block}{Solution~2: Use facilities of the transport layer}
+    \begin{itemize}\tightlist
+    \item Example: TCP allows for urgent messages in same connection
+    \item Urgent messages can be caught using OS signaling techniques
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Servers and state}
+  \begin{block}{Stateless servers}
+    Never keep \blue{accurate} information about the status of a client after having handled a request:
+    \begin{itemize}\tightlist
+    \item Don't record whether a file has been opened (simply close it again after access)
+    \item Don't promise to invalidate a client's cache
+    \item Don't keep track of your clients
+    \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{block}{Consequences}
+    \begin{itemize}\tightlist
+    \item Clients and servers are \blue{completely independent}
+    \item \blue{State inconsistencies} due to client or server crashes \blue{are reduced}
+    \item Possible \blue{loss of performance} because, e.g., a server cannot anticipate client behavior (think of
+      prefetching file blocks)
+    \end{itemize}
+  \end{block}
+  \onslide<3->
+  \begin{alertblock}{Question}
+    Does connection-oriented communication fit into a stateless design?
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Servers and state}
+  \begin{block}{Stateful servers}
+    Keeps track of the status of its clients:
+    \begin{itemize}\tightlist
+    \item Record that a file has been opened, so that prefetching can be done
+    \item Knows which data a client has cached, and allows clients to keep local copies of shared data
+    \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{Observation} 
+    The \blue{performance of stateful servers can be extremely high}, provided clients are allowed to keep
+    local copies. As it turns out, \blue{reliability is often not a major problem}.
+  \end{alertblock}
+\end{slide}
+\subsection{Object servers}
+\begin{slide}{Object servers}
+  \begin{columns}[T]
+    \begin{column}{0.35\textwidth}
+      \includefigure[0.71]{03-20}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+      \item \blue{Activation policy}: which actions to take when an invocation request comes in:
+        \begin{itemize}\firmlist
+        \item Where are code and data of the object?
+        \item Which threading model to use?
+        \item Keep modified state of object, if any?
+        \end{itemize}
+      \item \blue{Object adapter}: implements a specific activation policy
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{slide}
+\begin{slide}{Example: Ice runtime system -- a server}
+  \begin{centerfig}
+    \includelisting{03-21/server2}    
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Example: Ice runtime system -- a client }
+  \begin{centerfig}
+    \includelisting{03-21/client2}    
+  \end{centerfig}
+  \begin{quote}
+    \code{Object1 says: Hello World from printer1!} \\
+    \code{Object2 says: Hello World from printer2!}
+  \end{quote}
+\end{slide}
+\subsection{Example: The Apache Web server}
+\begin{slide}{Example: the Apache Web server}
+  \begin{centerfig}
+    \includefigure{03-22}
+  \end{centerfig}
+\end{slide}
+\subsection{Server clusters}
+\begin{slide}{Three different tiers}
+  \begin{block}{Common organization}
+    \begin{center}
+      \includefigure{03-23}
+    \end{center}
+  \end{block}
+  \begin{alertblock}{Crucial element} 
+    The first tier is generally responsible for passing requests to an appropriate server: \blue{request
+      dispatching}
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Request Handling}
+  \begin{block}{Observation} 
+    Having the first tier handle all communication from/to the cluster may lead to a \blue{bottleneck}.
+  \end{block}
+  \begin{exampleblock}{A solution: TCP handoff} 
+    \begin{center}
+      \includefigure{03-24}
+    \end{center}
+  \end{exampleblock}
+\end{slide}
+\begin{slide}{When servers are spread across the Internet}
+  \begin{block}{Observation}
+    Spreading servers across the Internet may introduce administrative problems. These can be largely
+    circumvented by using data centers from a single cloud provider.
+  \end{block}
+  \begin{block}{Request dispatching: if locality is important}
+    Common approach: use DNS:
+    \begin{enumerate}\tightlist
+    \item Client looks up specific service through DNS - client's IP address is part of request
+    \item DNS server keeps track of replica servers for the requested service, and returns address of most
+      local server.
+    \end{enumerate}
+  \end{block}
+  \begin{alertblock}{Client transparency}
+    To keep client unaware of distribution, let DNS resolver act on behalf of client. Problem is that the
+    resolver may actually be \blue{far from local} to the actual client.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{A simplified version of the Akamai CDN}
+  \begin{centerfig}
+    \includefigure{03-25}
+  \end{centerfig}
+  \onslide<2->
+  \begin{alertblock}{Important note}
+    The cache is often sophisticated enough to hold more than just passive data. Much of the application code
+    of the origin server can be moved to the cache as well.
+  \end{alertblock}
+\end{slide}
+\section{Code migration}
+\subsection{Reasons for migrating code}
+\begin{slide}{Reasons to migrate code}
+  \begin{block}{Load distribution}
+    \begin{itemize}\firmlist
+    \item Ensuring that servers in a data center are \blue{sufficiently} loaded (e.g., to prevent waste of
+      energy)
+    \item Minimizing communication by ensuring that computations are close to where the data is (think of
+      mobile computing).
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Flexibility: moving code to a client when needed}
+    \begin{centerfig}
+      \includefigure{03-27}
+    \end{centerfig}
+    Avoids pre-installing software and increases dynamic configuration.
+  \end{block}
+\end{slide}
+\begin{slide}{Reasons to migrate code}
+  \begin{block}{Privacy and security}
+    In many cases, one cannot move data to another location, for whatever reason (often legal
+    ones). \blue{Solution}: move the code to the data.
+  \end{block}
+  \begin{block}{Example: federated machine learning}
+    \begin{centerfig}
+      \includefigure{03-26}      
+    \end{centerfig}
+  \end{block}
+\end{slide}
+\subsection{Models for code migration}
+\begin{slide}{Paradigms for code mobility}
+  \begin{centerfig}
+    \includefigure[0.77]{03-28}
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Strong and weak mobility}
+  \begin{block}{Object components}
+    \begin{itemize}
+    \item \blue{Code segment}: contains the actual code
+    \item \blue{Data segment}: contains the state
+    \item \blue{Execution state}: contains context of thread executing the object's code
+    \end{itemize}
+  \end{block}
+  \begin{block}{Weak mobility: Move only code and data segment (and reboot execution)}
+    \begin{itemize}
+    \item Relatively simple, especially if code is portable
+    \item Distinguish \blue{code shipping} (push) from \blue{code fetching} (pull)
+    \end{itemize}
+  \end{block}
+  \begin{block}{Strong mobility: Move component, including execution state}
+    \begin{itemize}
+    \item \blue{Migration}: move entire object from one machine to the other
+    \item \blue{Cloning}: start a clone, and set it in the same execution state.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Migration in heterogeneous systems}
+\begin{slide}{Migration in heterogeneous systems}
+  \begin{block}{Main problem}
+    \begin{itemize}
+    \item The target machine may not be \blue{suitable to execute the migrated code}
+    \item The definition of process/thread/processor context is \blue{highly dependent on local hardware,
+      operating system and runtime system}
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Only solution: abstract machine implemented on different platforms}
+    \begin{itemize}
+    \item Interpreted languages, effectively having their own VM
+    \item Virtual machine monitors
+    \end{itemize}
+  \end{alertblock}
+  \begin{alertblock}{Observation}
+    As containers are directly dependent on the underlying operating system, their migration in heterogeneous
+    environments is far from trivial, to simply impractical, just as process migration is.
+  \end{alertblock}
+
+\end{slide}
+\begin{slide}{Migrating a virtual machine}
+  \begin{block}{Migrating images: three alternatives}
+    \begin{enumerate}
+    \item Pushing memory pages to the new machine and resending the ones that are later modified during the
+      migration process.
+    \item Stopping the current virtual machine; migrate memory, and start the new virtual machine.
+    \item Letting the new virtual machine pull in new pages as needed: processes start on the new
+      virtual machine immediately and copy memory pages on demand.
+    \end{enumerate}
+  \end{block}
+\end{slide}
+  \begin{slide}{Performance of migrating virtual machines}
+    \begin{block}{Problem}
+      A complete migration may actually take tens of seconds. We also need to realize that during the
+      migration, a service will be completely unavailable for multiple seconds. 
+    \end{block}
+    \begin{block}{Measurements regarding response times during VM migration}
+      \begin{center}
+        \includefigure{03-29} 
+      \end{center}
+    \end{block}
+  \end{slide}
+\section{Summary}

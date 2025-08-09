@@ -1,0 +1,750 @@
+\part{Consistency and replication}
+\section{Introduction}
+\subsection{Reasons for replication}
+\begin{slide}{Replication}
+  \begin{block}{Why replicate}
+    Assume a simple model in which we make a copy of a specific part of a system (meaning code and data).
+    \begin{itemize}
+    \item \red{Increase reliability}: if one copy does not live up to specifications, switch over to the other
+      copy while repairing the failing one.
+    \item \red{Performance}: simply spread requests between different replicated parts to keep load balanced,
+      or to ensure quick responses by taking proximity into account.
+    \end{itemize}
+    \begin{alertblock}{The problem}
+      Having multiple copies, means that when any copy changes, that change should be made at all copies:
+      \blue{replicas need to be kept the same}, that is, be kept \red{consistent}.
+    \end{alertblock}
+  \end{block}
+  
+\end{slide}
+\begin{slide}{Performance and scalability}
+  \begin{block}{Main issue} 
+    To keep replicas consistent, we generally need to ensure that all \blue{conflicting} operations are done
+    in the the same order everywhere
+  \end{block}
+  \begin{block}{Conflicting operations: From the world of transactions}
+    \begin{itemize}\tightlist
+    \item \blue{Read--write conflict}: a read operation and a write operation act concurrently
+    \item \blue{Write--write conflict}: two concurrent write operations
+    \end{itemize}
+  \end{block}
+  \begin{block}{Issue}
+    Guaranteeing global ordering on conflicting operations may be a costly operation, downgrading scalability.
+    \red{Solution:} weaken consistency requirements so that hopefully global synchronization can be avoided
+  \end{block}
+\end{slide}
+\subsection{Replication as scaling technique}
+\section{Data-centric consistency models}
+\begin{slide}{Data-centric consistency models}
+  \begin{block}{Consistency model} 
+    A contract between a (distributed) data store and processes, in which the data store specifies precisely
+    what the results of read and write operations are in the presence of concurrency.
+  \end{block}
+  \begin{alertblock}{Essential}
+    A data store is a distributed collection of storages:
+    \begin{center}
+      \includefigure{07-01}      
+    \end{center}
+  \end{alertblock}
+\end{slide}
+\subsection{Consistent ordering of operations}
+\begin{slide}{Some notations}
+  \begin{block}{Read and write operations}
+    \begin{itemize}
+    \item \red{\id{W_i(x)a}}: Process \id{P_i} writes value \id{a} to \id{x}
+    \item \red{\id{R_i(x)b}}: Process \id{P_i} reads value \id{b} from \id{x}
+    \item All data items initially have value \red{\id{NIL}}
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Possible behavior}
+    We omit the index when possible and draw according to time (x-axis):
+
+    \vspace*{12pt}
+    \begin{centerfig}
+      \includefigure[1.2]{07-02}
+    \end{centerfig}
+  \end{block}
+\end{slide}
+\begin{slide}{Sequential consistency}
+  \begin{block}{Definition}
+    The result of any execution is the same as if the operations of all processes were executed in some
+    sequential order, and the operations of each individual process appear in this sequence in the order
+    specified by its program.
+  \end{block}
+  \vspace*{-6pt}
+  \begin{centerfig}
+    \includefigure[1]{07-03a} \\
+    A sequentially consistent data store \\
+    \vspace*{12pt}
+    \includefigure[1]{07-03b} \\
+    A data store that is not sequentially consistent
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Example}
+  \begin{block}{Three concurrent processes (initial values: 0)}
+    \begin{center}
+      \renewcommand{\arraystretch}{0.9}
+      \begin{tabular}{lll}
+        Process \id{P_1} & Process \id{P_2} & Process \id{P_3} \\ \whline 
+        \code{x \mathexpr{\leftarrow} 1;} & \code{y \mathexpr{\leftarrow} 1;} & \code{z \mathexpr{\leftarrow} 1;} \\
+        \code{print(y,z);}                & \code{print(x,z);}                & \code{print(x,y);}
+      \end{tabular}
+    \end{center}
+  \end{block}
+  \onslide<2->
+  \begin{block}{Example execution sequences}
+    \begin{centerfig}
+      \includefigure{07-05}
+    \end{centerfig}
+  \end{block}
+\end{slide}
+  \begin{slide}{How tricky can it  get?}
+    \begin{block}{Seemingly okay}
+      \centering\includefigure[1.2]{07-06}
+    \end{block}
+    \onslide<2->
+    \begin{block}{But not really (don't forget that \id{P_1} and \id{P_2} act concurrently)}
+      \begin{center}
+        \begin{tabular}{|c@{;\ }c@{;\ }c@{;\ }c|c|c|}\hline
+          \multicolumn{4}{|c|}{\textbf{Possible ordering of operations}} & \multicolumn{2}{c|}{\textbf{Result}} \\ \whline
+          \idsn{W_1(x)a} & \idsn{W_1(y)a} & \idsn{W_2(y)b} & \idsn{W_2(x)b} & \idsn{R_1(x)b} & \idsn{R_2(y)b} \\
+          \idsn{W_1(x)a} & \idsn{W_2(y)b} & \idsn{W_1(y)a} & \idsn{W_2(x)b} & \idsn{R_1(x)b} & \idsn{R_2(y)a} \\
+          \idsn{W_1(x)a} & \idsn{W_2(y)b} & \idsn{W_2(x)b} & \idsn{W_1(y)a} & \idsn{R_1(x)b} & \idsn{R_2(y)a} \\
+          \idsn{W_2(y)b} & \idsn{W_1(x)a} & \idsn{W_1(y)a} & \idsn{W_2(x)b} & \idsn{R_1(x)b} & \idsn{R_2(y)a} \\
+          \idsn{W_2(y)b} & \idsn{W_1(x)a} & \idsn{W_2(x)b} & \idsn{W_1(y)a} & \idsn{R_1(x)b} & \idsn{R_2(y)a} \\
+          \idsn{W_2(y)b} & \idsn{W_2(x)b} & \idsn{W_1(x)a} & \idsn{W_1(y)a} & \idsn{R_1(x)a} & \idsn{R_2(y)a} \\ \hline
+        \end{tabular}
+      \end{center}
+    \end{block}
+  \end{slide}
+  \begin{slide}{How tricky can it get?}
+    \begin{block}{Linearizability}
+      Each operation should appear to take effect instantaneously at some moment between its start and completion.
+    \end{block}
+    \begin{block}{Operations complete within a given time (shaded area)}
+      \centering\includefigure[1.2]{07-07}
+    \end{block}
+    \begin{block}{With better results}
+      \begin{center}
+        \begin{tabular}{|c@{;\ }c@{;\ }c@{;\ }c|c|c|}\hline
+          \multicolumn{4}{|c|}{\textbf{Possible ordering of operations}} & \multicolumn{2}{c|}{\textbf{Result}} \\ \whline
+          \idsn{W_1(x)a} & \idsn{W_2(y)b} & \idsn{W_1(y)a} & \idsn{W_2(x)b} & \idsn{R_1(x)b} & \idsn{R_2(y)a} \\
+          \idsn{W_1(x)a} & \idsn{W_2(y)b} & \idsn{W_2(x)b} & \idsn{W_1(y)a} & \idsn{R_1(x)b} & \idsn{R_2(y)a} \\
+          \idsn{W_2(y)b} & \idsn{W_1(x)a} & \idsn{W_1(y)a} & \idsn{W_2(x)b} & \idsn{R_1(x)b} & \idsn{R_2(y)a} \\
+          \idsn{W_2(y)b} & \idsn{W_1(x)a} & \idsn{W_2(x)b} & \idsn{W_1(y)a} & \idsn{R_1(x)b} & \idsn{R_2(y)a} \\ \hline
+        \end{tabular}
+      \end{center}
+    \end{block}
+  \end{slide}
+\begin{slide}{Causal consistency}
+  \begin{block}{Definition}
+    Writes that are potentially causally related must be seen by all processes in the same order. Concurrent
+    writes may be seen in a different order by different processes.
+  \end{block}
+  \vspace*{-6pt}
+  \begin{centerfig}
+    \includefigure[1]{07-09a} \\
+    A violation of a causally-consistent store \\
+    \vspace*{12pt}
+    \includefigure[1]{07-09b} \\
+    A correct sequence of events in a causally-consistent store
+  \end{centerfig}
+\end{slide}
+  \begin{slide}{Consistency models, serializability, transactions}
+    \begin{block}{Overwhelming, but often already known}
+      Again, from the world of \blue{transactions}: can we order the execution of all operations in a set of
+      transactions in such a way that the final result matches a serial execution of those transactions? The
+      keyword is \red{serializability}.
+    \end{block}
+    \begin{centerfig}
+      \newcommand{\si}{\hspace*{1em}}
+      \renewcommand{\arraystretch}{0.9}
+      \begin{tabular}{l@{\hspace*{1cm}}l@{\hspace*{1cm}}l}
+        \code{BEGIN\_TRANSACTION} & \code{BEGIN\_TRANSACTION} & \code{BEGIN\_TRANSACTION} \\
+        \si\code{x = 0}           & \si\code{x = 0}           & \si\code{x = 0}           \\
+        \si\code{x = x + 1}       & \si\code{x = x + 2}       & \si\code{x = x + 3}       \\
+        \code{END\_TRANSACTION}   & \code{END\_TRANSACTION}   & \code{END\_TRANSACTION}   \\ 
+        \blue{Transaction \id{T_1}} & \blue{Transaction \id{T_2}} & \blue{Transaction \id{T_3}} \\
+      \end{tabular}
+    \end{centerfig}
+    \begin{exampleblock}{A number of schedules}
+      \begin{centerfig}
+        \sffamily\footnotesize
+        \begin{tabular}{|l|llllll|l|}\hline
+          & \multicolumn{6}{c|}{Time \mathexpr{\longrightarrow}} & \\ \hline
+          S1 & x = 0 & x = x + 1 & x = 0     & x = x + 2 & x = 0     & x = x + 3 & \blue{Legal}   \\
+          S2 & x = 0 & x = 0     & x = x + 1 & x = x + 2 & x = 0     & x = x + 3 & \blue{Legal}   \\
+          S3 & x = 0 & x = 0     & x = x + 1 & x = 0     & x = x + 2 & x = x + 3 & \red{Illegal} \\
+          S4 & x = 0 & x = 0     & x = x + 3 & x = 0     & x = x + 1 & x = x + 2 & \red{Illegal} \\ \hline
+        \end{tabular}
+      \end{centerfig}
+    \end{exampleblock}
+  \end{slide}
+\begin{slide}{Grouping operations}
+  \begin{block}{Entry consistency: Definition}
+    \begin{itemize}
+    \item Accesses to \red{locks} are sequentially consistent.
+    \item No access to a lock is allowed to be performed until all previous writes have completed everywhere.
+    \item No data access is allowed to be performed until all previous accesses to locks have been performed.
+    \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{block}{Basic idea} 
+    You don't care that reads and writes of a \blue{series} of operations are immediately known to other
+    processes. You just want the \blue{effect} of the series itself to be known.
+  \end{block}
+\end{slide}
+\begin{slide}{Grouping operations}
+  \begin{block}{A valid event sequence for entry consistency}
+    \begin{center}
+      \includefigure[1]{07-11}
+    \end{center}
+  \end{block}
+  \begin{block}{Observation} 
+    Entry consistency implies that we need to lock and unlock data (implicitly or not).
+  \end{block}
+  \begin{block}{Question}
+    What would be a convenient way of making this consistency more or less transparent to programmers?
+  \end{block}
+\end{slide}
+\subsection{Eventual consistency}
+\begin{slide}{Eventual consistency}
+  \begin{block}{Definition}
+    Consider a collection of data stores and (concurrent) write operations. The strores are \blue{eventually
+      consistent} when in lack of updates from a certain moment, all updates to that point are propagated in
+    such a way that replicas will have the same data stored (until updates are accepted again).
+  \end{block}
+
+  \begin{block}{Srong eventual consistency}
+    Basic idea: if there are conflicting updates, have a globally determined resolution mechanism (for
+    example, using NTP, simply let the ``most recent'' update win). 
+  \end{block}
+
+  \begin{block}{Program consistency}
+    \mathexpr{P} is a \red{monotonic problem} if for any input sets \mathexpr{S} and \mathexpr{T},
+    \mathexpr{P(S) \subseteq P(T)}.
+
+    \red{Observation}: A \blue{program} solving a monotonic problem can start with incomplete information, but
+    is guaranteed not to have to roll back when missing information becomes available. \green{Example}:
+    filling a shopping cart.
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{Important observation}
+    In all cases, we are avoiding global synchronization.
+  \end{alertblock}
+\end{slide}
+\subsection{Continuous consistency}
+\begin{slide}{Continuous Consistency}
+  \begin{block}{We can actually talk about a \blue{degree of consistency}}
+    \begin{itemize}\tightlist
+    \item replicas may differ in their \blue{numerical value}
+    \item replicas may differ in their relative \blue{staleness}
+    \item there may be differences regarding (number and order) of \blue{performed update operations}
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Conit}
+    Consistency unit \mathexpr{\Rightarrow} specifies the \blue{data unit} over which consistency is to be measured.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Example: Conit}
+  \begin{center}
+    \includefigure{07-15}
+  \end{center}
+  \begin{block}{Conit (contains the variables \id{g}, \id{p}, and \id{d})}
+    \begin{itemize}\tightlist
+    \item Each replica has a \blue{vector clock}: 
+      \red{([known] time @ A, [known] time @ B)}
+    \item \id{B} sends \id{A} operation [\mathexpr{\langle 5, \id{B} \rangle: \id{g \leftarrow d + 45}}];
+      \mathexpr{A} has made this operation \blue{permanent} (cannot be rolled back)
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Example: Conit}
+  \begin{center}
+    \includefigure{07-15}
+  \end{center}
+  \begin{block}{Conit (contains the variables \id{g}, \id{p}, and \id{d})}
+    \begin{itemize}\tightlist
+    \item \id{A} has three \blue{pending} operations \mathexpr{\Rightarrow} order deviation = 3
+    \item \id{A} missed \blue{two} operations from \id{B}; max diff is 70 + 412 units
+      \mathexpr{\Rightarrow} \mathexpr{(2,482)} 
+    \end{itemize}
+  \end{block}
+\end{slide}
+\section{Client-centric consistency models}
+\begin{slide}{Consistency for mobile users}
+  \begin{exampleblock}{Example}
+    Consider a distributed database to which you have access through your notebook. Assume your notebook acts
+    as a front end to the database.
+    \begin{itemize}
+    \item At location \id{A} you access the database doing reads and updates.
+    \item At location \id{B} you continue your work, but unless you access the same server as the one at location
+      \mathexpr{A}, you may detect inconsistencies:
+      \begin{itemize}\tightlist
+      \item your updates at \id{A} may not have yet been propagated to \id{B}
+      \item you may be reading newer entries than the ones available at \id{A}
+      \item your updates at \id{B} may eventually conflict with those at \id{A}
+      \end{itemize}
+    \end{itemize}
+  \end{exampleblock}
+  \onslide<2->
+  \begin{alertblock}{Note}
+    The only thing you really want is that the entries you updated and/or read at \id{A}, are in \id{B} the
+    way you left them in \id{A}. In that case, the database will appear to be consistent \blue{to you}.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Basic architecture}
+  \begin{block}{The principle of a mobile user accessing different replicas of a distributed database}
+    \begin{centerfig}
+      \includefigure{07-17}
+    \end{centerfig}
+  \end{block}
+\end{slide}
+\subsection{Monotonic reads}
+\begin{slide}{Client-centric consistency: notation}
+  \begin{block}{Notations} 
+    \begin{itemize}
+    \item \red{\id{W_1(x_2)}} is the write operation by process \id{P_1} that leads to \blue{version} \id{x_2} of \id{x}
+    \item \red{\id{W_1(x_i;x_j)}} indicates \id{P_1} produces version \id{x_j} based on a previous version \id{x_i}.
+    \item \red{\id{W_1(x_i|x_j)}} indicates \id{P_1} produces version \id{x_j} \blue{concurrently} to version
+      \id{x_i}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Monotonic reads}
+  \begin{exampleblock}{Example}
+    Automatically reading your personal calendar updates from different servers. Monotonic reads guarantees
+    that the user sees all updates, no matter from which server the automatic reading takes place.
+  \end{exampleblock}
+  \begin{exampleblock}{Example}
+    Reading (not modifying) incoming mail while you are on the move. Each time you connect to a different
+    e-mail server, that server fetches (at least) all the updates from the server you previously visited.
+  \end{exampleblock}
+\end{slide}
+\begin{slide}{Monotonic reads}
+  \begin{block}{Definition}
+    If a process reads the value of a data item \mathexpr{x}, any successive read operation
+    on \mathexpr{x} by that process will always return that same or a more recent value.
+  \end{block}
+  \begin{centerfig}
+    \includefigure[1]{07-18a} \\
+    A monotonic-read consistent data store \\
+  \end{centerfig}
+  \vspace*{12pt}
+  \begin{centerfig}
+    \includefigure[1]{07-18b} \\
+    A data store that does not provide monotonic reads
+  \end{centerfig}
+\end{slide}
+\subsection{Monotonic writes}
+\begin{slide}{Monotonic writes}
+  \begin{exampleblock}{Example}
+    Updating a program at server \id{S_2}, and ensuring that all components on which compilation and linking
+    depends, are also placed at \id{S_2}.
+  \end{exampleblock}
+  \begin{exampleblock}{Example}
+    Maintaining versions of replicated files in the correct order everywhere (propagate the previous version
+    to the server where the newest version is installed).
+  \end{exampleblock}
+\end{slide}
+\begin{slide}{Monotonic writes}
+  \begin{block}{Definition}
+    A write operation by a process on a data item \id{x} is completed before any successive write operation on
+    \id{x} by the same process.
+  \end{block}
+  \begin{centerfig}
+    \begin{tabular}{@{}c@{\hspace*{1cm}}c}
+      \includefigure[1]{07-19a} & 
+      \includefigure[1]{07-19b} \\
+      OK & Not OK
+    \end{tabular}
+  \end{centerfig}
+  \vspace*{12pt}
+  \begin{centerfig}
+    \begin{tabular}{@{}c@{\hspace*{1cm}}c}
+      \includefigure[1]{07-19c} & 
+      \includefigure[1]{07-19d} \\
+      Not OK & OK
+    \end{tabular}
+  \end{centerfig}
+\end{slide}
+\subsection{Read your writes}
+\begin{slide}{Read your writes}
+  \begin{block}{Definition}
+    The effect of a write operation by a process on a data item \id{x}, will always be seen by a successive read
+    operation on \id{x} by the same process. 
+  \end{block}
+  \begin{centerfig}
+    \includefigure[1]{07-20a} \\
+    OK
+  \end{centerfig}
+  \vspace*{12pt}
+  \begin{centerfig}
+    \includefigure[1]{07-20b} \\
+    Not OK
+  \end{centerfig}
+  \onslide<2->
+  \begin{exampleblock}{Example}
+    Updating your Web page and guaranteeing that your Web browser shows the newest version instead of its
+    cached copy.
+  \end{exampleblock}
+\end{slide}
+\subsection{Writes follow reads}
+\begin{slide}{Writes follow reads}
+  \begin{block}{Definition}
+    A write operation by a process on a data item \mathexpr{x} following a previous read operation on \mathexpr{x} by the same
+    process, is guaranteed to take place on the same or a more recent value of \mathexpr{x} that was read.
+  \end{block}
+  \begin{centerfig}
+    \includefigure[1]{07-21a} \\
+    OK
+  \end{centerfig}
+  \vspace*{12pt}
+  \begin{centerfig}
+    \includefigure[1]{07-21b} \\
+    Not OK
+  \end{centerfig}
+  \onslide<2->
+  \begin{exampleblock}{Example}
+    See reactions to posted articles only if you have the original posting (a read ``pulls in'' the
+    corresponding write operation).
+  \end{exampleblock}
+\end{slide}
+\subsection{Example: client-centric consistency in ZooKeeper}
+\begin{slide}{Example: ZooKeeper consistency}
+  \begin{block}{Yet another model?}
+    ZooKeeper's consistency model mixes elements of data-centric and client-centric models
+  \end{block}
+  \begin{exampleblock}{Take a naive example}
+    \begin{centerfig}
+      \includefigure{07-22}
+    \end{centerfig}
+  \end{exampleblock}
+\end{slide}
+\section{Replica management}
+\subsection{Finding the best server location}
+\begin{slide}{Replica placement}
+  \begin{block}{Essence}
+    Figure out what the best \mathexpr{K} places are out of \mathexpr{N} possible locations.
+    \begin{itemize}
+    \item<2-> Select best location out of \mathexpr{N-K} for which the \blue{average distance to clients is
+      minimal}. Then choose the next best server. (\red{Note:} The first chosen location minimizes the
+      average distance to all clients.) \blue{Computationally expensive}.
+    \item<3-> Select the \mathexpr{K}-th largest \blue{autonomous system} and place a server at the
+      best-connected host. \blue{Computationally expensive}.
+    \item<4-> Position nodes in a \mathexpr{d}-dimensional geometric space, where distance reflects
+      latency. Identify the \mathexpr{K} regions with highest density and place a server in every
+      one. \blue{Computationally cheap}.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Content replication and placement}
+\begin{slide}{Content replication}
+  \begin{block}{Distinguish different processes}
+    A process is capable of hosting a replica of an object or data:
+    \begin{itemize}
+    \item \blue{Permanent replicas:} Process/machine always having a replica
+    \item \blue{Server-initiated replica:} Process that can dynamically host a replica on request of another
+      server in the data store
+    \item \blue{Client-initiated replica:} Process that can dynamically host a replica on request of a client
+      (\red{client cache})
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Content replication}
+  \begin{block}{The logical organization of different kinds of copies of a data store into three
+    concentric rings}
+    \begin{centerfig}
+      \includefigure{07-24}
+    \end{centerfig}
+  \end{block}
+\end{slide}
+  \begin{slide}{Server-initiated replicas}
+    \begin{exampleblock}{Counting access requests from different clients}
+      \begin{centerfig}
+        \includefigure{07-25}
+      \end{centerfig}
+      \begin{itemize}\tightlist
+      \item Keep track of access counts per file, aggregated by considering server closest to requesting clients
+      \item Number of accesses drops below threshold \mathexpr{D} \mathexpr{{\Rightarrow}} drop file
+      \item Number of accesses exceeds threshold \mathexpr{R} \mathexpr{{\Rightarrow}} replicate file
+      \item Number of access between \mathexpr{D} and \mathexpr{R} \mathexpr{{\Rightarrow}} migrate file
+      \end{itemize}
+    \end{exampleblock}
+  \end{slide}
+\subsection{Content distribution}
+\begin{slide}{Content distribution}
+  \begin{block}{Consider only a client-server combination}
+    \begin{itemize}
+    \item Propagate only \blue{notification/invalidation} of update (often used for caches)
+    \item Transfer \blue{data} from one copy to another (distributed databases): \red{passive replication}
+    \item Propagate the update \blue{operation} to other copies: \red{active replication}
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Note}
+    No single approach is the best, but depends highly on available bandwidth and read-to-write ratio at
+    replicas.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Content distribution: client/server system}
+  \begin{block}{A comparison between push-based and pull-based protocols in the case of
+    multiple-client, single-server systems}
+    \begin{itemize}
+    \item \red{Pushing updates}: \blue{server-initiated approach}, in which update is propagated regardless
+      whether target asked for it.
+    \item \red{Pulling updates}: \blue{client-initiated approach}, in which client requests to be updated.
+    \end{itemize}
+    \begin{center}
+      \footnotesize
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{|l|l|l|}\hline
+        \blue{Issue} & \blue{Push-based} & \blue{Pull-based} \\ \hline
+        1: & List of client caches & None \\ \hline
+        2: & Update (and possibly fetch update) & Poll and update \\ \hline
+        3: & Immediate (or fetch-update time) & Fetch-update time  \\ \hline
+        \multicolumn{3}{|l|}{\itshape 1: State at server} \\
+        \multicolumn{3}{|l|}{\itshape 2: Messages to be exchanged} \\
+        \multicolumn{3}{|l|}{\itshape 3: Response time at the client} \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Content distribution}
+  \vspace*{-6pt}
+  \begin{block}{Observation} 
+    We can dynamically switch between pulling and pushing using \blue{leases}: A contract in which the server
+    promises to push updates to the client until the lease expires.
+  \end{block}
+  \begin{alertblock}{Make lease expiration time adaptive}
+    \begin{itemize}
+    \item<2,5> \blue{Age-based leases}: An object that hasn't changed for a long time, will not change in the near
+      future, so provide a long-lasting lease
+    \item<3,5> \blue{Renewal-frequency based leases}: The more often a client requests a specific object, the longer
+      the expiration time for that client (for that object) will be
+    \item<4,5> \blue{State-based leases}: The more loaded a server is, the shorter the expiration times become
+    \end{itemize}
+  \end{alertblock}
+  \onslide<5->
+  \begin{alertblock}{Question}
+    Why are we doing all this?  
+%%  Trying to reduce the server's state as much as possible while providing strong consistency.
+  \end{alertblock}
+\end{slide}
+\subsection{Managing replicated objects}
+\begin{slide}{Managing replicated objects}
+  \begin{itemize}
+  \item Prevent concurrent execution of multiple invocations on the same object: access to the
+    internal data of an object has to be serialized. Using local locking mechanisms are sufficient.
+  \item Ensure that all changes to the replicated state of the object are the same: no two independent
+    method invocations take place on different replicas at the same time: we need \red{deterministic thread
+      scheduling}. 
+  \end{itemize}
+  \begin{centerfig}
+    \includefigure[0.71]{07-27}
+  \end{centerfig}
+\end{slide}
+  \begin{slide}{Replicated-object invocations}
+    \begin{block}{Problem when invocating a replicated object}
+      \begin{centerfig}
+        \includefigure{07-28}
+      \end{centerfig}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Replicated-object invocations}
+    \begin{centerfig}
+      \begin{tabular}{@{}c@{\hspace*{1cm}}c}
+        \includefigure{07-29a} &
+        \includefigure{07-29b} \\
+        Forwarding a request & Returning the reply \\
+      \end{tabular}
+    \end{centerfig}
+  \end{slide}
+\section{Consistency protocols}
+\subsection{Sequential consistency: Primary-based protocols}
+\begin{slide}{Primary-based protocols}
+  \begin{block}{Primary-backup protocol}
+    \begin{centerfig}
+      \includefigure{07-30}
+    \end{centerfig}
+  \end{block}
+  \onslide<2->
+  \begin{exampleblock}{Example primary-backup protocol}
+    Traditionally applied in distributed databases and file systems that require a high degree of fault
+    tolerance. Replicas are often placed on the same LAN.
+  \end{exampleblock}
+\end{slide}
+\begin{slide}{Primary-based protocols}
+  \begin{block}{Primary-backup protocol with local writes}
+    \begin{centerfig}
+      \includefigure{07-31}
+    \end{centerfig}
+  \end{block}
+  \onslide<2->
+  \begin{exampleblock}{Example primary-backup protocol with local writes}
+    Mobile computing in disconnected mode (ship all relevant files to user before disconnecting, and update
+    later on).
+  \end{exampleblock}
+\end{slide}
+\subsection{Sequential consistency: Replicated-write protocols}
+\begin{slide}{Replicated-write protocols}
+  \begin{block}{Quorum-based protocols} 
+    Assume \mathexpr{N} replicas. Ensure that each operation is carried out in such a way that a majority vote
+    is established: distinguish \blue{read quorum} \mathexpr{N_R} and \blue{write quorum}
+    \mathexpr{N_W}. Ensure:
+    \begin{enumerate}\firmlist
+    \item \red{\mathexpr{N_R + N_W > N}} (prevent read-write conflicts)
+    \item \red{\mathexpr{N_W > N / 2}} (prevent write-write conflicts)
+    \end{enumerate}
+  \end{block}
+
+  \vspace*{12pt}
+  \begin{center}
+    \begin{tabular}{c@{\hspace*{1cm}}c@{\hspace*{1cm}}c}
+      \includefigure{07-32a} &
+      \includefigure{07-32b} &
+      \includefigure{07-32c} \\
+      Correct & Write-write conflict & Correct (ROWA)
+    \end{tabular}
+  \end{center}
+\end{slide}
+\subsection{Cache-coherence protocols}
+\subsection{Implementing continuous consistency}
+\begin{slide}{Continuous consistency: Numerical errors}
+  \begin{block}{Principal operation}
+    \begin{itemize}
+    \item Every server \id{S_i} has a log, denoted as \red{\id{L_i}}.
+    \item Consider a data item \id{x} and let \red{\mathexpr{val(\id{W})}} denote the \blue{numerical change} in its value
+      after a write operation \id{W}. Assume that \[\forall \id{W}: val(\id{W}) > 0\]
+    \item \id{W} is initially forwarded to one of the \mathexpr{N} replicas, denoted as \red{\mathexpr{origin(W)}}. \mathexpr{TW[i,j]} are
+      the \blue{writes executed by server \mathexpr{S_i} that originated from \mathexpr{S_j}}:
+      \[TW[i,j] = \sum \{ val(\id{W}) | origin(\id{W}) = \id{S_j} \mbox{\ \&\ } \id{W} \in \id{L_i} \}\]
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Continuous consistency: Numerical errors}
+  \begin{alertblock}{Note}
+    Actual value \mathexpr{v(t)} of \id{x}:
+    \[v(t) = v_{init} + \sum_{k=1}^N TW[k,k]\]
+    value \mathexpr{v_i} of \id{x} at server \id{S_i}:\vspace*{-0.25cm}
+    \[v_i = v_{init} + \sum_{k=1}^N TW[i,k]\]
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Continuous consistency: Numerical errors}
+  \begin{alertblock}{Problem}
+    We need to ensure that \mathexpr{v(t) - v_i < \delta_i} for every server \id{S_i}.
+  \end{alertblock}
+  \onslide<2->
+  \begin{block}{Approach}
+    Let every server \id{S_k} maintain a \blue{view} \mathexpr{TW_k[i,j]} of what it believes is the value of
+    \mathexpr{TW[i,j]}. This information can be \blue{gossiped} when an update is propagated.
+  \end{block}
+  \onslide<3->
+  \begin{alertblock}{Note}
+    \[0 \leq TW_k[i,j] \leq TW[i,j] \leq TW[j,j]\]
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Continuous consistency: Numerical errors}
+  \begin{block}{Solution} 
+    \id{S_k} sends operations from its log to \id{S_i} \blue{when it sees that \mathexpr{TW_k[i,k]} is getting too far from
+    \mathexpr{TW[k,k]}}, in particular, when \[TW[k,k] - TW_k[i,k] > \delta_i/(N-1)\]
+  \end{block}
+  \onslide<2->
+  \begin{block}{Question}
+    To what extent are we being \red{pessimistic} here: where does \mathexpr{\delta_i/(N-1)} come from?
+  \end{block}
+  \onslide<3->
+  \begin{alertblock}{Note}
+    Staleness can be done analogously, by essentially keeping track of what has been seen last from \id{S_i} (see
+    book).
+  \end{alertblock}
+\end{slide}
+\subsection{Implementing client-centric consistency}
+\begin{slide}{Implementing client-centric consistency}
+  
+  \begin{block}{Keeping it simple}
+    Each write operation \id{W} is assigned a globally unique identifier by its \blue{origin server}. For each
+    client, we keep track of two sets of writes:
+    \begin{itemize}
+    \item \red{Read set}: the (identifiers of the) writes relevant for that client's read operations
+    \item \red{Write set}: the (identifiers of the) client's write operations.
+    \end{itemize}
+  \end{block}
+
+  \onslide<2->
+  \begin{block}{Monotonic-read consistency}
+    When client \id{C} wants to read at server \id{S}, \id{C} passes its read set. \id{S} can pull in any
+    updates before executing the read operation, after which the read set is updated.
+  \end{block}
+
+  \onslide<3->
+  \begin{block}{Monotonic-write consistency}
+    When client \id{C} wants to write at server \id{S}, \id{C} passes its write set. \id{S} can pull in any
+    updates, executes them in the correct order, and then executes the write operation, after which the write
+    set is updated.
+  \end{block}
+
+\end{slide}
+\begin{slide}{Implementing client-centric consistency}
+  
+  \begin{block}{Read-your-writes consistency}
+    When client \id{C} wants to read at server \id{S}, \id{C} passes its write set. \id{S} can pull in any
+    updates before executing the read operation, after which the read set is updated.
+  \end{block}
+
+  \onslide<2->
+  \begin{block}{Writes-follows-reads consistency}
+    When client \id{C} wants to write at server \id{S}, \id{C} passes its read set. \id{S} can pull in any
+    updates, executes them in the correct order, and then executes the write operation, after which the write
+    set is updated.
+  \end{block}
+
+\end{slide}
+\section{Example: Caching and replication in the Web}
+\begin{slide}{Example: replication in the Web}
+  \begin{block}{Client-side caches}
+    \begin{itemize}
+    \item In the browser
+    \item At a client's site, notably through a \blue{Web proxy}
+    \end{itemize}
+  \end{block}
+  \begin{block}{Caches at ISPs}
+    Internet Service Providers also place caches to (1) reduce cross-ISP traffic and (2) improve client-side
+    performance. May get nasty when a request needs to pass many ISPs.
+  \end{block}
+\end{slide}
+  \begin{slide}{Cooperative caching}
+    \begin{centerfig}
+      \includefigure[0.71]{07-35}
+    \end{centerfig}
+  \end{slide}
+\begin{slide}{Web-cache consistency}
+  \begin{block}{How to guarantee freshness?}
+    To prevent that stale information is returned to a client:
+    \begin{itemize}
+    \item \red{Option 1}: let the cache contact the original server to see if content is still up to date.
+    \item \red{Option 2}: Assign an expiration time \mathexpr{T_{expire}} that depends on how long ago the
+      document was last modified when it is cached. If \mathexpr{T_{\mts{last\_modified}}} is the last
+      modification time of a document (as recorded by its owner), and \mathexpr{T_{\mts{cached}}} is the time
+      it was cached, then
+      \[
+      T_{\mts{expire}} = \alpha (T_{\mts{cached}} - T_{\mts{last\_modified}}) + T_{\mts{cached}}
+      \]
+      with \mathexpr{\alpha = 0.2}. Until \mathexpr{T_{\mts{expire}}}, the document is considered valid.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Alternatives for caching and replication}
+  \vspace*{-6pt}
+  \begin{centerfig}
+    \includefigure[0.83]{07-37}
+  \end{centerfig}
+  \begin{itemize}\tightlist
+  \item \red{Database copy}: the edge has the same as the origin server
+  \item \red{Content-aware cache}: check if a (normal query) can be answered with cached data. Requires that
+    the server knows about which data is cached at the edge.
+  \item \red{Content-blind cache}: store a query, and its result. When the exact same query is issued again,
+    return the result from the cache.
+  \end{itemize}
+\end{slide}
+\section{Summary}

@@ -1,0 +1,783 @@
+\part{Naming}
+\section{Names, identifiers, and addresses}
+\begin{slide}{Naming}
+  \begin{block}{Essence} 
+    Names are used to denote entities in a distributed system. To operate on an entity, we need to access it
+    at an \red{access point}. Access points are entities that are named by means of an \red{address}.
+  \end{block}
+  \begin{alertblock}{Note}
+    A \blue{location-independent} name for an entity \id{E}, is independent of the addresses of the access
+    points offered by \id{E}.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Identifiers}
+  \begin{block}{Pure name}
+    A name that has no meaning at all; it is just a random string. Pure names can be used for comparison only.
+  \end{block}
+  \begin{block}{Identifier: A name having some specific properties}
+    \begin{enumerate}\tightlist
+    \item An identifier refers to at most one entity.
+    \item Each entity is referred to by at most one identifier.
+    \item An identifier always refers to the same entity (i.e., it is never reused).
+    \end{enumerate}
+  \end{block}
+  \begin{block}{Observation} 
+    An identifier need not necessarily be a pure name, i.e., it may have content.
+  \end{block}
+\end{slide}
+\section{Flat naming}
+\subsection{Simple solutions}
+\begin{slide}{Broadcasting}
+  \begin{block}{Broadcast the ID, requesting the entity to return its current address}
+    \begin{itemize}\tightlist
+    \item Can never scale beyond local-area networks
+    \item Requires all processes to listen to incoming location requests
+    \end{itemize}
+  \end{block}
+  \begin{exampleblock}{Address Resolution Protocol (ARP)}
+    To find out which MAC address is associated with an IP address, broadcast the query ``who has this IP
+    address''?
+  \end{exampleblock}
+\end{slide}
+\begin{slide}{Forwarding pointers}
+  \begin{block}{When an entity moves, it leaves behind a pointer to its next location}
+    \begin{itemize}
+    \item Dereferencing can be made entirely transparent to clients by simply following the chain of pointers
+    \item Update a client's reference when present location is found
+    \item Geographical scalability problems (for which separate chain reduction mechanisms are needed):
+      \begin{itemize}\tightlist
+      \item Long chains are not fault tolerant
+      \item Increased network latency at dereferencing
+      \end{itemize}
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Home-based approaches}
+\begin{slide}{Home-based approaches}
+  \begin{block}{Single-tiered scheme: Let a \blue{home} keep track of where the entity is}
+    \begin{itemize}\tightlist
+    \item Entity's \red{home address} registered at a naming service
+    \item The home registers the \red{foreign address} of the entity
+    \item Client contacts the home first, and then continues with foreign location
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{The principle of mobile IP}
+  \begin{center}
+    \includefigure{06-01}
+  \end{center}
+\end{slide}
+\begin{slide}{Home-based approaches}
+  \begin{block}{Problems with home-based approaches}
+    \begin{itemize}
+    \item Home address has to be supported for entity's lifetime
+    \item Home address is fixed \mathexpr{\Rightarrow} unnecessary burden when the entity permanently moves
+    \item Poor geographical scalability (entity may be next to client)
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Note}
+    Permanent moves may be tackled with another level of naming (DNS)
+  \end{alertblock}
+\end{slide}
+\subsection{Distributed hash tables}
+\begin{slide}{Illustrative: Chord}
+  \begin{block}{Consider the organization of many nodes into a \blue{logical ring}}
+    \begin{itemize}\tightlist
+    \item Each node is assigned a random \mathexpr{m}-bit \red{identifier}.
+    \item Every entity is assigned a unique \mathexpr{m}-bit \red{key}.
+    \item Entity with key \mathexpr{k} falls under jurisdiction of node with smallest \mathexpr{id \geq k}
+      (called its \red{successor} \mathexpr{\func{succ}(k)}).
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Nonsolution}
+    Let each node keep track of its neighbor and start linear search along the ring.
+  \end{alertblock}
+  \begin{block}{Notation}
+    We will speak of node \id{p} as the node have identifier \mathexpr{p}
+  \end{block}
+\end{slide}
+\begin{slide}{Chord finger tables}
+  \begin{block}{Principle}
+    \begin{itemize}
+    \item<1-> Each node \id{p} maintains a \red{finger table} \mathexpr{\id{FT_p}[]} with at most \mathexpr{m}
+      entries:
+      \[
+      \id{FT_p}[i] = \func{succ}(p + 2^{i-1})
+      \]
+      \red{Note}: the \mathexpr{i}-th entry points to the first node succeeding \id{p} by at least
+      \mathexpr{2^{i-1}}.
+    \item<2-> To look up a key \mathexpr{k}, node \id{p} forwards the request to node with index \mathexpr{j}
+      satisfying
+      \[
+      q = \id{FT_p}[j] \leq k < \id{FT_p}[j+1]
+      \]
+    \item<3-> If \mathexpr{p < k < \id{FT_p}[1]}, the request is also forwarded to \mathexpr{\id{FT_p}[1]}
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Chord lookup example}
+  \begin{block}{Resolving key \mathexpr{26} from node \id{1} and key \id{12} from node \id{28}}
+    \begin{center}
+      \includefigure[0.63]{06-02}
+    \end{center}
+  \end{block}
+\end{slide}
+  \begin{slide}{Chord in Python}
+    \begin{block}{}
+      \begin{tabular}{@{\hspace*{1em}}l}
+        \includelisting{06-04/chord-book}
+      \end{tabular}
+    \end{block}
+  \end{slide}
+\begin{slide}{Exploiting network proximity}
+  \begin{alertblock}{Problem}
+    The logical organization of nodes in the overlay may lead to \blue{erratic message transfers} in the
+    underlying Internet: node \id{p} and node \mathexpr{\func{succ}(p+1)} may be very far apart.
+  \end{alertblock}
+  \begin{block}{Solutions}
+    \begin{itemize}
+    \item<2->\red{Topology-aware node assignment}: When assigning an ID to a node, make sure that nodes
+      close in the ID space are also close in the network. \blue{Can be very difficult}.
+    \item<3->\red{Proximity routing}: Maintain more than one possible successor, and forward to the
+      closest. \newline \blue{Example:} in Chord \mathexpr{\id{FT_p}[i]} points to first node in
+      \mathexpr{INT = [p+2^{i -1},p+2^i-1]}. Node \id{p} can also store pointers to other nodes in
+      \mathexpr{INT}.
+    \item<4->\red{Proximity neighbor selection}: When there is a choice of selecting who your neighbor
+      will be (not in Chord), pick the closest one.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\subsection{Hierarchical approaches}
+\begin{slide}{Hierarchical Location Services (HLS)}
+  \vspace*{-6pt}
+  \begin{block}{Basic idea} 
+    Build a large-scale search tree for which the underlying network is divided into hierarchical
+    domains. Each domain is represented by a separate directory node.
+  \end{block}
+  \begin{block}{Principle}
+    \begin{center}
+      \includefigure{06-05}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{HLS: Tree organization}
+  \vspace*{-6pt}
+  \begin{block}{Invariants}
+    \begin{itemize}\tightlist
+    \item Address of entity \id{E} is stored in a leaf or intermediate node
+    \item Intermediate nodes contain a pointer to a child if and only if the subtree rooted at the child
+      stores an address of the entity
+    \item The root knows about all entities
+    \end{itemize}
+  \end{block}
+  \begin{block}{Storing information of an entity having two addresses in different
+      leaf domains}
+    \begin{center}
+      \includefigure[0.83]{06-06}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{HLS: Lookup operation}
+  \begin{block}{Basic principles}
+    \begin{itemize}\tightlist
+    \item Start lookup at local leaf node
+    \item Node knows about \id{E}  \mathexpr{\Rightarrow} follow downward pointer, else go up
+    \item Upward lookup always stops at root
+    \end{itemize}
+  \end{block}
+  \begin{block}{Looking up a location}
+    \begin{center}
+      \includefigure[0.81]{06-07}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{HLS: Insert operation}
+  \begin{block}{(a)~An insert request is forwarded to the first node that knows about entity
+    \id{E}. (b)~A chain of forwarding pointers to the leaf node is created}
+    \begin{center}
+      \begin{tabular}{@{\hspace*{-6pt}}c@{}c}
+        \includefigure[0.81]{06-08a} &
+        \includefigure[0.81]{06-08b} \\
+        (a) & (b) 
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+  \begin{slide}{Can an HLS scale?}
+    \begin{block}{Observation}
+      A design flaw seems to be that the root node needs to keep track of \blue{all} identifiers
+      \mathexpr{\Rightarrow} make a distinction between a \red{logical design} and its \red{physical
+        implementation}.
+    \end{block}
+    \begin{block}{Notation}
+      \begin{itemize}\tightlist
+      \item Assume there are a total of \mathexpr{N} physical hosts \mathexpr{\{\id{H_1}, \id{H_2}, \ldots,
+        \id{H_{N}}\}}. Each host is capable of running one or more location servers.
+      \item \mathexpr{D_k(\id{A})} denotes the domain at level \mathexpr{k} that contains address \id{A}; 
+        \mathexpr{k = 0} denotes the root domain. 
+      \item \mathexpr{\func{LS}_k(\id{E},\id{A})} denotes the unique location server in \mathexpr{D_k(\id{A})}
+        responsible for keeping track of entity \id{E}.
+      \end{itemize}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Can an HLS scale?}
+    \begin{block}{Basic idea for scaling}
+      \begin{itemize}\tightlist
+      \item Choose different physical servers for the logical name servers on a per-entity basis
+        \begin{itemize}
+        \item (at root level, but also intermediate)
+        \end{itemize}
+      \item Implement a mapping of entities to physical servers such that the load of storing records will be
+        distributed
+      \end{itemize}
+    \end{block}
+  \end{slide}
+  \begin{slide}{Can an HLS scale?}
+    \begin{block}{Solution}
+      \begin{itemize}\tightlist
+      \item \mathexpr{\mathbf{D}_k = \{\id{D_{k,1}},\id{D_{k,2}},\ldots,\id{D_{k,{N_k}}}\}} denotes the
+        \mathexpr{N_k} domains at level \mathexpr{k}
+      \item \blue{Note}: \mathexpr{N_0 = |\mathbf{D}_0| = 1}. 
+      \item For each level \mathexpr{k}, the set of hosts is partitioned into \mathexpr{N_k} subsets, with
+        each host running a location server representing exactly one of the domains \id{D_{k,i}} from
+        \mathexpr{\mathbf{D}_k}.
+      \end{itemize}
+    \end{block}
+    \begin{block}{Principle of distributing logical location servers}
+      \begin{center}
+        \includefigure{06-09}
+      \end{center}
+    \end{block}
+  \end{slide}
+\subsection{Secure flat naming}
+\begin{slide}{Security in flat naming}
+
+  \begin{block}{Basics}
+    Without special measures, we need to trust that the name-resolution process to return what is associated
+    with a flat name. Two approaches to follow:
+    \begin{itemize}
+    \item Secure the identifier-to-entity association
+    \item Secure the name-resolution process
+    \end{itemize}
+  \end{block}
+  
+  \begin{block}{Self-certifying names}
+    Use a value derived from the associated entity and make it (part of) the flat name:
+    \begin{itemize}
+    \item \( \func{id}(\func{entity}) = \func{hash}(\func{data associated with the entity}) \)
+    \end{itemize}
+    when dealing with read-only entities, otherwise
+    \begin{itemize}
+    \item \( \func{id}(\func{entity}) = \func{public key}(\func{entity}) \)
+    \end{itemize}
+    in which case additional data is returned, such as a verifiable digital signature.
+  \end{block}
+
+  \begin{alertblock}{Securing the name-resolution process}
+    Much more involved: discussion deferred until discussing secure DNS.
+  \end{alertblock}
+  
+\end{slide}
+\section{Structured naming}
+\subsection{Name spaces}
+\begin{slide}{Name space}
+  \vspace*{-6pt}
+  \begin{block}{Naming graph} 
+    A graph in which a \red{leaf node} represents a (named) entity. A \red{directory node} is an entity that
+    refers to other nodes.
+  \end{block}
+  \begin{block}{A general naming graph with a single root node}
+    \begin{center}
+      \includefigure{06-10}
+    \end{center}
+  \end{block}
+  \begin{block}{Note} 
+    A directory node contains a table of \emph{(node~identifier,~edge~label)} pairs. 
+  \end{block}
+\end{slide}
+\begin{slide}{Name space}
+  \begin{block}{We can easily store all kinds of \blue{attributes} in a node}
+    \begin{itemize}\tightlist
+    \item Type of the entity
+    \item An identifier for that entity
+    \item Address of the entity's location
+    \item Nicknames
+    \item ...
+    \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{Note}
+    Directory nodes can also have attributes, besides just storing a directory table with \emph{(identifier,
+      label)} pairs.
+  \end{alertblock}
+\end{slide}
+\subsection{Name resolution}
+\begin{slide}{Name resolution}
+  \begin{alertblock}{Problem}
+    To resolve a name, we need a directory node. How do we actually find that (initial) node?
+  \end{alertblock}
+  \onslide<2->
+  \begin{block}{Closure mechanism: The mechanism to select the implicit context from which to start name
+      resolution}
+    \begin{itemize}\tightlist
+    \item \code{www.distributed-systems.net}: start at a DNS name server
+    \item \code{/home/maarten/mbox}: start at the local NFS file server (possible recursive search)
+    \item \code{0031 20 598 7784}: dial a phone number
+    \item \code{77.167.55.6}: route message to a specific IP address
+    \end{itemize}
+  \end{block}
+  \onslide<3->
+  \begin{block}{Note}
+    You cannot have an explicit closure mechanism -- how would you start?
+  \end{block}
+\end{slide}
+\begin{slide}{Name linking}
+  \begin{block}{Hard link} 
+    What we have described so far as a \red{path name}: a name that is resolved by following a specific path
+    in a naming graph from one node to another.
+  \end{block}
+  \begin{block}{Soft link: Allow a node \id{N} to contain a \red{name} of another node}
+    \begin{itemize}\tightlist
+    \item First resolve \id{N}'s name (leading to \id{N})
+    \item Read the content of \id{N}, yielding \id{name}
+    \item Name resolution continues with \id{name}
+    \end{itemize}
+  \end{block}
+  \onslide<2->
+  \begin{block}{Observations}
+    \begin{itemize}\tightlist
+    \item The name resolution process determines that we read the \blue{content} of a node, in particular, the
+      name in the other node that we need to go to.
+    \item One way or the other, we know where and how to start name resolution given \id{name}
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Name linking}
+  \begin{block}{The concept of a symbolic link explained in a naming graph}
+    \begin{center}
+      \includefigure{06-12}
+    \end{center}
+  \end{block}
+  \begin{alertblock}{Observation} 
+    Node \id{n5} has only one name
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Mounting}
+  \begin{block}{Issue}
+    Name resolution can also be used to merge \blue{different name spaces} transparently through
+    \red{mounting}: associating a node identifier of another name space with a node in a current name space.
+  \end{block}
+  \begin{block}{Terminology}
+    \begin{itemize}\tightlist
+    \item \red{Foreign name space}: the name space that needs to be accessed
+    \item \red{Mount point}: the node in the current name space containing the node identifier of the foreign
+      name space
+    \item \red{Mounting point}: the node in the foreign name space where to continue name resolution
+    \end{itemize}
+  \end{block}
+  \begin{block}{Mounting across a network}
+    \begin{enumerate}\tightlist
+    \item The name of an access protocol.
+    \item The name of the server.
+    \item The name of the mounting point in the foreign name space.
+    \end{enumerate}
+  \end{block}
+\end{slide}
+\begin{slide}{Mounting in distributed systems}
+  \vspace*{-6pt}
+  \begin{block}{Mounting remote name spaces through a specific access protocol}
+    \begin{center}
+      \includefigure[0.81]{06-13}
+    \end{center}
+  \end{block}
+\end{slide}
+\subsection{The implementation of a name space}
+\begin{slide}{Name-space implementation}
+  \begin{block}{Basic issue} 
+    Distribute the name resolution process as well as name space management across multiple machines, by
+    distributing nodes of the naming graph.
+  \end{block}
+  \onslide<2->
+  \begin{block}{Distinguish three levels}
+    \begin{itemize}\tightlist
+    \item<3-> \blue{Global level:} Consists of the high-level directory nodes. Main aspect is that these directory
+      nodes have to be jointly managed by different administrations
+    \item<4-> \blue{Administrational level:} Contains mid-level directory nodes that can be grouped in such a way
+      that each group can be assigned to a separate administration.
+    \item<5-> \blue{Managerial level:} Consists of low-level directory nodes within a single administration. Main
+      issue is effectively mapping directory nodes to local name servers.
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Name-space implementation}
+  \vspace*{-6pt}
+  \begin{block}{An example partitioning of the DNS name space, including network files}
+    \begin{center}
+      \includefigure{06-14}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Name-space implementation}
+  \begin{block}{A comparison between name servers for implementing nodes in a name space}
+    \begin{center}
+      \small
+      \renewcommand{\arraystretch}{1.1}
+      \begin{tabular}{|l|l|l|l|}\hline
+        \blue{Item} & \blue{Global} & \blue{Administrational} & \blue{Managerial}\\ \hline
+        1 & Worldwide	& Organization 	& Department 	\\ \hline
+        2 & Few 		& Many 			& Vast numbers 	\\ \hline
+        3 & Seconds 	& Milliseconds 	& Immediate 	\\ \hline
+        4 & Lazy 		& Immediate 	& Immediate 	\\ \hline
+        5 & Many 		& None or few 	& None 			\\ \hline
+        6 & Yes 		& Yes 			& Sometimes 	\\ \hline\hline
+        \multicolumn{2}{|l|}{1: Geographical scale} & \multicolumn{2}{l|}{4: Update propagation} \\ 
+        \multicolumn{2}{|l|}{2: \# Nodes} 			& \multicolumn{2}{l|}{5: \# Replicas} \\ 
+        \multicolumn{2}{|l|}{3: Responsiveness} 	& \multicolumn{2}{l|}{6: Client-side caching?} \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Iterative name resolution}
+  \begin{block}{Principle}
+    \begin{enumerate}\tightlist
+    \item \id{resolve(dir,[name_1,...,name_K])} sent to \id{Server_0} responsible for \id{dir}
+    \item \id{Server_0} resolves \id{resolve(dir,name_1)} \mathexpr{\rightarrow} \id{dir_1}, returning the 
+      identification (address) of \id{Server_1}, which stores \id{dir_1}.
+    \item Client sends \id{resolve(dir_1,[name_2,...,name_K])} to \id{Server_1}, etc.
+    \end{enumerate}
+    \begin{center}
+      \includefigure{06-16}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Recursive name resolution}
+  \vspace*{-4pt}
+  \begin{block}{Principle}
+    \begin{enumerate}\tightlist
+    \item \id{resolve(dir,[name_1,...,name_K])} sent to \id{Server_0} responsible for \id{dir}
+    \item \id{Server_0} resolves \id{resolve(dir,name_1)} \mathexpr{\rightarrow} \id{dir_1}, and sends
+      \id{resolve(dir_1,[name_2,...,name_K])} to \id{Server_1}, which stores \id{dir_1}.
+    \item \id{Server_0} waits for result from \id{Server_1}, and returns it to client.
+    \end{enumerate}
+    \begin{center}
+      \includefigure{06-17}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Caching in recursive name resolution}
+  \begin{centerfig}
+    \includefigure{06-18}
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Scalability issues}
+  \begin{alertblock}{Size scalability}
+    We need to ensure that servers can handle a large number of requests per time unit $\Rightarrow$
+    high-level servers are in big trouble.
+  \end{alertblock}
+  \onslide<2->
+  \begin{block}{Solution} 
+    Assume (at least at global and administrational level) that content of nodes hardly ever changes. 
+    We can then apply extensive replication by mapping nodes to multiple servers, and start name resolution
+    at the nearest server.
+  \end{block}
+  \onslide<3->
+  \begin{block}{Observation} 
+    An important attribute of many nodes is the \blue{address} where the represented entity can be
+    contacted. Replicating nodes makes large-scale traditional name servers unsuitable for locating mobile
+    entities.
+  \end{block}
+\end{slide}
+\begin{slide}{Scalability issues}
+  \begin{alertblock}{We need to ensure that the name resolution process scales across large geographical
+      distances}
+    \begin{center}
+      \includefigure{06-19}
+    \end{center}
+  \end{alertblock}
+  \begin{block}{Problem} 
+    By mapping nodes to servers that can be located anywhere, we introduce an implicit location
+    dependency.
+  \end{block}
+\end{slide}
+\subsection{Example: The Domain Name System}
+\begin{slide}{DNS}
+  \vspace*{-6pt}
+  \begin{block}{Essence}
+    \begin{itemize}\tightlist
+    \item Hierarchically organized name space with each node having exactly one incoming edge
+      \mathexpr{\Rightarrow} edge label = node label. 
+    \item \red{domain}: a subtree
+    \item \red{domain name}: a path name to a domain's root node. 
+    \end{itemize}
+  \end{block}
+  \vspace*{-6pt}
+  \begin{block}{Information in a node}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{center}
+      \sffamily\footnotesize
+      \begin{tabular}{|l|l|l|}\hline
+        \textbf{Type} & \textbf{Refers to}& \textbf{Description} \\ \whline
+        \id{SOA}   & Zone     & Holds info on the represented zone \\ \hline
+        \id{A}     & Host     & IP addr. of host this node represents \\ \hline
+        \id{MX}    & Domain   & Mail server to handle mail for this node \\ \hline
+        \id{SRV}   & Domain   & Server handling a specific service \\ \hline
+        \id{NS}    & Zone     & Name server for the represented zone \\ \hline
+        \id{CNAME} & Node     & Symbolic link  \\ \hline
+        \id{PTR}   & Host     & Canonical name of a host \\ \hline
+        \id{HINFO} & Host     & Info on this host \\ \hline
+        \id{TXT}   & Any kind & Any info considered useful \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Modern DNS}
+  \begin{centerfig}
+    \includefigure{06-23a} \\
+    The traditional organization of the implementation of DNS \\ 
+  \end{centerfig}
+  \vspace*{12pt}
+  \begin{centerfig}
+    \includefigure{06-23b} \\
+    The modern organization of DNS
+  \end{centerfig}
+\end{slide}
+\begin{slide}{Secure DNS}
+  \begin{block}{Basic approach}
+    Resource records of the same type are grouped into a \blue{signed set}, per zone. Examples:
+    \begin{itemize}\tightlist
+    \item A set with all the IPv4 addresses of a zone
+    \item A set with all the IPv6 addresses of a zone
+    \item A set with the name servers of a zone
+    \end{itemize}
+    The public key associated with the secret key used for signing a set of resource records is added to a
+    zone, called a \red{zone-signing key}. 
+  \end{block}
+  \begin{block}{Trusting the signatures}
+    \begin{itemize}
+    \item All zone-signing keys are grouped again into a separate set, which is signed using another secret
+      key. The public key of the latter is the \red{key-signing key}.
+    \item The hash of the key-signing key \blue{is stored at, and signed by}, \red{the parent zone}
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Secure DNS}
+  \begin{centerfig}
+    \includefigure{06-24}
+  \end{centerfig}
+  \begin{block}{Building a trust chain}
+    \begin{itemize}
+    \item Consider a \blue{single set of resource records \id{RR}}, hashed with \id{HZ_k} and signed with
+      \id{SKZ_k}
+    \item \id{SZK_k} has associated public key \id{ZSK_k}
+    \item (Set of) \id{ZSK_k} is hashed with \id{HK_k} and signed with \id{SKK_k}
+    \item \id{SKK_k} has associated public key \id{KSK_k}
+    \end{itemize}
+    A client can \blue{verify signature} \mathexpr{\func{SKZ}_2(\func{HZ}_2(\id{RR}))} by checking
+    \[
+    \func{ZSK}_2(\func{SKZ}_2(\func{HZ}_2(\id{RR}))) \stackrel{?}{=} \func{HZ}_2(\id{RR})
+    \]
+  \end{block}
+\end{slide}
+\subsection{Example: The Network File System}
+\begin{slide}{Naming in NFS}
+  \begin{centerfig}
+    \includefigure{06-25}
+  \end{centerfig}
+  \begin{block}{Observation}
+    A server may \blue{export} (a part of) its filesystem, which can then be \blue{imported} by different
+    clients by \red{mounting}. Note that different clients will have \red{different (nonsharable) namespaces}!
+  \end{block}
+\end{slide}
+\begin{slide}{Mounting nested directories}
+  \begin{centerfig}
+    \includefigurew{06-26}
+  \end{centerfig}
+\end{slide}
+\section{Attribute-based naming}
+\subsection{Directory services}
+\begin{slide}{Attribute-based naming}
+  \begin{block}{Observation} 
+    In many cases, it is much more convenient to name, and look up entities through their
+    \red{attributes} \mathexpr{\Rightarrow} traditional \red{directory services} (aka \red{yellow pages}).
+  \end{block}
+  \onslide<2->
+  \begin{alertblock}{Problem} 
+    Lookup operations can be expensive, as they require matching \blue{requested attribute values},
+    against \blue{actual attribute values} \mathexpr{\Rightarrow} inspect \red{all entities} (in principle).
+  \end{alertblock}
+\end{slide}
+\subsection{Hierarchical implementations: LDAP}
+\begin{slide}{Implementing directory services}
+  \begin{block}{Solution for scalable searching} 
+    Implement basic directory service as database, and combine with traditional structured naming system.
+  \end{block}
+  \begin{block}{Lightweight Directory Access Protocol (LDAP)}
+    Each directory entry consists of (\emph{attribute,~value}) pairs, and is \blue{uniquely named} to ease
+    lookups. 
+    \begin{center}
+      \sffamily\footnotesize
+      \renewcommand{\arraystretch}{1.0}
+      \begin{tabular}{|l|l|l|} \hline
+        \textbf{Attribute} & \textbf{Abbr.} & \textbf{Value} \\ \whline
+        Country            & \id{C}  & NL \\
+        Locality           & \id{L}  & Amsterdam \\
+        Organization       & \id{O}  & VU University \\
+        OrganizationalUnit & \id{OU} & Computer Science \\
+        CommonName         & \id{CN} & Main server \\
+        Mail\_Servers      & -- & 137.37.20.3, 130.37.24.6, 137.37.20.10 \\
+        FTP\_Server        & -- & 130.37.20.20 \\
+        WWW\_Server        & -- & 130.37.20.20 \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{LDAP}
+  \begin{block}{Essence}
+    \begin{itemize}\tightlist
+      \item \red{Directory Information Base}: collection of all directory entries in an LDAP service.
+      \item Each record is uniquely named as a sequence of naming attributes (called \red{Relative
+        Distinguished Name}), so that it can be looked up. 
+      \item \red{Directory Information Tree}: the naming graph of an LDAP directory service; each node
+        represents a directory entry.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Part of a directory information tree}
+    \begin{center}
+      \includefigure[0.81]{06-30a}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{LDAP}
+\begin{block}{Two directory entries having \id{HostName} as RDN}
+    \footnotesize
+    \begin{center}
+      \begin{tabular}{|@{}ll|@{}ll|}\hline
+        \textbf{Attribute}      & \textbf{Value}         & \textbf{Attribute}    & \textbf{Value} \\ \whline
+        \id{Locality}           & \id{Amsterdam}         & \id{Locality}         & \id{Amsterdam} \\ \hline
+        \id{Organization}       & \id{VU\ University}    & \id{Organization}     & \id{VU\ University} \\ \hline
+        \id{OrganizationalUnit} & \id{Computer\ Science} &\id{OrganizationalUnit}& \id{Computer\ Science} \\ \hline
+        \id{CommonName}         & \id{Main\ server}      & \id{CommonName}       & \id{Main\ server} \\ \hline
+        \id{HostName}           & \id{star}              & \id{HostName}         & \id{zephyr} \\ \hline
+        \id{HostAddress}        & \id{192.31.231.42}     & \id{HostAddress}      & \id{137.37.20.10} \\ \hline
+      \end{tabular}
+    \end{center}
+    Result of \code{search(\char34(C=NL)(O=VU\ University)(OU=*)(CN=Main\ server)\char34)}
+  \end{block}
+\end{slide}
+\subsection{Decentralized implementations}
+\begin{slide}{Distributed index}
+  \begin{block}{Basic idea}
+    \begin{itemize}\tightlist
+    \item Assume a set of attributes \mathexpr{\{\id{a^1},\ldots,\id{a^N}\}}
+    \item Each attribute \id{a^k} takes values from a set \id{R^k}
+    \item For each attribute \id{a^k} associate a set \mathexpr{\mathbf{S^k} =
+      \{\id{S^k_1},\ldots,\id{S^k_{n_k}}\}} of \mathexpr{n_k} servers
+    \item \blue{Global mapping} \mathexpr{F}: \mathexpr{F(\id{a^k},\id{v}) = \id{S^k_j}} with
+      \mathexpr{\id{S^k_j} \in \mathbf{S^k}} and \mathexpr{\id{v} \in \id{R^k}}
+    \end{itemize}
+  \end{block}
+  \begin{block}{Observation}
+    If \mathexpr{L(\id{a^k},\id{v})} is set of keys returned by \mathexpr{F(\id{a^k},\id{v})}, then
+    a query can be formulated as a logical expression, e.g.,
+    \begin{quote}
+      \mathexpr{\big(F(\id{a^1},\id{v^1}) \land F(\id{a^2},\id{v^2})\big) \vee F(\id{a^3},\id{v^3})}
+    \end{quote}
+    which can be processed by the client by constructing the set
+    \begin{quote}
+      \mathexpr{\big(L(\id{a^1},\id{v^1}) \cap  L(\id{a^2},\id{v^2})\big) \cup L(\id{a^3},\id{v^3})}
+    \end{quote}
+  \end{block}
+\end{slide}
+\begin{slide}{Drawbacks of distributed index}
+  \begin{block}{Quite a few}
+    \begin{itemize}
+    \item A query involving \mathexpr{k} attributes requires contacting \mathexpr{k} servers
+    \item Imagine looking up ``\mathexpr{\id{lastName} = \id{Smith} \land \id{firstName} = \id{Pheriby}}'': the
+      client may need to process \blue{many} files as there are so many people named ``Smith.''
+    \item No (easy) support for \red{range queries}, such as ``\mathexpr{\id{price} = \id{[1000-2500]}}.''
+    \end{itemize}
+  \end{block}
+\end{slide}
+\begin{slide}{Alternative: map all attributes to 1 dimension and then index}
+  \vspace*{-6pt}
+  \begin{block}{Space-filling curves: principle}
+    \begin{enumerate}\tightlist
+    \item Map the \mathexpr{N}-dimensional space covered by the \mathexpr{N} attributes
+      \mathexpr{\{\id{a^1},\ldots,\id{a^N}\}} into a single dimension
+    \item Hashing values in order to distribute the 1-dimensional space among index servers.
+    \end{enumerate}
+  \end{block}
+  \vspace*{-6pt}
+  \begin{block}{Hilbert space-filling curve of (a) order 1, and (b) order 4}
+    \begin{center}
+      \begin{tabular}{@{(a)}c@{\hspace*{36pt}(b)}c}
+        \includefigure[0.73]{06-31a} &
+        \includefigure[0.73]{06-31b} 
+      \end{tabular}
+    \end{center}
+  \end{block}
+\end{slide}
+\begin{slide}{Space-filling curve}
+  \begin{block}{Once the curve has been drawn}
+    Consider the two-dimensional case
+    \begin{itemize}\tightlist
+    \item a Hilbert curve of order \mathexpr{k} connects \mathexpr{2^{2k}} subsquares \mathexpr{\Rightarrow} has
+      \mathexpr{2^{2k}} indices.
+    \item A range query corresponds to a \blue{rectangle} \mathexpr{R} in the 2-dimensional case
+    \item \mathexpr{R} intersects with a number of subsquares, each one corresponding to an index
+      \mathexpr{\Rightarrow} we now have a \red{series of indices} associated with \mathexpr{R}.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Getting to the entities}
+    Each index is to be mapped to a server, who keeps a reference to the associated entity. One possible
+    solution: \blue{use a DHT}.
+  \end{block}
+\end{slide}
+\section{Named-data networking}
+\subsection{Basics}
+\begin{slide}{Named-data networking}
+  \begin{centerfig}
+    \includefigure{06-32}
+  \end{centerfig}
+  \begin{block}{Basics}
+    \begin{itemize}\tightlist
+    \item Retrieve an entity from the network by using that entity's \red{name} and \red{not address}.
+    \item The network takes that name as input, and \blue{routes a request} to a location where the entity is
+      stored.
+    \item NDN takes over the role of IP in a future architecture of the Internet,
+    \end{itemize}
+  \end{block}
+  \begin{exampleblock}{Example name}
+    \id{/distributed\mbox{\code{-}}systems.net/books/Distributed\ Systems/4/01/Naming}
+  \end{exampleblock}
+\end{slide}
+\subsection{Routing}
+\begin{slide}{Routing}
+  \begin{alertblock}{Question}
+    Is there really a difference in attempting to route a request such as
+    \begin{quote}
+      \id{distributed\mbox{\code{-}}systems.net/books/Distributed\ Systems/4/01/Naming}
+    \end{quote}
+    from the IPv6 address
+    \begin{quote}
+      \id{2001\mbox{\code{:}}610\mbox{\code{:}}508\mbox{\code{:}}108\mbox{\code{:}}192\mbox{\code{:}}87\mbox{\code{:}}108\mbox{\code{:}}15}
+    \end{quote}
+  \end{alertblock}
+  \begin{alertblock}{Key observation}
+    Theres is \red{no fundamental difference}. We decide which part of a name or address (i.e., \blue{a
+      prefix}) should be announced within a \blue{global routing substrate}, just as with IPv4 addresses with
+    BGP routers.
+  \end{alertblock}
+\end{slide}
+\begin{slide}{Routing}
+  \begin{centerfig}
+    \includefigure{06-33a} \\
+    Forwarding a request to (a next router on the way to) its destination
+  \end{centerfig}
+  \begin{centerfig}
+    \includefigure{06-33b} \\
+    Returning the request (to a router) on the path toward requester
+  \end{centerfig}
+\end{slide}
+\subsection{Security in named-data networking}
+\section{Summary}
