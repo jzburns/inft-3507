@@ -1,366 +1,366 @@
 \part{Coordination}
-\section{Clock synchronization}
-\subsection{Physical clocks}
-\begin{slide}{Physical clocks}
-  \begin{alertblock}{Problem}
-    Sometimes we simply need the exact time, not just an ordering.
-  \end{alertblock}
-  \begin{block}{Solution: Universal Coordinated Time (UTC)}
-    \begin{itemize}\tightlist
-    \item Based on the number of transitions per second of the cesium 133 atom (pretty accurate).
-    \item At present, the real time is taken as the average of some 50 cesium clocks around the world.
-    \item Introduces a leap second from time to time to compensate that days are getting longer.
-    \end{itemize}
-  \end{block}
-  \begin{block}{Note}
-    UTC is \blue{broadcast} through short-wave radio and satellite. Satellites can give an accuracy of about
-    \mathexpr{\pm 0.5} ms.
-  \end{block}
-\end{slide}
-\subsection{Clock synchronization algorithms}
-\begin{slide}{Clock synchronization}
-  \begin{block}{Precision}
-    The goal is to keep the deviation \blue{between two clocks on any two machines} within a specified bound,
-    known as the \red{precision} \mathexpr{\pi}:
-    \[ \forall t, \forall \id{p},\id{q}: |C_p(t) - C_q(t)| \leq \pi \]
-    with \mathexpr{C_p(t)} the \blue{computed} clock time of machine \id{p} at \blue{UTC time} \mathexpr{t}. 
-  \end{block}
-  \begin{block}{Accuracy}
-    In the case of \red{accuracy}, we aim to keep the clock bound to a value \mathexpr{\alpha}:
-    \[ \forall t, \forall \id{p}: |C_p(t) - t| \leq \alpha \]
-  \end{block}
-  \begin{alertblock}{Synchronization}
-    \begin{itemize}\tightlist
-    \item \red{Internal synchronization}: keep clocks \blue{precise}
-    \item \red{External synchronization}: keep clocks \blue{accurate}
-    \end{itemize}
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Clock drift}
-  \begin{block}{Clock specifications}
-    \begin{itemize}\tightlist
-    \item A clock comes specified with its \red{maximum clock drift rate} \mathexpr{\rho}.
-    \item \mathexpr{F(t)} denotes oscillator frequency of the hardware clock at time \mathexpr{t}
-    \item \mathexpr{F} is the clock's ideal (constant) frequency \mathexpr{\Rightarrow} living up to
-      specifications: 
-      \[ \forall t: (1 - \rho) \leq \frac{F(t)}{F} \leq (1 + \rho) \]
-    \end{itemize}
-  \end{block}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Observation}
-        By using hardware interrupts we couple a software clock to the hardware clock, and thus also its clock
-        drift rate:
-        \[ C_p(t) = \frac{1}{F} \int_0^t F(t) dt \Rightarrow \frac{dC_p(t)}{dt} = \frac{F(t)}{F} \]
-        \[ \Rightarrow \blue{\forall t: 1 - \rho \leq \frac{dC_p(t)}{dt} \leq 1 + \rho}\]
-      \end{block}
-    \end{column}
-    \begin{column}{0.45\textwidth}    
-      \begin{block}{Fast, perfect, slow clocks}
-        \begin{centerfig}
-          \includefigure[0.71]{05-04}
-        \end{centerfig}
-      \end{block}
-    \end{column}
-  \end{columns}
-\end{slide}
-\begin{slide}{Detecting and adjusting incorrect times}
-  \begin{block}{Getting the current time from a timeserver}
-    \begin{centerfig}
-      \includefigure{05-05}
-    \end{centerfig}
-  \end{block}
-  \begin{block}{Computing the relative offset \mathexpr{\theta} and delay \mathexpr{\delta}}
-    \red{Assumption}: \mathexpr{\delta T_{req} = T_2 - T_1 \approx T_4 - T_3 = \delta T_{res}}
-    \[
-    \theta = T_3 + \bigl(( T_2 - T_1 ) + ( T_4 - T_3 )\bigr)/{2} - T_4 = \bigl(( T_2 - T_1 ) + ( T_3 - T_4 )\bigr)/{2}
-    \]
-    \[
-    \delta = \bigl((T_4-T_1) - (T_3 -T_2)\bigr)/{2}
-    \]
-  \end{block}
-  \onslide<2->
-  \begin{exampleblock}{Network Time Protocol}
-    Collect \mathexpr{(\theta,\delta)} pairs. Choose \mathexpr{\theta} for which associated delay
-    \mathexpr{\delta} was minimal.
-  \end{exampleblock}
-\end{slide}
-\begin{slide}{Reference broadcast synchronization}
-  \begin{block}{Essence}
-    \begin{itemize}\tightlist
-    \item A node broadcasts a reference message \id{m} \mathexpr{\Rightarrow} each receiving node \id{p}
-      records the time \mathexpr{T_{p,m}} that it received \id{m}. 
-    \item \blue{Note}: \mathexpr{T_{p,m}} is read from \id{p}'s local clock. 
-    \end{itemize}
-  \end{block}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Problem: averaging will not capture drift \mathexpr{\Rightarrow} use linear regression}
-        \[
-        \begin{array}{ll}
-        \mbox{NO:}  & \func{Offset}[p,q](t) = \frac{\sum_{k=1}^{M} ( T_{p,k} - T_{q,k} )}{M} \\
-        \mbox{YES:} & \func{Offset}[p,q](t) = \alpha t + \beta
-        \end{array}
-        \]
-      \end{block}
-    \end{column}
-    \begin{column}{0.45\textwidth}
-      \begin{block}{RBS minimizes critical path}
-        \begin{center}
-          \includefigure{05-06}
-        \end{center}
-      \end{block}
-    \end{column}
-  \end{columns}
-\end{slide}
-\section{Logical clocks}
-\subsection{Lamport's logical clocks}
-\begin{slide}{The Happened-before relationship}
-  \begin{alertblock}{Issue}
-    What usually matters is not that all processes agree on exactly what time it is, but that they agree on
-    the \red{order in which events occur}. \blue{Requires a notion of ordering}.
-  \end{alertblock}
-  \onslide<2->
-  \begin{block}{The \red{happened-before} relation}
-    \begin{itemize}\tightlist
-    \item If \mathexpr{a} and \mathexpr{b} are two events in the same process, and \mathexpr{a} comes before
-      \mathexpr{b}, then \mathexpr{a \rightarrow b}.
-    \item If \mathexpr{a} is the sending of a message, and \mathexpr{b} is the receipt of that message, then
-      \mathexpr{a \rightarrow b}
-    \item If \mathexpr{a \rightarrow b} and \mathexpr{b \rightarrow c}, then \mathexpr{a \rightarrow c}
-    \end{itemize}
-  \end{block}
-  \begin{alertblock}{Note}
-    This introduces a \blue{partial ordering of events} in a system with concurrently operating processes.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Logical clocks}
-  \begin{alertblock}{Problem}
-    How do we maintain a global view of the system's behavior that is consistent with the happened-before
-    relation?
-  \end{alertblock}
-  \onslide<2->
-  \begin{block}{Attach a time\-stamp \mathexpr{C(e)} to each event \mathexpr{e}, satisfying the following properties:}
-    \begin{enumerate}\tightlist
-    \item[\blue{P1}] If \mathexpr{a} and \mathexpr{b} are two events in the same process, and \mathexpr{a
-      \rightarrow b}, then we demand that \mathexpr{C(a) < C(b)}.
-    \item[\blue{P2}] If \mathexpr{a} corresponds to sending a message \id{m}, and \mathexpr{b} to the
-      receipt of that message, then also \mathexpr{C(a) < C(b)}.
-    \end{enumerate}
-  \end{block}
-  \onslide<3->
-  \begin{alertblock}{Problem}
-    How to attach a time\-stamp to an event when there's no global clock \mathexpr{\Rightarrow} maintain a
-    \blue{consistent} set of logical clocks, one per process.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Logical clocks: solution}
-  \begin{block}{Each process \id{P_i} maintains a \blue{local} counter \id{C_i} and adjusts this counter}
-    \begin{enumerate}\tightlist
-    \item For each new event that takes place within \id{P_i}, \id{C_i} is incremented by 1.
-    \item Each time a message \id{m} is \blue{sent} by process \id{P_i}, the message receives a time\-stamp
-      \mathexpr{ts(\id{m}) = \id{C_i}}.
-    \item Whenever a message \mathexpr{m} is \blue{received} by a process \id{P_j}, \id{P_j} adjusts its local
-      counter \id{C_j} to \red{\mathexpr{\max\{\id{C_j}, ts(\id{m})\}}}; then executes step 1 before passing
-      \id{m} to the application.
-    \end{enumerate}
-  \end{block}
-  \begin{block}{Notes}
-    \begin{itemize}\tightlist
-    \item Property \blue{P1} is satisfied by (1); Property \blue{P2} by (2) and (3).
-    \item It can still occur that two events happen at the same time. Avoid this by \blue{breaking ties through
-      process IDs}.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Logical clocks: example}
-  \begin{block}{Consider three processes with \red{event counters} operating at different rates}
-    \begin{center}
-      \begin{tabular}{c@{\hspace*{48pt}}c}
-        \includefigure{05-07a} &
-        \includefigure{05-07b} 
-      \end{tabular}
-    \end{center}
-  \end{block}
-\end{slide}
-\begin{slide}{Logical clocks: where implemented}
-  \begin{block}{Adjustments implemented in middleware}
-    \begin{center}
-      \includefigure{05-08}
-    \end{center}
-  \end{block}
-\end{slide}
-\begin{slide}{Example: Totally ordered multicast}
-  \begin{block}{Concurrent updates on a replicated database are seen in the same order everywhere}
-    \begin{itemize}\tightlist
-    \item \id{P_1} adds \dollar 100 to an account (initial value: \dollar 1000)
-    \item \id{P_2} increments account by 1\%
-    \item There are two replicas
-    \end{itemize}
-    \begin{center}
-      \includefigure{05-09}
-    \end{center}
-  \end{block}
-  \begin{block}{Result} 
-    In absence of proper synchronization: \newline replica \#1 \mathexpr{\leftarrow} \dollar 1111, while
-    replica \#2 \mathexpr{\leftarrow} \dollar 1110.
-  \end{block}
-\end{slide}
-\begin{slide}{Example: Totally ordered multicast}
-  \begin{block}{Solution}
-    \begin{itemize}\tightlist
-    \item Process \id{P_i} sends \blue{timestamped message} \id{m_i} to all others. The message itself is put in a
-      local queue \id{queue_i}.
-    \item Any incoming message at \id{P_j} is queued in \id{queue_j}, \blue{according to its timestamp}, and
-      \blue{acknowledged} to every other process.
-    \end{itemize}
-  \end{block}
-  \onslide<2->
-  \begin{alertblock}{\id{P_j} passes a message \id{m_i} to its application if:}
-    \begin{itemize}\tightlist
-    \item[(1)] \id{m_i} is at the head of \id{queue_j}
-    \item[(2)] for each process \id{P_k}, there is a message \id{m_k} in \id{queue_j} with a larger
-      timestamp.
-    \end{itemize}
-  \end{alertblock}
-  \onslide<3->
-  \begin{block}{Note}
-    We are assuming that communication is \red{reliable} and \red{FIFO ordered}.
-  \end{block}
-\end{slide}
-  \begin{slide}{Lamport's clocks for mutual exclusion}
-    \begin{tabular}{@{\hspace*{1em}}l}
-      \includelisting{05-10/process-book-a}
-    \end{tabular}
-  \end{slide}
-  \begin{slide}{Lamport's clocks for mutual exclusion}
-    \begin{tabular}{@{\hspace*{1em}}l}
-      \includelisting{05-10/process-book-b}
-    \end{tabular}
-  \end{slide}
-  \begin{slide}{Lamport's clocks for mutual exclusion}
-    \begin{block}{Analogy with totally ordered multicast}
-      \begin{itemize}\firmlist
-      \item With totally ordered multicast, all processes build identical queues, delivering messages in the same order
-      \item Mutual exclusion is about agreeing in which order processes are allowed to enter a critical region
-      \end{itemize}
-    \end{block}
-  \end{slide}
-\subsection{Vector clocks}
-\begin{slide}{Vector clocks}
-  \begin{block}{Observation}
-    Lamport's clocks do not guarantee that if \mathexpr{C(a) < C(b)} that \mathexpr{a} \blue{causally
-      preceded} \mathexpr{b}.
-  \end{block}
-  \begin{columns}[T]
-    \begin{column}{0.45\textwidth}
-      \begin{block}{Concurrent message transmission using logical clocks}
-        \begin{centerfig}
-          \includefigure{05-11}
-        \end{centerfig}
-      \end{block}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Observation}
-        Event \mathexpr{a}: \id{m_1} is received at \mathexpr{T = 16}; \newline
-        Event \mathexpr{b}: \id{m_2} is sent at \mathexpr{T = 20}.
-      \end{block}
-      \onslide<2->
-      \begin{alertblock}{Note}
-        We \blue{cannot} conclude that \mathexpr{a} causally precedes \mathexpr{b}.
-      \end{alertblock}
-    \end{column}
-  \end{columns}
-\end{slide}
-\begin{slide}{Causal dependency}
-  \begin{block}{Definition}
-    We say that $b$ may causally depend on $a$ if $ts(a) < ts(b)$, with:
-    \begin{itemize}
-    \item for all $k$, $ts(a)[k] \leq ts(b)[k]$ and
-    \item there exists at least one index $k^{\prime}$ for which $ts(a)[k^{\prime}] < ts(b)[k^{\prime}]$ 
-    \end{itemize}
-  \end{block}
-  \begin{block}{Precedence vs.\ dependency}
-    \begin{itemize}
-      \item We say that $a$ causally precedes $b$.
-      \item $b$ \red{may} causally depend on $a$, as there may be information from $a$ that is propagated into
-        $b$.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Capturing potential causality}
-  \begin{block}{Solution: each \id{P_i} maintains a vector \id{VC_i}}
-    \begin{itemize}
-    \item \mathexpr{\id{VC_i}[i]} is the local logical clock at process \id{P_i}.
-    \item If \mathexpr{\id{VC_i}[j] = k} then \id{P_i} knows that \mathexpr{k} events have occurred at
-      \id{P_j}.
-    \end{itemize}
-  \end{block}
-  \begin{block}{Maintaining vector clocks}
-    \begin{enumerate}
-    \item Before executing an event, \id{P_i} executes \mathexpr{\id{VC_i}[i] \leftarrow \id{VC_i}[i] + 1}.
-    \item When process \id{P_i} sends a message \id{m} to \id{P_j}, it sets \id{m}'s (vector) timestamp
-      \mathexpr{ts(\id{m})} equal to \id{VC_i} after having executed step 1.
-    \item Upon the receipt of a message \id{m}, process \id{P_j} sets \mathexpr{\id{VC_j}[k] \leftarrow
-      \max\{\id{VC_j}[k], ts(\id{m})[k]\}} for each \mathexpr{k}, after which it executes step 1 and then
-      delivers the message to the application.
-    \end{enumerate}
-  \end{block}
-\end{slide}
-\begin{slide}{Vector clocks: Example}
-  \begin{block}{Capturing potential causality when exchanging messages}
-    \begin{tabular}{@{}cc}
-      \includefigure[0.65]{05-12a} &
-      \includefigure[0.65]{05-12b} \\
-      {\footnotesize (a)} & {\footnotesize (b)}
-    \end{tabular}
-  \end{block}
-  \begin{block}{Analysis}
-    \begin{center}
-      \sffamily\footnotesize
-      \begin{tabular}{|c|c|c|c|c|l|}\hline
-        \textbf{Situation} 
-        & \mathexpr{ts(\id{m_2})} & \mathexpr{ts(\id{m_4})} & \mathexpr{ts(\id{m_2})} & \mathexpr{ts(\id{m_2})} 
-        & \multicolumn{1}{c|}{\textbf{Conclusion}} \\ [-0.75ex]
-        &                         &                        & \mathexpr{<}            & \mathexpr{>} & \\ [-0.75ex] 
-        &                         &                        & \mathexpr{ts(\id{m_4})} & \mathexpr{ts(\id{m_4})} & \\ \whline
-        (a) 
-        & \mathexpr{(2,1,0)}      & \mathexpr{(4,3,0)}     & Yes & No & \id{m_2} may causally precede \id{m_4} \\ \hline
-        (b) 
-        & \mathexpr{(4,1,0)}      & \mathexpr{(2,3,0)}     & No  & No & \id{m_2} and \id{m_4} may conflict \\ \hline
-      \end{tabular}
-    \end{center}
-  \end{block}
-\end{slide}
-  \begin{slide}{Causally ordered multicasting}
-    \begin{block}{Observation}
-      We can now ensure that a message is delivered only if all causally preceding messages have already been
-      delivered.
-    \end{block}
-    \begin{block}{Adjustment} 
-      \id{P_i} increments \mathexpr{\id{VC_i}[i]} only when sending a message, and \id{P_j} ``adjusts''
-      \id{VC_j} when receiving a message (i.e., effectively does not change \mathexpr{\id{VC_j}[j]}).
-    \end{block}
-    \onslide<2->
-    \begin{alertblock}{\id{P_j} postpones delivery of \id{m} until:}
-      \begin{enumerate}\tightlist
-      \item \mathexpr{ts(\id{m})[i] = \id{VC_j}[i] + 1}
-      \item \mathexpr{ts(\id{m})[k] \leq \id{VC_j}[k]} for all \mathexpr{k \neq i}
-      \end{enumerate}
-    \end{alertblock}
-  \end{slide}
-  \begin{slide}{Causally ordered multicasting}
-    \begin{block}{Enforcing causal communication}
-      \begin{centerfig}
-        \includefigure{05-13}
-      \end{centerfig}
-    \end{block}
-    \onslide<2->
-    \begin{exampleblock}{Example}
-      Take \mathexpr{\id{VC_3} = [0,2,2], ts(\id{m}) = [1,3,0]} from \id{P_1}. What information does \id{P_3}
-      have, and what will it do when receiving \id{m} (from \id{P_1})?
-    \end{exampleblock}
-  \end{slide}
+% \section{Clock synchronization}
+% \subsection{Physical clocks}
+% \begin{slide}{Physical clocks}
+%   \begin{alertblock}{Problem}
+%     Sometimes we simply need the exact time, not just an ordering.
+%   \end{alertblock}
+%   \begin{block}{Solution: Universal Coordinated Time (UTC)}
+%     \begin{itemize}\tightlist
+%     \item Based on the number of transitions per second of the cesium 133 atom (pretty accurate).
+%     \item At present, the real time is taken as the average of some 50 cesium clocks around the world.
+%     \item Introduces a leap second from time to time to compensate that days are getting longer.
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Note}
+%     UTC is \blue{broadcast} through short-wave radio and satellite. Satellites can give an accuracy of about
+%     \mathexpr{\pm 0.5} ms.
+%   \end{block}
+% \end{slide}
+% \subsection{Clock synchronization algorithms}
+% \begin{slide}{Clock synchronization}
+%   \begin{block}{Precision}
+%     The goal is to keep the deviation \blue{between two clocks on any two machines} within a specified bound,
+%     known as the \red{precision} \mathexpr{\pi}:
+%     \[ \forall t, \forall \id{p},\id{q}: |C_p(t) - C_q(t)| \leq \pi \]
+%     with \mathexpr{C_p(t)} the \blue{computed} clock time of machine \id{p} at \blue{UTC time} \mathexpr{t}. 
+%   \end{block}
+%   \begin{block}{Accuracy}
+%     In the case of \red{accuracy}, we aim to keep the clock bound to a value \mathexpr{\alpha}:
+%     \[ \forall t, \forall \id{p}: |C_p(t) - t| \leq \alpha \]
+%   \end{block}
+%   \begin{alertblock}{Synchronization}
+%     \begin{itemize}\tightlist
+%     \item \red{Internal synchronization}: keep clocks \blue{precise}
+%     \item \red{External synchronization}: keep clocks \blue{accurate}
+%     \end{itemize}
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Clock drift}
+%   \begin{block}{Clock specifications}
+%     \begin{itemize}\tightlist
+%     \item A clock comes specified with its \red{maximum clock drift rate} \mathexpr{\rho}.
+%     \item \mathexpr{F(t)} denotes oscillator frequency of the hardware clock at time \mathexpr{t}
+%     \item \mathexpr{F} is the clock's ideal (constant) frequency \mathexpr{\Rightarrow} living up to
+%       specifications: 
+%       \[ \forall t: (1 - \rho) \leq \frac{F(t)}{F} \leq (1 + \rho) \]
+%     \end{itemize}
+%   \end{block}
+%   \begin{columns}[T]
+%     \begin{column}{0.5\textwidth}
+%       \begin{block}{Observation}
+%         By using hardware interrupts we couple a software clock to the hardware clock, and thus also its clock
+%         drift rate:
+%         \[ C_p(t) = \frac{1}{F} \int_0^t F(t) dt \Rightarrow \frac{dC_p(t)}{dt} = \frac{F(t)}{F} \]
+%         \[ \Rightarrow \blue{\forall t: 1 - \rho \leq \frac{dC_p(t)}{dt} \leq 1 + \rho}\]
+%       \end{block}
+%     \end{column}
+%     \begin{column}{0.45\textwidth}    
+%       \begin{block}{Fast, perfect, slow clocks}
+%         \begin{centerfig}
+%           \includefigure[0.71]{05-04}
+%         \end{centerfig}
+%       \end{block}
+%     \end{column}
+%   \end{columns}
+% \end{slide}
+% \begin{slide}{Detecting and adjusting incorrect times}
+%   \begin{block}{Getting the current time from a timeserver}
+%     \begin{centerfig}
+%       \includefigure{05-05}
+%     \end{centerfig}
+%   \end{block}
+%   \begin{block}{Computing the relative offset \mathexpr{\theta} and delay \mathexpr{\delta}}
+%     \red{Assumption}: \mathexpr{\delta T_{req} = T_2 - T_1 \approx T_4 - T_3 = \delta T_{res}}
+%     \[
+%     \theta = T_3 + \bigl(( T_2 - T_1 ) + ( T_4 - T_3 )\bigr)/{2} - T_4 = \bigl(( T_2 - T_1 ) + ( T_3 - T_4 )\bigr)/{2}
+%     \]
+%     \[
+%     \delta = \bigl((T_4-T_1) - (T_3 -T_2)\bigr)/{2}
+%     \]
+%   \end{block}
+%   \onslide
+%   \begin{exampleblock}{Network Time Protocol}
+%     Collect \mathexpr{(\theta,\delta)} pairs. Choose \mathexpr{\theta} for which associated delay
+%     \mathexpr{\delta} was minimal.
+%   \end{exampleblock}
+% \end{slide}
+% \begin{slide}{Reference broadcast synchronization}
+%   \begin{block}{Essence}
+%     \begin{itemize}\tightlist
+%     \item A node broadcasts a reference message \id{m} \mathexpr{\Rightarrow} each receiving node \id{p}
+%       records the time \mathexpr{T_{p,m}} that it received \id{m}. 
+%     \item \blue{Note}: \mathexpr{T_{p,m}} is read from \id{p}'s local clock. 
+%     \end{itemize}
+%   \end{block}
+%   \begin{columns}[T]
+%     \begin{column}{0.5\textwidth}
+%       \begin{block}{Problem: averaging will not capture drift \mathexpr{\Rightarrow} use linear regression}
+%         \[
+%         \begin{array}{ll}
+%         \mbox{NO:}  & \func{Offset}[p,q](t) = \frac{\sum_{k=1}^{M} ( T_{p,k} - T_{q,k} )}{M} \\
+%         \mbox{YES:} & \func{Offset}[p,q](t) = \alpha t + \beta
+%         \end{array}
+%         \]
+%       \end{block}
+%     \end{column}
+%     \begin{column}{0.45\textwidth}
+%       \begin{block}{RBS minimizes critical path}
+%         \begin{center}
+%           \includefigure{05-06}
+%         \end{center}
+%       \end{block}
+%     \end{column}
+%   \end{columns}
+% \end{slide}
+% \section{Logical clocks}
+% \subsection{Lamport's logical clocks}
+% \begin{slide}{The Happened-before relationship}
+%   \begin{alertblock}{Issue}
+%     What usually matters is not that all processes agree on exactly what time it is, but that they agree on
+%     the \red{order in which events occur}. \blue{Requires a notion of ordering}.
+%   \end{alertblock}
+%   \onslide
+%   \begin{block}{The \red{happened-before} relation}
+%     \begin{itemize}\tightlist
+%     \item If \mathexpr{a} and \mathexpr{b} are two events in the same process, and \mathexpr{a} comes before
+%       \mathexpr{b}, then \mathexpr{a \rightarrow b}.
+%     \item If \mathexpr{a} is the sending of a message, and \mathexpr{b} is the receipt of that message, then
+%       \mathexpr{a \rightarrow b}
+%     \item If \mathexpr{a \rightarrow b} and \mathexpr{b \rightarrow c}, then \mathexpr{a \rightarrow c}
+%     \end{itemize}
+%   \end{block}
+%   \begin{alertblock}{Note}
+%     This introduces a \blue{partial ordering of events} in a system with concurrently operating processes.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Logical clocks}
+%   \begin{alertblock}{Problem}
+%     How do we maintain a global view of the system's behavior that is consistent with the happened-before
+%     relation?
+%   \end{alertblock}
+%   \onslide
+%   \begin{block}{Attach a time\-stamp \mathexpr{C(e)} to each event \mathexpr{e}, satisfying the following properties:}
+%     \begin{enumerate}\tightlist
+%     \item[\blue{P1}] If \mathexpr{a} and \mathexpr{b} are two events in the same process, and \mathexpr{a
+%       \rightarrow b}, then we demand that \mathexpr{C(a) < C(b)}.
+%     \item[\blue{P2}] If \mathexpr{a} corresponds to sending a message \id{m}, and \mathexpr{b} to the
+%       receipt of that message, then also \mathexpr{C(a) < C(b)}.
+%     \end{enumerate}
+%   \end{block}
+%   \onslide
+%   \begin{alertblock}{Problem}
+%     How to attach a time\-stamp to an event when there's no global clock \mathexpr{\Rightarrow} maintain a
+%     \blue{consistent} set of logical clocks, one per process.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Logical clocks: solution}
+%   \begin{block}{Each process \id{P_i} maintains a \blue{local} counter \id{C_i} and adjusts this counter}
+%     \begin{enumerate}\tightlist
+%     \item For each new event that takes place within \id{P_i}, \id{C_i} is incremented by 1.
+%     \item Each time a message \id{m} is \blue{sent} by process \id{P_i}, the message receives a time\-stamp
+%       \mathexpr{ts(\id{m}) = \id{C_i}}.
+%     \item Whenever a message \mathexpr{m} is \blue{received} by a process \id{P_j}, \id{P_j} adjusts its local
+%       counter \id{C_j} to \red{\mathexpr{\max\{\id{C_j}, ts(\id{m})\}}}; then executes step 1 before passing
+%       \id{m} to the application.
+%     \end{enumerate}
+%   \end{block}
+%   \begin{block}{Notes}
+%     \begin{itemize}\tightlist
+%     \item Property \blue{P1} is satisfied by (1); Property \blue{P2} by (2) and (3).
+%     \item It can still occur that two events happen at the same time. Avoid this by \blue{breaking ties through
+%       process IDs}.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Logical clocks: example}
+%   \begin{block}{Consider three processes with \red{event counters} operating at different rates}
+%     \begin{center}
+%       \begin{tabular}{c@{\hspace*{48pt}}c}
+%         \includefigure{05-07a} &
+%         \includefigure{05-07b} 
+%       \end{tabular}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Logical clocks: where implemented}
+%   \begin{block}{Adjustments implemented in middleware}
+%     \begin{center}
+%       \includefigure{05-08}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Example: Totally ordered multicast}
+%   \begin{block}{Concurrent updates on a replicated database are seen in the same order everywhere}
+%     \begin{itemize}\tightlist
+%     \item \id{P_1} adds \dollar 100 to an account (initial value: \dollar 1000)
+%     \item \id{P_2} increments account by 1\%
+%     \item There are two replicas
+%     \end{itemize}
+%     \begin{center}
+%       \includefigure{05-09}
+%     \end{center}
+%   \end{block}
+%   \begin{block}{Result} 
+%     In absence of proper synchronization: \newline replica \#1 \mathexpr{\leftarrow} \dollar 1111, while
+%     replica \#2 \mathexpr{\leftarrow} \dollar 1110.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Example: Totally ordered multicast}
+%   \begin{block}{Solution}
+%     \begin{itemize}\tightlist
+%     \item Process \id{P_i} sends \blue{timestamped message} \id{m_i} to all others. The message itself is put in a
+%       local queue \id{queue_i}.
+%     \item Any incoming message at \id{P_j} is queued in \id{queue_j}, \blue{according to its timestamp}, and
+%       \blue{acknowledged} to every other process.
+%     \end{itemize}
+%   \end{block}
+%   \onslide
+%   \begin{alertblock}{\id{P_j} passes a message \id{m_i} to its application if:}
+%     \begin{itemize}\tightlist
+%     \item[(1)] \id{m_i} is at the head of \id{queue_j}
+%     \item[(2)] for each process \id{P_k}, there is a message \id{m_k} in \id{queue_j} with a larger
+%       timestamp.
+%     \end{itemize}
+%   \end{alertblock}
+%   \onslide
+%   \begin{block}{Note}
+%     We are assuming that communication is \red{reliable} and \red{FIFO ordered}.
+%   \end{block}
+% \end{slide}
+%   \begin{slide}{Lamport's clocks for mutual exclusion}
+%     \begin{tabular}{@{\hspace*{1em}}l}
+%       \includelisting{05-10/process-book-a}
+%     \end{tabular}
+%   \end{slide}
+%   \begin{slide}{Lamport's clocks for mutual exclusion}
+%     \begin{tabular}{@{\hspace*{1em}}l}
+%       \includelisting{05-10/process-book-b}
+%     \end{tabular}
+%   \end{slide}
+%   \begin{slide}{Lamport's clocks for mutual exclusion}
+%     \begin{block}{Analogy with totally ordered multicast}
+%       \begin{itemize}\firmlist
+%       \item With totally ordered multicast, all processes build identical queues, delivering messages in the same order
+%       \item Mutual exclusion is about agreeing in which order processes are allowed to enter a critical region
+%       \end{itemize}
+%     \end{block}
+%   \end{slide}
+% \subsection{Vector clocks}
+% \begin{slide}{Vector clocks}
+%   \begin{block}{Observation}
+%     Lamport's clocks do not guarantee that if \mathexpr{C(a) < C(b)} that \mathexpr{a} \blue{causally
+%       preceded} \mathexpr{b}.
+%   \end{block}
+%   \begin{columns}[T]
+%     \begin{column}{0.45\textwidth}
+%       \begin{block}{Concurrent message transmission using logical clocks}
+%         \begin{centerfig}
+%           \includefigure{05-11}
+%         \end{centerfig}
+%       \end{block}
+%     \end{column}
+%     \begin{column}{0.5\textwidth}
+%       \begin{block}{Observation}
+%         Event \mathexpr{a}: \id{m_1} is received at \mathexpr{T = 16}; \newline
+%         Event \mathexpr{b}: \id{m_2} is sent at \mathexpr{T = 20}.
+%       \end{block}
+%       \onslide
+%       \begin{alertblock}{Note}
+%         We \blue{cannot} conclude that \mathexpr{a} causally precedes \mathexpr{b}.
+%       \end{alertblock}
+%     \end{column}
+%   \end{columns}
+% \end{slide}
+% \begin{slide}{Causal dependency}
+%   \begin{block}{Definition}
+%     We say that $b$ may causally depend on $a$ if $ts(a) < ts(b)$, with:
+%     \begin{itemize}
+%     \item for all $k$, $ts(a)[k] \leq ts(b)[k]$ and
+%     \item there exists at least one index $k^{\prime}$ for which $ts(a)[k^{\prime}] < ts(b)[k^{\prime}]$ 
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Precedence vs.\ dependency}
+%     \begin{itemize}
+%       \item We say that $a$ causally precedes $b$.
+%       \item $b$ \red{may} causally depend on $a$, as there may be information from $a$ that is propagated into
+%         $b$.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Capturing potential causality}
+%   \begin{block}{Solution: each \id{P_i} maintains a vector \id{VC_i}}
+%     \begin{itemize}
+%     \item \mathexpr{\id{VC_i}[i]} is the local logical clock at process \id{P_i}.
+%     \item If \mathexpr{\id{VC_i}[j] = k} then \id{P_i} knows that \mathexpr{k} events have occurred at
+%       \id{P_j}.
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Maintaining vector clocks}
+%     \begin{enumerate}
+%     \item Before executing an event, \id{P_i} executes \mathexpr{\id{VC_i}[i] \leftarrow \id{VC_i}[i] + 1}.
+%     \item When process \id{P_i} sends a message \id{m} to \id{P_j}, it sets \id{m}'s (vector) timestamp
+%       \mathexpr{ts(\id{m})} equal to \id{VC_i} after having executed step 1.
+%     \item Upon the receipt of a message \id{m}, process \id{P_j} sets \mathexpr{\id{VC_j}[k] \leftarrow
+%       \max\{\id{VC_j}[k], ts(\id{m})[k]\}} for each \mathexpr{k}, after which it executes step 1 and then
+%       delivers the message to the application.
+%     \end{enumerate}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Vector clocks: Example}
+%   \begin{block}{Capturing potential causality when exchanging messages}
+%     \begin{tabular}{@{}cc}
+%       \includefigure[0.65]{05-12a} &
+%       \includefigure[0.65]{05-12b} \\
+%       {\footnotesize (a)} & {\footnotesize (b)}
+%     \end{tabular}
+%   \end{block}
+%   \begin{block}{Analysis}
+%     \begin{center}
+%       \sffamily\footnotesize
+%       \begin{tabular}{|c|c|c|c|c|l|}\hline
+%         \textbf{Situation} 
+%         & \mathexpr{ts(\id{m_2})} & \mathexpr{ts(\id{m_4})} & \mathexpr{ts(\id{m_2})} & \mathexpr{ts(\id{m_2})} 
+%         & \multicolumn{1}{c|}{\textbf{Conclusion}} \\ [-0.75ex]
+%         &                         &                        & \mathexpr{<}            & \mathexpr{>} & \\ [-0.75ex] 
+%         &                         &                        & \mathexpr{ts(\id{m_4})} & \mathexpr{ts(\id{m_4})} & \\ \whline
+%         (a) 
+%         & \mathexpr{(2,1,0)}      & \mathexpr{(4,3,0)}     & Yes & No & \id{m_2} may causally precede \id{m_4} \\ \hline
+%         (b) 
+%         & \mathexpr{(4,1,0)}      & \mathexpr{(2,3,0)}     & No  & No & \id{m_2} and \id{m_4} may conflict \\ \hline
+%       \end{tabular}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+%   \begin{slide}{Causally ordered multicasting}
+%     \begin{block}{Observation}
+%       We can now ensure that a message is delivered only if all causally preceding messages have already been
+%       delivered.
+%     \end{block}
+%     \begin{block}{Adjustment} 
+%       \id{P_i} increments \mathexpr{\id{VC_i}[i]} only when sending a message, and \id{P_j} ``adjusts''
+%       \id{VC_j} when receiving a message (i.e., effectively does not change \mathexpr{\id{VC_j}[j]}).
+%     \end{block}
+%     \onslide
+%     \begin{alertblock}{\id{P_j} postpones delivery of \id{m} until:}
+%       \begin{enumerate}\tightlist
+%       \item \mathexpr{ts(\id{m})[i] = \id{VC_j}[i] + 1}
+%       \item \mathexpr{ts(\id{m})[k] \leq \id{VC_j}[k]} for all \mathexpr{k \neq i}
+%       \end{enumerate}
+%     \end{alertblock}
+%   \end{slide}
+%   \begin{slide}{Causally ordered multicasting}
+%     \begin{block}{Enforcing causal communication}
+%       \begin{centerfig}
+%         \includefigure{05-13}
+%       \end{centerfig}
+%     \end{block}
+%     \onslide
+%     \begin{exampleblock}{Example}
+%       Take \mathexpr{\id{VC_3} = [0,2,2], ts(\id{m}) = [1,3,0]} from \id{P_1}. What information does \id{P_3}
+%       have, and what will it do when receiving \id{m} (from \id{P_1})?
+%     \end{exampleblock}
+%   \end{slide}
 \section{Mutual exclusion}
 \subsection{Overview}
 \begin{slide}{Mutual exclusion}
@@ -451,17 +451,17 @@
 \begin{slide}{Decentralized mutual exclusion}
   \begin{block}{How robust is this system?}
     \begin{itemize}
-    \item<1-> Let \mathexpr{p = \Delta t / T} be the probability that a coordinator resets during a time interval
+    \item Let \mathexpr{p = \Delta t / T} be the probability that a coordinator resets during a time interval
       \mathexpr{\Delta t}, while having a lifetime of \mathexpr{T}.
-    \item<2-> The probability \mathexpr{\mathbb{P}[k]} that
+    \item The probability \mathexpr{\mathbb{P}[k]} that
     \mathexpr{k} out of \mathexpr{m} coordinators reset during the same interval is
     \[
     \mathbb{P}[k] = \binom{m}{k} p^k (1 - p)^{m-k}
     \]
-    \item<3-> \mathexpr{f} coordinators reset \mathexpr{\Rightarrow} \blue{correctness is violated when there is
+    \item \mathexpr{f} coordinators reset \mathexpr{\Rightarrow} \blue{correctness is violated when there is
       only a minority of nonfaulty coordinators}: when \red{\mathexpr{N-(m-f) \geq m}}, or, \red{\mathexpr{f
         \geq 2m-N}}.
-    \item<4-> The probability of a violation is \mathexpr{\sum_{k=2m-N}^m \mathbb{P}[k]}.
+    \item The probability of a violation is \mathexpr{\sum_{k=2m-N}^m \mathbb{P}[k]}.
     \end{itemize}
   \end{block}
 \end{slide}
@@ -500,7 +500,7 @@
       \end{tabular}
     \end{center}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{So....}
     What can we conclude?
   \end{alertblock}
@@ -589,7 +589,7 @@
     In many systems, the coordinator is chosen manually (e.g.,\ file servers). This leads to centralized
     solutions \mathexpr{\Rightarrow} single point of failure.
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Teasers}
     \begin{enumerate}
     \item If a coordinator is chosen dynamically, to what extent can we speak about a centralized or
@@ -747,7 +747,7 @@
     \end{itemize}
   \end{block}
 
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Observation}
     By slightly differing the timeout values per follower for deciding when to start an election, we can avoid
     concurrent elections, and the election will rapidly converge.
@@ -792,12 +792,12 @@
       \end{itemize}
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Observation}
     By controlling \mathexpr{K}, we control the difficulty of finding \mathexpr{\tilde{h}}. If \mathexpr{p}
     is the probability that a random guess for \mathexpr{\tilde{h}} will suffice: \mathexpr{p=(1/2)^{K}}.
   \end{alertblock}
-  \onslide<3->
+  \onslide
   \begin{block}{Current practice}
     In many PoW-based blockchain systems, \mathexpr{K=64}
     \begin{itemize}%\firmlist
@@ -870,10 +870,10 @@
     \begin{itemize}
     \item \red{Data dissemination}: Perhaps the most important one. Note that there are many variants of
       dissemination.
-    \item \red{Aggregation}: Let every node \id{P_i} maintain a variable \mathexpr{v_i}. When two nodes gossip, they
+    \item \red{Aggregation Function (Average)}: Let every node \id{P_i} maintain a variable \mathexpr{v_i}. When two nodes gossip, they
       each reset their variable to\[{v_i},{v_j} \leftarrow ({v_i} + {v_j}) /2\] Result: in the end
       each node will have computed the average \mathexpr{\bar{v} = \sum_i {v_i} / N}.
-    \item<2-> What happens in the case that initially \mathexpr{{v_i} = 1} and \mathexpr{{v_j} = 0, j \neq i}?
+    \item What happens in the case that initially \mathexpr{{v_i} = 1} and \mathexpr{{v_j} = 0, j \neq i}?
     \end{itemize}
   \end{block}
 \end{slide}
@@ -965,7 +965,7 @@
     updating its local list. An attacker is in limbo: will its response be used for statistical purposes or
     for functional purposes?
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Observation}
     When gathering statistics may reveal colluders, a colluding node will be \red{forced} to behave according
     to the protocol.
@@ -983,7 +983,7 @@
       \id{N}.
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Hard part}
     Implementing the \blue{match} function in a scalable manner.
   \end{alertblock}
@@ -1025,7 +1025,7 @@
   \item[(a)]~first broadcast subscriptions
   \item[(b)]~forward notifications only to relevant rendezvous nodes
   \end{itemize}
-  \onslide<2->
+  \onslide
   \begin{block}{Example of a (partially filled) routing table}
     \begin{centerfig}
       \sffamily\footnotesize
@@ -1057,7 +1057,7 @@
     \item We are interested only in notifications that fall into \mathexpr{\set{\overline{S}} = \cup \set{S_i}}.
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Goal}
     Partition \set{\overline{S}} into \mathexpr{M} disjoint subspaces
     \mathexpr{\set{\overline{S}_1},\ldots,\set{\overline{S}_M}} such that
@@ -1099,7 +1099,7 @@
       sensitive information \mathexpr{\Rightarrow} we now have a \red{routing problem}.
     \end{itemize}
   \end{alertblock}
-  \onslide<2->
+  \onslide
   \begin{block}{Solution}
     \begin{itemize}
     \item Allow for searching (and matching) on encrypted data, without the need for decryption.
