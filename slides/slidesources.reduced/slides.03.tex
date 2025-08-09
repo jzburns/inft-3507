@@ -1,32 +1,13 @@
 \part{Processes}
 \section{Threads}
-\subsection{Introduction to threads}
-\begin{slide}{Introduction to threads}
-  \begin{block}{Basic idea} 
-    We build \blue{virtual processors} in software, on top of physical processors:
-    \begin{description}
-    \item[\textbf{Processor}:] Provides a set of instructions along with the capability of automatically
-      executing a series of those instructions.
-    \item[\textbf{Thread}:] A minimal software processor in whose \blue{context} a series of instructions can be
-      executed. Saving a thread context implies stopping the current execution and saving all the data needed
-      to continue the execution at a later stage.
-    \item[\textbf{Process}:] A software processor in whose context one or more threads may be executed. Executing
-      a thread, means executing a series of instructions in the context of that thread.
-    \end{description}
-  \end{block}
-\end{slide}
-\begin{slide}{Context switching}
-  \begin{block}{Contexts}
+\subsection{Introduction to Processes and Threads}
+\begin{slide}{Introduction to Processes and Threads}
     \begin{itemize}
-    \item \textbf{Processor context}: The minimal collection of values stored in the registers of a processor
-      used for the execution of a series of instructions (e.g., stack pointer, addressing registers, program
-      counter).
-    \item \textbf{Thread context}: The minimal collection of values stored in registers and memory, used for
-      the execution of a series of instructions (i.e., processor context, state).
-    \item \textbf{Process context}: The minimal collection of values stored in registers and memory, used for
-      the execution of a thread (i.e., thread context, but now also at least MMU register values).
-    \end{itemize}
-  \end{block}
+    \item \textbf{Definition}: A process is an independent program in execution with its own memory space, while a thread is a lightweight unit of execution within a process, sharing the process's memory.
+    \item \textbf{Memory}: A process has its own isolated memory space (address space), whereas threads within the same process share the same memory space, including code, data, and resources.
+    \item \textbf{Overhead}: Processes are heavier, requiring more system resources and time for creation and context switching, while threads are lighter, with lower overhead for creation and switching.
+    \item \textbf{Communication}: Inter-process communication (IPC) is complex and slower (e.g., pipes, sockets), while threads communicate faster via shared memory but require synchronization (e.g., locks).      
+  \end{itemize}
 \end{slide}
 \begin{slide}{Context switching}
   \begin{block}{Observations}
@@ -237,7 +218,6 @@
   \begin{block}{Overview}
     \begin{center}
       \begin{tabular}{|l|l|}\hline
-        \multicolumn{1}{|c|}{\textbf{Model}} &  \multicolumn{1}{c|}{\textbf{Characteristics}} \\ \hline
         Multithreading          & Parallelism, blocking system calls \\ \hline
         Single-threaded process & No parallelism, blocking system calls \\ \hline
         Finite-state machine    & Parallelism, nonblocking system calls \\ \hline
@@ -249,7 +229,6 @@
 \subsection{Principle of virtualization}
 \begin{slide}{Virtualization}
   \begin{block}{Observation} 
-    \blue{Virtualization} is important:
     \begin{itemize}\tightlist
     \item Hardware \blue{changes faster} than software
     \item Ease of \blue{portability} and code migration
