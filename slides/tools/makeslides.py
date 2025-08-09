@@ -12,7 +12,7 @@ if chap not in [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09' ]:
 	os._exit(0)
 
 if kind in ['S']:
-	slide.write("\\documentclass[10pt,xcolor=dvipsnames]{beamer}\n")
+	slide.write("\\documentclass[10pt,aspectratio=169,xcolor=dvipsnames]{beamer}\n")
 elif kind in ['H','X']:
 	slide.write("\\documentclass[10pt,handout,xcolor=dvipsnames]{beamer}\n")
 else:
