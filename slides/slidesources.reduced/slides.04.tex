@@ -4,43 +4,44 @@
 \begin{slide}{Basic networking model}
   \begin{block}{}
     \begin{center}
-      \includefigure[0.71]{04-01}
+      \includefigure[0.65]{04-01}
     \end{center}
   \end{block}
   \begin{block}{Drawbacks}
     \begin{itemize}\tightlist
     \item Focus on message-passing only
-    \item Often unneeded or unwanted functionality 
-    \item Violates access transparency
+    \item Violates access transparency - fails to hide the complexities of 
+    accessing resources or services across different machines or locations, making it apparent to users or applications that 
+    they are interacting with a distributed environment
     \end{itemize}
   \end{block}
 \end{slide}
-\begin{slide}{Low-level layers}
-  \begin{block}{Recap}
-    \begin{itemize}\tightlist
-    \item \blue{Physical layer}: contains the specification and implementation of bits, and their transmission
-      between sender and receiver
-    \item \blue{Data link layer}: prescribes the transmission of a series of bits into a frame to allow for
-      error and flow control
-    \item \blue{Network layer}: describes how packets in a network of computers are to be \red{routed}.
-    \end{itemize}
-  \end{block}
-  \begin{block}{Observation} 
-    For many distributed systems, the lowest-level interface is that of the network layer. 
-  \end{block}
-\end{slide}
-\begin{slide}{Transport Layer}
-  \begin{alertblock}{Important} 
-    The transport layer provides the actual communication facilities for most distributed systems.
-  \end{alertblock}
-  \begin{block}{Standard Internet protocols}
-    \begin{itemize}\tightlist
-    \item TCP: connection-oriented, reliable, stream-oriented communication
-    \item UDP: unreliable (best-effort) datagram communication
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Middleware layer}
+% \begin{slide}{Low-level layers}
+%   \begin{block}{Recap}
+%     \begin{itemize}\tightlist
+%     \item \blue{Physical layer}: contains the specification and implementation of bits, and their transmission
+%       between sender and receiver
+%     \item \blue{Data link layer}: prescribes the transmission of a series of bits into a frame to allow for
+%       error and flow control
+%     \item \blue{Network layer}: describes how packets in a network of computers are to be \red{routed}.
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Observation} 
+%     For many distributed systems, the lowest-level interface is that of the network layer. 
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Transport Layer}
+%   \begin{alertblock}{Important} 
+%     The transport layer provides the actual communication facilities for most distributed systems.
+%   \end{alertblock}
+%   \begin{block}{Standard Internet protocols}
+%     \begin{itemize}\tightlist
+%     \item TCP: connection-oriented, reliable, stream-oriented communication
+%     \item UDP: unreliable (best-effort) datagram communication
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+\begin{slide}{Middleware ``layer"}
   \begin{block}{Observation} 
     Middleware is invented to provide \blue{common} services and protocols that can be used by many
     \blue{different} applications
@@ -109,7 +110,7 @@
     \item Server essentially waits only for incoming requests, and subsequently processes them
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Drawbacks synchronous communication}
     \begin{itemize}\tightlist
     \item Client cannot do any other work while waiting for reply
@@ -118,16 +119,16 @@
     \end{itemize}
   \end{block}
 \end{slide}
-\begin{slide}{Messaging}
-  \begin{block}{Message-oriented middleware}
-    Aims at high-level \blue{persistent asynchronous communication}:
-    \begin{itemize}\tightlist
-    \item Processes send each other messages, which are queued
-    \item Sender need not wait for immediate reply, but can do other things
-    \item Middleware often ensures  fault tolerance
-    \end{itemize}
-  \end{block}
-\end{slide}
+% \begin{slide}{Messaging}
+%   \begin{block}{Message-oriented middleware}
+%     Aims at high-level \blue{persistent asynchronous communication}:
+%     \begin{itemize}\tightlist
+%     \item Processes send each other messages, which are queued
+%     \item Sender need not wait for immediate reply, but can do other things
+%     \item Middleware often ensures  fault tolerance
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
 \section{Remote procedure call}
 \subsection{Basic RPC operation}
 \begin{slide}{Basic RPC operation}
@@ -205,12 +206,12 @@
         \blue{references to (global) data}.
       \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Conclusion} 
     Full access transparency cannot be realized.
   \end{alertblock}
-  \onslide<3->
-  \begin{block}{A \blue{remote reference} mechanism enhances access transparency}
+  \onslide
+  \begin{block}{A remote reference mechanism enhances access transparency}
     \begin{itemize}\tightlist
     \item Remote reference offers \blue{unified access} to remote data
     \item Remote references can be \blue{passed as parameter} in RPCs
@@ -266,19 +267,19 @@
     \end{center}
   \end{block}
 \end{slide}
-  \begin{slide}{Sockets: Python code}
-    \vspace*{-6pt}
-    \begin{block}{Server}
-      \begin{tabular}{@{\hspace*{1em}}l}
-        \includelisting{04-19/server-book}
-      \end{tabular}
-    \end{block}
-    \begin{block}{Client}
-      \begin{tabular}{@{\hspace*{1em}}l}
-        \includelisting{04-19/client-book}
-      \end{tabular}
-    \end{block}
-  \end{slide}
+  % \begin{slide}{Sockets: Python code}
+  %   \vspace*{-6pt}
+  %   \begin{block}{Server}
+  %     \begin{tabular}{@{\hspace*{1em}}l}
+  %       \includelisting{04-19/server-book}
+  %     \end{tabular}
+  %   \end{block}
+  %   \begin{block}{Client}
+  %     \begin{tabular}{@{\hspace*{1em}}l}
+  %       \includelisting{04-19/client-book}
+  %     \end{tabular}
+  %   \end{block}
+  % \end{slide}
 \subsection{Advanced transient messaging}
 \begin{slide}{Making sockets easier to work with}
   \begin{block}{Observation}
@@ -468,7 +469,7 @@
   \begin{centerfig}
     \includefigure[0.71]{04-32}
   \end{centerfig}
-  \onslide<2->
+  \onslide
   \begin{block}{Variation}
     Let \id{Q} forward a message with a certain probability \mathexpr{p_{flood}}, possibly even dependent
     on its own number of neighbors (i.e., \red{node degree}) or the degree of its neighbors.
@@ -592,7 +593,7 @@
       \end{column}
     \end{columns}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Note}
     If we really have to ensure that all servers are eventually updated, rumor spreading alone is not enough
   \end{alertblock}
@@ -620,3 +621,14 @@
   \end{alertblock}
 \end{slide}
 \section{Summary}
+\begin{slide}{Summary and Conclusions}
+We have discussed some important communication principles
+in Distributed Systems, namely:
+\begin{itemize}
+  \item Types of Communication
+  \item Basic RPC
+  \item Asynchronous messaging patterns
+  \item Message-oriented middleware (MPI)
+  \item Application-level multicasting
+\end{itemize}  
+\end{slide}
