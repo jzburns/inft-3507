@@ -121,6 +121,20 @@
   }
 }
 
+% \AtBeginSection{\frame{\sectionpage}}
+% \AtBeginSubsection{\frame{\subsectionpage}}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
 \newcommand{\scalefigure}{0.83}
 \newcommand{\includefigurew}[2][\textwidth]{\includegraphics[width=\textwidth]{\pngdir#2.png}}
 

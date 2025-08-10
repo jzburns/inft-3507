@@ -926,11 +926,11 @@
     \end{tabular}
   \end{centerfig}
 \end{slide}
-  \begin{slide}{A gossip-based 2D torus in Python (outline)}
-    \begin{centerfig}
-      \includelisting{05-28/outline}
-    \end{centerfig}
-  \end{slide}
+  % \begin{slide}{A gossip-based 2D torus in Python (outline)}
+  %   \begin{centerfig}
+  %     \includelisting{05-28/outline}
+  %   \end{centerfig}
+  % \end{slide}
 \subsection{Secure gossiping}
 \begin{slide}{Secure gossiping}
   \begin{alertblock}{Dramatic attack}
@@ -1108,171 +1108,171 @@
     \end{itemize}
   \end{block}
 \end{slide}
-\begin{slide}{Public-Key Encryption with Keyword Search (PEKS)}
-  \begin{block}{Basics}
-    \begin{itemize}
-    \item Use a public key \id{PK}, message \id{m} and its \mathexpr{n} keywords
-      \mathexpr{\id{KW_1},\ldots,\id{KW_n}} are stored at a server as the message \id{m^*}:
-      \[
-      \id{m^*} = [ PK(\id{m}) | \func{PEKS}(\id{PK}, \id{KW_1}) | \func{PEKS}(\id{PK}, \id{KW_2}) | \cdots |
-        \func{PEKS}(\id{PK}, \id{KW_n}) ]
-      \]
-    \item A subscriber gets the accompanying secret key.
-    \item For each keyword \id{KW_i}, a \red{trapdoor} \id{T_{KW_i}} is generated: \id{T_W}(\id{m^*}) will
-      return \id{true} iff \mathexpr{\id{W} \in \{\id{KW_1},\ldots,\id{KW_n}\}}.
-    \end{itemize}
-  \end{block}
-  \begin{centerfig}
-    \includefigure{05-35} \\
-    {\footnotesize \mathexpr{\id{KW_i^*} = \func{PEKS}(\id{PK}, \id{KW_i})}}
-  \end{centerfig}
-\end{slide}
-\section{Location systems}
-\begin{slide}{Positioning nodes}
-  \begin{block}{Issue}
-    In large-scale distributed systems in which nodes are dispersed across a wide-area network, we often need
-    to take some notion of \blue{proximity} or \blue{distance} into account \mathexpr{\Rightarrow} it starts
-    with determining a (relative) \red{location} of a node.
-  \end{block}
-\end{slide}
-\subsection{GPS: Global Positioning System}
-\begin{slide}{Computing position}
-  \begin{block}{Observation} 
-    A node \id{P} needs \mathexpr{d+1} \blue{landmarks} to compute its own position in a
-    \mathexpr{d}-dimensional space. Consider two-dimensional case.
-  \end{block}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Computing a position in 2D}
-        \begin{centerfig}
-          \includefigure{05-36}
-        \end{centerfig}
-      \end{block}
-    \end{column}
-    \begin{column}{0.45\textwidth}
-      \begin{block}{Solution} 
-        \id{P} needs to solve three equations in two unknowns (\mathexpr{x_P},\mathexpr{y_P}):
-        \[d_i = \sqrt{(x_i - x_P)^2 + (y_i - y_P)^2}\]
-      \end{block}
-    \end{column}
-  \end{columns}
-\end{slide}
-\begin{slide}{Global Positioning System}
-  \begin{block}{Assuming that the clocks of the satellites are accurate and synchronized}
-    \begin{itemize}\tightlist
-    \item It takes a while before a signal reaches the receiver
-    \item The receiver's clock is definitely out of sync with the satellite
-    \end{itemize}
-  \end{block}
-  \begin{block}{Basics}
-    \begin{itemize}\tightlist
-    \item \red{\mathexpr{\Delta_r}}: \red{unknown deviation} of the receiver's clock.
-    \item \red{\mathexpr{x_r}}, \red{\mathexpr{y_r}}, \red{\mathexpr{z_r}}: \red{unknown coordinates} of the receiver.
-    \item \mathexpr{T_i}: timestamp on a message from satellite \mathexpr{i}
-    \item \mathexpr{\blue{\Delta_i} = (T_{now} - T_i) + \red{\Delta_r}}: \blue{measured delay} of the message sent by satellite \mathexpr{i}.
-    \item \blue{Measured distance} to satellite \mathexpr{i}: \mathexpr{c \times \blue{\Delta_i}} (\mathexpr{c} is speed of light)
-    \item Real distance: \mathexpr{\red{d_i} = c \blue{\Delta_i} - c \red{\Delta_r} = \sqrt{(\blue{x_i} -
-        \red{x_r})^2 + (\blue{y_i} - \red{y_r})^2 + (\blue{z_i} - \red{z_r})^2}}
-    \end{itemize}
-  \end{block}
-  \begin{block}{Observation}
-    4 satellites \mathexpr{\Rightarrow} 4 equations in 4 unknowns (with \mathexpr{\red{\Delta_r}} as one of them)
-  \end{block}
-\end{slide}
-\subsection{When GPS is not an option}
-\begin{slide}{WiFi-based location services}
-  \begin{block}{Basic idea}
-    \begin{itemize}\tightlist
-    \item Assume we have a database of known access points (APs) with coordinates
-    \item Assume we can estimate distance to an AP
-    \item Then: with 3 detected access points, we can compute a position.
-    \end{itemize}
-  \end{block}
-  \begin{block}{War driving: locating access points}
-    \begin{itemize}\tightlist
-    \item Use a WiFi-enabled device along with a GPS receiver, and move through an area while recording
-      observed access points. 
-    \item Compute the centroid: assume an access point \id{AP} has been detected at \mathexpr{N} different
-      locations \mathexpr{\{\vec{x_1}, \vec{x_2}, \ldots, \vec{x_N}\}}, with known GPS location.
-    \item Compute location of \id{AP} as \mathexpr{\vec{x}_{AP} = \frac{\sum_{i=1}^N \vec{x_i}}{N}}.
-    \end{itemize}
-  \end{block}
-  \begin{alertblock}{Problems}
-    \begin{itemize}\tightlist
-    \item Limited accuracy of each GPS detection point \mathexpr{\vec{x_i}}
-    \item An access point has a nonuniform transmission range
-    \item Number of sampled detection points \mathexpr{N} may be too low.
-    \end{itemize}
-  \end{alertblock}
-\end{slide}
-\subsection{Logical positioning of nodes}
-\begin{slide}{Computing position}
-  \begin{columns}[T]
-    \begin{column}{0.45\textwidth}
-      \begin{block}{Problems}
-        \begin{itemize}
-        \item Measured latencies to landmarks fluctuate
-        \item Computed distances will not even be consistent
-        \end{itemize}
-      \end{block}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Inconsistent distances in 1D space}
-        \begin{centerfig}
-          \includefigure{05-37}
-        \end{centerfig}
-      \end{block}
-    \end{column}
-  \end{columns}
-  \begin{block}{Solution: minimize errors}
-    \begin{itemize}\tightlist
-    \item Use \mathexpr{N} special \red{landmark nodes} \mathexpr{\id{L_1}, \ldots, \id{L_N}}. 
-    \item Landmarks measure their pairwise latencies \mathexpr{\tilde{d}(\id{L_i}, \id{L_j})}
-    \item A central node computes the coordinates for each landmark, minimizing:
-      \[
-      \sum_{i=1}^N \sum_{j=i+1}^N \bigg(\frac{\tilde{d}(\id{L_i}, \id{L_j})
-        - \hat{d}(\id{L_i},\id{L_j})}{\tilde{d}(\id{L_i},\id{L_j})}\bigg)^{2}
-      \]
-      where \mathexpr{\hat{d}(\id{L_i}, \id{L_j})} is distance after nodes \id{L_i} and \id{L_j} have been
-      positioned.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Computing position}
-  \begin{block}{Choosing the dimension \mathexpr{m}}
-    The hidden parameter is the dimension \mathexpr{m} with \mathexpr{N > m}. A node \id{P} measures its
-    distance to each of the \mathexpr{N} landmarks and computes its coordinates by minimizing
-    \[
-    \sum_{i=1}^N \bigg(\frac{\tilde{d}(\id{L_i}, \id{P})
-      - \hat{d}(\id{L_i},\id{P})}{\tilde{d}(\id{L_i},\id{P})}\bigg)^{2}
-    \]
-  \end{block}
-  \begin{block}{Observation}
-    Practice shows that \mathexpr{m} can be as small as 6 or 7 to achieve latency estimations within a factor
-    2 of the actual value.
-  \end{block}
-\end{slide}
-\begin{slide}{Vivaldi}
-  \begin{block}{Principle: network of springs exerting forces}
-    Consider a collection of \mathexpr{N} nodes \mathexpr{\id{P_1}, \ldots, \id{P_N}}, each \id{P_i} having
-    coordinates \mathexpr{\vec{x_i}}. Two nodes exert a \red{mutual force}:
-    \[
-    \vec{F}_{ij} = \big(\tilde{d}(\id{P_i},\id{P_j}) - \hat{d}(\id{P_i},\id{P_j})\big) \times
-    u(\vec{x_i}-\vec{x_j})
-    \]
-    with \mathexpr{u(\vec{x_i}-\vec{x_j})} is the unit vector in the direction of \mathexpr{\vec{x_i} -
-      \vec{x_j}}
-  \end{block}
-  \begin{block}{Node \id{P_i} repeatedly executes steps}
-    \begin{enumerate}\tightlist
-    \item Measure the latency \mathexpr{\tilde{d}_{ij}} to node \id{P_j}, and also receive \id{P_j}'s coordinates
-      \mathexpr{\vec{x_j}}. 
-    \item Compute the error \mathexpr{e = \tilde{d}(\id{P_i},\id{P_j}) - \hat{d}(\id{P_i},\id{P_j})}
-    \item Compute the direction \mathexpr{\vec{u} = u(\vec{x_i} - \vec{x_j})}.
-    \item Compute the force vector \mathexpr{F_{ij} = e \cdot \vec{u}}
-    \item Adjust own position by moving along the force vector: \mathexpr{\vec{x_i} \leftarrow \vec{x_i} + \delta
-      \cdot \vec{u}}.
-    \end{enumerate}
-  \end{block}
-\end{slide}
+% \begin{slide}{Public-Key Encryption with Keyword Search (PEKS)}
+%   \begin{block}{Basics}
+%     \begin{itemize}
+%     \item Use a public key \id{PK}, message \id{m} and its \mathexpr{n} keywords
+%       \mathexpr{\id{KW_1},\ldots,\id{KW_n}} are stored at a server as the message \id{m^*}:
+%       \[
+%       \id{m^*} = [ PK(\id{m}) | \func{PEKS}(\id{PK}, \id{KW_1}) | \func{PEKS}(\id{PK}, \id{KW_2}) | \cdots |
+%         \func{PEKS}(\id{PK}, \id{KW_n}) ]
+%       \]
+%     \item A subscriber gets the accompanying secret key.
+%     \item For each keyword \id{KW_i}, a \red{trapdoor} \id{T_{KW_i}} is generated: \id{T_W}(\id{m^*}) will
+%       return \id{true} iff \mathexpr{\id{W} \in \{\id{KW_1},\ldots,\id{KW_n}\}}.
+%     \end{itemize}
+%   \end{block}
+%   \begin{centerfig}
+%     \includefigure{05-35} \\
+%     {\footnotesize \mathexpr{\id{KW_i^*} = \func{PEKS}(\id{PK}, \id{KW_i})}}
+%   \end{centerfig}
+% \end{slide}
+% \section{Location systems}
+% \begin{slide}{Positioning nodes}
+%   \begin{block}{Issue}
+%     In large-scale distributed systems in which nodes are dispersed across a wide-area network, we often need
+%     to take some notion of \blue{proximity} or \blue{distance} into account \mathexpr{\Rightarrow} it starts
+%     with determining a (relative) \red{location} of a node.
+%   \end{block}
+% \end{slide}
+% \subsection{GPS: Global Positioning System}
+% \begin{slide}{Computing position}
+%   \begin{block}{Observation} 
+%     A node \id{P} needs \mathexpr{d+1} \blue{landmarks} to compute its own position in a
+%     \mathexpr{d}-dimensional space. Consider two-dimensional case.
+%   \end{block}
+%   \begin{columns}[T]
+%     \begin{column}{0.5\textwidth}
+%       \begin{block}{Computing a position in 2D}
+%         \begin{centerfig}
+%           \includefigure{05-36}
+%         \end{centerfig}
+%       \end{block}
+%     \end{column}
+%     \begin{column}{0.45\textwidth}
+%       \begin{block}{Solution} 
+%         \id{P} needs to solve three equations in two unknowns (\mathexpr{x_P},\mathexpr{y_P}):
+%         \[d_i = \sqrt{(x_i - x_P)^2 + (y_i - y_P)^2}\]
+%       \end{block}
+%     \end{column}
+%   \end{columns}
+% \end{slide}
+% \begin{slide}{Global Positioning System}
+%   \begin{block}{Assuming that the clocks of the satellites are accurate and synchronized}
+%     \begin{itemize}\tightlist
+%     \item It takes a while before a signal reaches the receiver
+%     \item The receiver's clock is definitely out of sync with the satellite
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Basics}
+%     \begin{itemize}\tightlist
+%     \item \red{\mathexpr{\Delta_r}}: \red{unknown deviation} of the receiver's clock.
+%     \item \red{\mathexpr{x_r}}, \red{\mathexpr{y_r}}, \red{\mathexpr{z_r}}: \red{unknown coordinates} of the receiver.
+%     \item \mathexpr{T_i}: timestamp on a message from satellite \mathexpr{i}
+%     \item \mathexpr{\blue{\Delta_i} = (T_{now} - T_i) + \red{\Delta_r}}: \blue{measured delay} of the message sent by satellite \mathexpr{i}.
+%     \item \blue{Measured distance} to satellite \mathexpr{i}: \mathexpr{c \times \blue{\Delta_i}} (\mathexpr{c} is speed of light)
+%     \item Real distance: \mathexpr{\red{d_i} = c \blue{\Delta_i} - c \red{\Delta_r} = \sqrt{(\blue{x_i} -
+%         \red{x_r})^2 + (\blue{y_i} - \red{y_r})^2 + (\blue{z_i} - \red{z_r})^2}}
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Observation}
+%     4 satellites \mathexpr{\Rightarrow} 4 equations in 4 unknowns (with \mathexpr{\red{\Delta_r}} as one of them)
+%   \end{block}
+% \end{slide}
+% \subsection{When GPS is not an option}
+% \begin{slide}{WiFi-based location services}
+%   \begin{block}{Basic idea}
+%     \begin{itemize}\tightlist
+%     \item Assume we have a database of known access points (APs) with coordinates
+%     \item Assume we can estimate distance to an AP
+%     \item Then: with 3 detected access points, we can compute a position.
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{War driving: locating access points}
+%     \begin{itemize}\tightlist
+%     \item Use a WiFi-enabled device along with a GPS receiver, and move through an area while recording
+%       observed access points. 
+%     \item Compute the centroid: assume an access point \id{AP} has been detected at \mathexpr{N} different
+%       locations \mathexpr{\{\vec{x_1}, \vec{x_2}, \ldots, \vec{x_N}\}}, with known GPS location.
+%     \item Compute location of \id{AP} as \mathexpr{\vec{x}_{AP} = \frac{\sum_{i=1}^N \vec{x_i}}{N}}.
+%     \end{itemize}
+%   \end{block}
+%   \begin{alertblock}{Problems}
+%     \begin{itemize}\tightlist
+%     \item Limited accuracy of each GPS detection point \mathexpr{\vec{x_i}}
+%     \item An access point has a nonuniform transmission range
+%     \item Number of sampled detection points \mathexpr{N} may be too low.
+%     \end{itemize}
+%   \end{alertblock}
+% \end{slide}
+% \subsection{Logical positioning of nodes}
+% \begin{slide}{Computing position}
+%   \begin{columns}[T]
+%     \begin{column}{0.45\textwidth}
+%       \begin{block}{Problems}
+%         \begin{itemize}
+%         \item Measured latencies to landmarks fluctuate
+%         \item Computed distances will not even be consistent
+%         \end{itemize}
+%       \end{block}
+%     \end{column}
+%     \begin{column}{0.5\textwidth}
+%       \begin{block}{Inconsistent distances in 1D space}
+%         \begin{centerfig}
+%           \includefigure{05-37}
+%         \end{centerfig}
+%       \end{block}
+%     \end{column}
+%   \end{columns}
+%   \begin{block}{Solution: minimize errors}
+%     \begin{itemize}\tightlist
+%     \item Use \mathexpr{N} special \red{landmark nodes} \mathexpr{\id{L_1}, \ldots, \id{L_N}}. 
+%     \item Landmarks measure their pairwise latencies \mathexpr{\tilde{d}(\id{L_i}, \id{L_j})}
+%     \item A central node computes the coordinates for each landmark, minimizing:
+%       \[
+%       \sum_{i=1}^N \sum_{j=i+1}^N \bigg(\frac{\tilde{d}(\id{L_i}, \id{L_j})
+%         - \hat{d}(\id{L_i},\id{L_j})}{\tilde{d}(\id{L_i},\id{L_j})}\bigg)^{2}
+%       \]
+%       where \mathexpr{\hat{d}(\id{L_i}, \id{L_j})} is distance after nodes \id{L_i} and \id{L_j} have been
+%       positioned.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Computing position}
+%   \begin{block}{Choosing the dimension \mathexpr{m}}
+%     The hidden parameter is the dimension \mathexpr{m} with \mathexpr{N > m}. A node \id{P} measures its
+%     distance to each of the \mathexpr{N} landmarks and computes its coordinates by minimizing
+%     \[
+%     \sum_{i=1}^N \bigg(\frac{\tilde{d}(\id{L_i}, \id{P})
+%       - \hat{d}(\id{L_i},\id{P})}{\tilde{d}(\id{L_i},\id{P})}\bigg)^{2}
+%     \]
+%   \end{block}
+%   \begin{block}{Observation}
+%     Practice shows that \mathexpr{m} can be as small as 6 or 7 to achieve latency estimations within a factor
+%     2 of the actual value.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Vivaldi}
+%   \begin{block}{Principle: network of springs exerting forces}
+%     Consider a collection of \mathexpr{N} nodes \mathexpr{\id{P_1}, \ldots, \id{P_N}}, each \id{P_i} having
+%     coordinates \mathexpr{\vec{x_i}}. Two nodes exert a \red{mutual force}:
+%     \[
+%     \vec{F}_{ij} = \big(\tilde{d}(\id{P_i},\id{P_j}) - \hat{d}(\id{P_i},\id{P_j})\big) \times
+%     u(\vec{x_i}-\vec{x_j})
+%     \]
+%     with \mathexpr{u(\vec{x_i}-\vec{x_j})} is the unit vector in the direction of \mathexpr{\vec{x_i} -
+%       \vec{x_j}}
+%   \end{block}
+%   \begin{block}{Node \id{P_i} repeatedly executes steps}
+%     \begin{enumerate}\tightlist
+%     \item Measure the latency \mathexpr{\tilde{d}_{ij}} to node \id{P_j}, and also receive \id{P_j}'s coordinates
+%       \mathexpr{\vec{x_j}}. 
+%     \item Compute the error \mathexpr{e = \tilde{d}(\id{P_i},\id{P_j}) - \hat{d}(\id{P_i},\id{P_j})}
+%     \item Compute the direction \mathexpr{\vec{u} = u(\vec{x_i} - \vec{x_j})}.
+%     \item Compute the force vector \mathexpr{F_{ij} = e \cdot \vec{u}}
+%     \item Adjust own position by moving along the force vector: \mathexpr{\vec{x_i} \leftarrow \vec{x_i} + \delta
+%       \cdot \vec{u}}.
+%     \end{enumerate}
+%   \end{block}
+% \end{slide}
 \section{Summary}
