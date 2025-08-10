@@ -92,7 +92,7 @@
       \end{tabular}
     \end{center}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Example execution sequences}
     \begin{centerfig}
       \includefigure{07-05}
@@ -103,7 +103,7 @@
     \begin{block}{Seemingly okay}
       \centering\includefigure[1.2]{07-06}
     \end{block}
-    \onslide<2->
+    \onslide
     \begin{block}{But not really (don't forget that \id{P_1} and \id{P_2} act concurrently)}
       \begin{center}
         \begin{tabular}{|c@{;\ }c@{;\ }c@{;\ }c|c|c|}\hline
@@ -189,7 +189,7 @@
     \item No data access is allowed to be performed until all previous accesses to locks have been performed.
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Basic idea} 
     You don't care that reads and writes of a \blue{series} of operations are immediately known to other
     processes. You just want the \blue{effect} of the series itself to be known.
@@ -228,11 +228,9 @@
     \red{Observation}: A \blue{program} solving a monotonic problem can start with incomplete information, but
     is guaranteed not to have to roll back when missing information becomes available. \green{Example}:
     filling a shopping cart.
+    NOTE: \emph{In all cases, we are avoiding global 
+    synchronization.}
   \end{block}
-  \onslide<2->
-  \begin{alertblock}{Important observation}
-    In all cases, we are avoiding global synchronization.
-  \end{alertblock}
 \end{slide}
 \subsection{Continuous consistency}
 \begin{slide}{Continuous Consistency}
@@ -288,7 +286,7 @@
       \end{itemize}
     \end{itemize}
   \end{exampleblock}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Note}
     The only thing you really want is that the entries you updated and/or read at \id{A}, are in \id{B} the
     way you left them in \id{A}. In that case, the database will appear to be consistent \blue{to you}.
@@ -384,7 +382,7 @@
     \includefigure[1]{07-20b} \\
     Not OK
   \end{centerfig}
-  \onslide<2->
+  \onslide
   \begin{exampleblock}{Example}
     Updating your Web page and guaranteeing that your Web browser shows the newest version instead of its
     cached copy.
@@ -405,7 +403,7 @@
     \includefigure[1]{07-21b} \\
     Not OK
   \end{centerfig}
-  \onslide<2->
+  \onslide
   \begin{exampleblock}{Example}
     See reactions to posted articles only if you have the original posting (a read ``pulls in'' the
     corresponding write operation).
@@ -428,12 +426,12 @@
   \begin{block}{Essence}
     Figure out what the best \mathexpr{K} places are out of \mathexpr{N} possible locations.
     \begin{itemize}
-    \item<2-> Select best location out of \mathexpr{N-K} for which the \blue{average distance to clients is
+    \item Select best location out of \mathexpr{N-K} for which the \blue{average distance to clients is
       minimal}. Then choose the next best server. (\red{Note:} The first chosen location minimizes the
       average distance to all clients.) \blue{Computationally expensive}.
-    \item<3-> Select the \mathexpr{K}-th largest \blue{autonomous system} and place a server at the
+    \item Select the \mathexpr{K}-th largest \blue{autonomous system} and place a server at the
       best-connected host. \blue{Computationally expensive}.
-    \item<4-> Position nodes in a \mathexpr{d}-dimensional geometric space, where distance reflects
+    \item Position nodes in a \mathexpr{d}-dimensional geometric space, where distance reflects
       latency. Identify the \mathexpr{K} regions with highest density and place a server in every
       one. \blue{Computationally cheap}.
     \end{itemize}
@@ -518,14 +516,14 @@
   \end{block}
   \begin{alertblock}{Make lease expiration time adaptive}
     \begin{itemize}
-    \item<2,5> \blue{Age-based leases}: An object that hasn't changed for a long time, will not change in the near
+    \item\blue{Age-based leases}: An object that hasn't changed for a long time, will not change in the near
       future, so provide a long-lasting lease
-    \item<3,5> \blue{Renewal-frequency based leases}: The more often a client requests a specific object, the longer
+    \item\blue{Renewal-frequency based leases}: The more often a client requests a specific object, the longer
       the expiration time for that client (for that object) will be
-    \item<4,5> \blue{State-based leases}: The more loaded a server is, the shorter the expiration times become
+    \item\blue{State-based leases}: The more loaded a server is, the shorter the expiration times become
     \end{itemize}
   \end{alertblock}
-  \onslide<5->
+  \onslide
   \begin{alertblock}{Question}
     Why are we doing all this?  
 %%  Trying to reduce the server's state as much as possible while providing strong consistency.
@@ -565,10 +563,10 @@
 \begin{slide}{Primary-based protocols}
   \begin{block}{Primary-backup protocol}
     \begin{centerfig}
-      \includefigure{07-30}
+      \includefigure[0.65]{07-30}
     \end{centerfig}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{exampleblock}{Example primary-backup protocol}
     Traditionally applied in distributed databases and file systems that require a high degree of fault
     tolerance. Replicas are often placed on the same LAN.
@@ -577,10 +575,10 @@
 \begin{slide}{Primary-based protocols}
   \begin{block}{Primary-backup protocol with local writes}
     \begin{centerfig}
-      \includefigure{07-31}
+      \includefigure[0.65]{07-31}
     \end{centerfig}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{exampleblock}{Example primary-backup protocol with local writes}
     Mobile computing in disconnected mode (ship all relevant files to user before disconnecting, and update
     later on).
@@ -634,12 +632,12 @@
   \begin{alertblock}{Problem}
     We need to ensure that \mathexpr{v(t) - v_i < \delta_i} for every server \id{S_i}.
   \end{alertblock}
-  \onslide<2->
+  \onslide
   \begin{block}{Approach}
     Let every server \id{S_k} maintain a \blue{view} \mathexpr{TW_k[i,j]} of what it believes is the value of
     \mathexpr{TW[i,j]}. This information can be \blue{gossiped} when an update is propagated.
   \end{block}
-  \onslide<3->
+  \onslide
   \begin{alertblock}{Note}
     \[0 \leq TW_k[i,j] \leq TW[i,j] \leq TW[j,j]\]
   \end{alertblock}
@@ -649,11 +647,11 @@
     \id{S_k} sends operations from its log to \id{S_i} \blue{when it sees that \mathexpr{TW_k[i,k]} is getting too far from
     \mathexpr{TW[k,k]}}, in particular, when \[TW[k,k] - TW_k[i,k] > \delta_i/(N-1)\]
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Question}
     To what extent are we being \red{pessimistic} here: where does \mathexpr{\delta_i/(N-1)} come from?
   \end{block}
-  \onslide<3->
+  \onslide
   \begin{alertblock}{Note}
     Staleness can be done analogously, by essentially keeping track of what has been seen last from \id{S_i} (see
     book).
@@ -671,13 +669,13 @@
     \end{itemize}
   \end{block}
 
-  \onslide<2->
+  \onslide
   \begin{block}{Monotonic-read consistency}
     When client \id{C} wants to read at server \id{S}, \id{C} passes its read set. \id{S} can pull in any
     updates before executing the read operation, after which the read set is updated.
   \end{block}
 
-  \onslide<3->
+  \onslide
   \begin{block}{Monotonic-write consistency}
     When client \id{C} wants to write at server \id{S}, \id{C} passes its write set. \id{S} can pull in any
     updates, executes them in the correct order, and then executes the write operation, after which the write
@@ -692,7 +690,7 @@
     updates before executing the read operation, after which the read set is updated.
   \end{block}
 
-  \onslide<2->
+  \onslide
   \begin{block}{Writes-follows-reads consistency}
     When client \id{C} wants to write at server \id{S}, \id{C} passes its read set. \id{S} can pull in any
     updates, executes them in the correct order, and then executes the write operation, after which the write
@@ -748,3 +746,14 @@
   \end{itemize}
 \end{slide}
 \section{Summary}
+\begin{slide}{Summary}
+In this section on \emph{Consistency and Replication},
+we discussed the following topics  
+  \begin{itemize}\tightlist
+  \item Data-centric consistency models
+  \item Client-centric consistency models
+  \item Replica Management
+  \item Consistency Protocols
+  \item Caching Example
+  \end{itemize}
+\end{slide}
