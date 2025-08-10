@@ -99,19 +99,19 @@
 \begin{slide}{Chord finger tables}
   \begin{block}{Principle}
     \begin{itemize}
-    \item<1-> Each node \id{p} maintains a \red{finger table} \mathexpr{\id{FT_p}[]} with at most \mathexpr{m}
+    \item Each node \id{p} maintains a \red{finger table} \mathexpr{\id{FT_p}[]} with at most \mathexpr{m}
       entries:
       \[
       \id{FT_p}[i] = \func{succ}(p + 2^{i-1})
       \]
       \red{Note}: the \mathexpr{i}-th entry points to the first node succeeding \id{p} by at least
       \mathexpr{2^{i-1}}.
-    \item<2-> To look up a key \mathexpr{k}, node \id{p} forwards the request to node with index \mathexpr{j}
+    \item To look up a key \mathexpr{k}, node \id{p} forwards the request to node with index \mathexpr{j}
       satisfying
       \[
       q = \id{FT_p}[j] \leq k < \id{FT_p}[j+1]
       \]
-    \item<3-> If \mathexpr{p < k < \id{FT_p}[1]}, the request is also forwarded to \mathexpr{\id{FT_p}[1]}
+    \item If \mathexpr{p < k < \id{FT_p}[1]}, the request is also forwarded to \mathexpr{\id{FT_p}[1]}
     \end{itemize}
   \end{block}
 \end{slide}
@@ -122,13 +122,13 @@
     \end{center}
   \end{block}
 \end{slide}
-  \begin{slide}{Chord in Python}
-    \begin{block}{}
-      \begin{tabular}{@{\hspace*{1em}}l}
-        \includelisting{06-04/chord-book}
-      \end{tabular}
-    \end{block}
-  \end{slide}
+  % \begin{slide}{Chord in Python}
+  %   \begin{block}{}
+  %     \begin{tabular}{@{\hspace*{1em}}l}
+  %       \includelisting{06-04/chord-book}
+  %     \end{tabular}
+  %   \end{block}
+  % \end{slide}
 \begin{slide}{Exploiting network proximity}
   \begin{alertblock}{Problem}
     The logical organization of nodes in the overlay may lead to \blue{erratic message transfers} in the
@@ -136,13 +136,13 @@
   \end{alertblock}
   \begin{block}{Solutions}
     \begin{itemize}
-    \item<2->\red{Topology-aware node assignment}: When assigning an ID to a node, make sure that nodes
+    \item\red{Topology-aware node assignment}: When assigning an ID to a node, make sure that nodes
       close in the ID space are also close in the network. \blue{Can be very difficult}.
-    \item<3->\red{Proximity routing}: Maintain more than one possible successor, and forward to the
+    \item\red{Proximity routing}: Maintain more than one possible successor, and forward to the
       closest. \newline \blue{Example:} in Chord \mathexpr{\id{FT_p}[i]} points to first node in
       \mathexpr{INT = [p+2^{i -1},p+2^i-1]}. Node \id{p} can also store pointers to other nodes in
       \mathexpr{INT}.
-    \item<4->\red{Proximity neighbor selection}: When there is a choice of selecting who your neighbor
+    \item\red{Proximity neighbor selection}: When there is a choice of selecting who your neighbor
       will be (not in Chord), pick the closest one.
     \end{itemize}
   \end{block}
@@ -296,7 +296,7 @@
   \end{block}
 \end{slide}
 \begin{slide}{Name space}
-  \begin{block}{We can easily store all kinds of \blue{attributes} in a node}
+  \begin{block}{We can easily store all kinds of attributes in a node}
     \begin{itemize}\tightlist
     \item Type of the entity
     \item An identifier for that entity
@@ -305,7 +305,7 @@
     \item ...
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Note}
     Directory nodes can also have attributes, besides just storing a directory table with \emph{(identifier,
       label)} pairs.
@@ -316,7 +316,7 @@
   \begin{alertblock}{Problem}
     To resolve a name, we need a directory node. How do we actually find that (initial) node?
   \end{alertblock}
-  \onslide<2->
+  \onslide
   \begin{block}{Closure mechanism: The mechanism to select the implicit context from which to start name
       resolution}
     \begin{itemize}\tightlist
@@ -326,7 +326,7 @@
     \item \code{77.167.55.6}: route message to a specific IP address
     \end{itemize}
   \end{block}
-  \onslide<3->
+  \onslide
   \begin{block}{Note}
     You cannot have an explicit closure mechanism -- how would you start?
   \end{block}
@@ -343,7 +343,7 @@
     \item Name resolution continues with \id{name}
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Observations}
     \begin{itemize}\tightlist
     \item The name resolution process determines that we read the \blue{content} of a node, in particular, the
@@ -362,143 +362,143 @@
     Node \id{n5} has only one name
   \end{alertblock}
 \end{slide}
-\begin{slide}{Mounting}
-  \begin{block}{Issue}
-    Name resolution can also be used to merge \blue{different name spaces} transparently through
-    \red{mounting}: associating a node identifier of another name space with a node in a current name space.
-  \end{block}
-  \begin{block}{Terminology}
-    \begin{itemize}\tightlist
-    \item \red{Foreign name space}: the name space that needs to be accessed
-    \item \red{Mount point}: the node in the current name space containing the node identifier of the foreign
-      name space
-    \item \red{Mounting point}: the node in the foreign name space where to continue name resolution
-    \end{itemize}
-  \end{block}
-  \begin{block}{Mounting across a network}
-    \begin{enumerate}\tightlist
-    \item The name of an access protocol.
-    \item The name of the server.
-    \item The name of the mounting point in the foreign name space.
-    \end{enumerate}
-  \end{block}
-\end{slide}
-\begin{slide}{Mounting in distributed systems}
-  \vspace*{-6pt}
-  \begin{block}{Mounting remote name spaces through a specific access protocol}
-    \begin{center}
-      \includefigure[0.81]{06-13}
-    \end{center}
-  \end{block}
-\end{slide}
-\subsection{The implementation of a name space}
-\begin{slide}{Name-space implementation}
-  \begin{block}{Basic issue} 
-    Distribute the name resolution process as well as name space management across multiple machines, by
-    distributing nodes of the naming graph.
-  \end{block}
-  \onslide<2->
-  \begin{block}{Distinguish three levels}
-    \begin{itemize}\tightlist
-    \item<3-> \blue{Global level:} Consists of the high-level directory nodes. Main aspect is that these directory
-      nodes have to be jointly managed by different administrations
-    \item<4-> \blue{Administrational level:} Contains mid-level directory nodes that can be grouped in such a way
-      that each group can be assigned to a separate administration.
-    \item<5-> \blue{Managerial level:} Consists of low-level directory nodes within a single administration. Main
-      issue is effectively mapping directory nodes to local name servers.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Name-space implementation}
-  \vspace*{-6pt}
-  \begin{block}{An example partitioning of the DNS name space, including network files}
-    \begin{center}
-      \includefigure{06-14}
-    \end{center}
-  \end{block}
-\end{slide}
-\begin{slide}{Name-space implementation}
-  \begin{block}{A comparison between name servers for implementing nodes in a name space}
-    \begin{center}
-      \small
-      \renewcommand{\arraystretch}{1.1}
-      \begin{tabular}{|l|l|l|l|}\hline
-        \blue{Item} & \blue{Global} & \blue{Administrational} & \blue{Managerial}\\ \hline
-        1 & Worldwide	& Organization 	& Department 	\\ \hline
-        2 & Few 		& Many 			& Vast numbers 	\\ \hline
-        3 & Seconds 	& Milliseconds 	& Immediate 	\\ \hline
-        4 & Lazy 		& Immediate 	& Immediate 	\\ \hline
-        5 & Many 		& None or few 	& None 			\\ \hline
-        6 & Yes 		& Yes 			& Sometimes 	\\ \hline\hline
-        \multicolumn{2}{|l|}{1: Geographical scale} & \multicolumn{2}{l|}{4: Update propagation} \\ 
-        \multicolumn{2}{|l|}{2: \# Nodes} 			& \multicolumn{2}{l|}{5: \# Replicas} \\ 
-        \multicolumn{2}{|l|}{3: Responsiveness} 	& \multicolumn{2}{l|}{6: Client-side caching?} \\ \hline
-      \end{tabular}
-    \end{center}
-  \end{block}
-\end{slide}
-\begin{slide}{Iterative name resolution}
-  \begin{block}{Principle}
-    \begin{enumerate}\tightlist
-    \item \id{resolve(dir,[name_1,...,name_K])} sent to \id{Server_0} responsible for \id{dir}
-    \item \id{Server_0} resolves \id{resolve(dir,name_1)} \mathexpr{\rightarrow} \id{dir_1}, returning the 
-      identification (address) of \id{Server_1}, which stores \id{dir_1}.
-    \item Client sends \id{resolve(dir_1,[name_2,...,name_K])} to \id{Server_1}, etc.
-    \end{enumerate}
-    \begin{center}
-      \includefigure{06-16}
-    \end{center}
-  \end{block}
-\end{slide}
-\begin{slide}{Recursive name resolution}
-  \vspace*{-4pt}
-  \begin{block}{Principle}
-    \begin{enumerate}\tightlist
-    \item \id{resolve(dir,[name_1,...,name_K])} sent to \id{Server_0} responsible for \id{dir}
-    \item \id{Server_0} resolves \id{resolve(dir,name_1)} \mathexpr{\rightarrow} \id{dir_1}, and sends
-      \id{resolve(dir_1,[name_2,...,name_K])} to \id{Server_1}, which stores \id{dir_1}.
-    \item \id{Server_0} waits for result from \id{Server_1}, and returns it to client.
-    \end{enumerate}
-    \begin{center}
-      \includefigure{06-17}
-    \end{center}
-  \end{block}
-\end{slide}
-\begin{slide}{Caching in recursive name resolution}
-  \begin{centerfig}
-    \includefigure{06-18}
-  \end{centerfig}
-\end{slide}
-\begin{slide}{Scalability issues}
-  \begin{alertblock}{Size scalability}
-    We need to ensure that servers can handle a large number of requests per time unit $\Rightarrow$
-    high-level servers are in big trouble.
-  \end{alertblock}
-  \onslide<2->
-  \begin{block}{Solution} 
-    Assume (at least at global and administrational level) that content of nodes hardly ever changes. 
-    We can then apply extensive replication by mapping nodes to multiple servers, and start name resolution
-    at the nearest server.
-  \end{block}
-  \onslide<3->
-  \begin{block}{Observation} 
-    An important attribute of many nodes is the \blue{address} where the represented entity can be
-    contacted. Replicating nodes makes large-scale traditional name servers unsuitable for locating mobile
-    entities.
-  \end{block}
-\end{slide}
-\begin{slide}{Scalability issues}
-  \begin{alertblock}{We need to ensure that the name resolution process scales across large geographical
-      distances}
-    \begin{center}
-      \includefigure{06-19}
-    \end{center}
-  \end{alertblock}
-  \begin{block}{Problem} 
-    By mapping nodes to servers that can be located anywhere, we introduce an implicit location
-    dependency.
-  \end{block}
-\end{slide}
+% \begin{slide}{Mounting}
+%   \begin{block}{Issue}
+%     Name resolution can also be used to merge \blue{different name spaces} transparently through
+%     \red{mounting}: associating a node identifier of another name space with a node in a current name space.
+%   \end{block}
+%   \begin{block}{Terminology}
+%     \begin{itemize}\tightlist
+%     \item \red{Foreign name space}: the name space that needs to be accessed
+%     \item \red{Mount point}: the node in the current name space containing the node identifier of the foreign
+%       name space
+%     \item \red{Mounting point}: the node in the foreign name space where to continue name resolution
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Mounting across a network}
+%     \begin{enumerate}\tightlist
+%     \item The name of an access protocol.
+%     \item The name of the server.
+%     \item The name of the mounting point in the foreign name space.
+%     \end{enumerate}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Mounting in distributed systems}
+%   \vspace*{-6pt}
+%   \begin{block}{Mounting remote name spaces through a specific access protocol}
+%     \begin{center}
+%       \includefigure[0.81]{06-13}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \subsection{The implementation of a name space}
+% \begin{slide}{Name-space implementation}
+%   \begin{block}{Basic issue} 
+%     Distribute the name resolution process as well as name space management across multiple machines, by
+%     distributing nodes of the naming graph.
+%   \end{block}
+%   \onslide
+%   \begin{block}{Distinguish three levels}
+%     \begin{itemize}\tightlist
+%     \item \blue{Global level:} Consists of the high-level directory nodes. Main aspect is that these directory
+%       nodes have to be jointly managed by different administrations
+%     \item \blue{Administrational level:} Contains mid-level directory nodes that can be grouped in such a way
+%       that each group can be assigned to a separate administration.
+%     \item \blue{Managerial level:} Consists of low-level directory nodes within a single administration. Main
+%       issue is effectively mapping directory nodes to local name servers.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Name-space implementation}
+%   \vspace*{-6pt}
+%   \begin{block}{An example partitioning of the DNS name space, including network files}
+%     \begin{center}
+%       \includefigure{06-14}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Name-space implementation}
+%   \begin{block}{A comparison between name servers for implementing nodes in a name space}
+%     \begin{center}
+%       \small
+%       \renewcommand{\arraystretch}{1.1}
+%       \begin{tabular}{|l|l|l|l|}\hline
+%         \blue{Item} & \blue{Global} & \blue{Administrational} & \blue{Managerial}\\ \hline
+%         1 & Worldwide	& Organization 	& Department 	\\ \hline
+%         2 & Few 		& Many 			& Vast numbers 	\\ \hline
+%         3 & Seconds 	& Milliseconds 	& Immediate 	\\ \hline
+%         4 & Lazy 		& Immediate 	& Immediate 	\\ \hline
+%         5 & Many 		& None or few 	& None 			\\ \hline
+%         6 & Yes 		& Yes 			& Sometimes 	\\ \hline\hline
+%         \multicolumn{2}{|l|}{1: Geographical scale} & \multicolumn{2}{l|}{4: Update propagation} \\ 
+%         \multicolumn{2}{|l|}{2: \# Nodes} 			& \multicolumn{2}{l|}{5: \# Replicas} \\ 
+%         \multicolumn{2}{|l|}{3: Responsiveness} 	& \multicolumn{2}{l|}{6: Client-side caching?} \\ \hline
+%       \end{tabular}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Iterative name resolution}
+%   \begin{block}{Principle}
+%     \begin{enumerate}\tightlist
+%     \item \id{resolve(dir,[name_1,...,name_K])} sent to \id{Server_0} responsible for \id{dir}
+%     \item \id{Server_0} resolves \id{resolve(dir,name_1)} \mathexpr{\rightarrow} \id{dir_1}, returning the 
+%       identification (address) of \id{Server_1}, which stores \id{dir_1}.
+%     \item Client sends \id{resolve(dir_1,[name_2,...,name_K])} to \id{Server_1}, etc.
+%     \end{enumerate}
+%     \begin{center}
+%       \includefigure{06-16}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Recursive name resolution}
+%   \vspace*{-4pt}
+%   \begin{block}{Principle}
+%     \begin{enumerate}\tightlist
+%     \item \id{resolve(dir,[name_1,...,name_K])} sent to \id{Server_0} responsible for \id{dir}
+%     \item \id{Server_0} resolves \id{resolve(dir,name_1)} \mathexpr{\rightarrow} \id{dir_1}, and sends
+%       \id{resolve(dir_1,[name_2,...,name_K])} to \id{Server_1}, which stores \id{dir_1}.
+%     \item \id{Server_0} waits for result from \id{Server_1}, and returns it to client.
+%     \end{enumerate}
+%     \begin{center}
+%       \includefigure{06-17}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Caching in recursive name resolution}
+%   \begin{centerfig}
+%     \includefigure{06-18}
+%   \end{centerfig}
+% \end{slide}
+% \begin{slide}{Scalability issues}
+%   \begin{alertblock}{Size scalability}
+%     We need to ensure that servers can handle a large number of requests per time unit $\Rightarrow$
+%     high-level servers are in big trouble.
+%   \end{alertblock}
+%   \onslide
+%   \begin{block}{Solution} 
+%     Assume (at least at global and administrational level) that content of nodes hardly ever changes. 
+%     We can then apply extensive replication by mapping nodes to multiple servers, and start name resolution
+%     at the nearest server.
+%   \end{block}
+%   \onslide
+%   \begin{block}{Observation} 
+%     An important attribute of many nodes is the \blue{address} where the represented entity can be
+%     contacted. Replicating nodes makes large-scale traditional name servers unsuitable for locating mobile
+%     entities.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Scalability issues}
+%   \begin{alertblock}{We need to ensure that the name resolution process scales across large geographical
+%       distances}
+%     \begin{center}
+%       \includefigure{06-19}
+%     \end{center}
+%   \end{alertblock}
+%   \begin{block}{Problem} 
+%     By mapping nodes to servers that can be located anywhere, we introduce an implicit location
+%     dependency.
+%   \end{block}
+% \end{slide}
 \subsection{Example: The Domain Name System}
 \begin{slide}{DNS}
   \vspace*{-6pt}
@@ -600,7 +600,7 @@
     In many cases, it is much more convenient to name, and look up entities through their
     \red{attributes} \mathexpr{\Rightarrow} traditional \red{directory services} (aka \red{yellow pages}).
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Problem} 
     Lookup operations can be expensive, as they require matching \blue{requested attribute values},
     against \blue{actual attribute values} \mathexpr{\Rightarrow} inspect \red{all entities} (in principle).
@@ -698,86 +698,96 @@
     \end{itemize}
   \end{block}
 \end{slide}
-\begin{slide}{Alternative: map all attributes to 1 dimension and then index}
-  \vspace*{-6pt}
-  \begin{block}{Space-filling curves: principle}
-    \begin{enumerate}\tightlist
-    \item Map the \mathexpr{N}-dimensional space covered by the \mathexpr{N} attributes
-      \mathexpr{\{\id{a^1},\ldots,\id{a^N}\}} into a single dimension
-    \item Hashing values in order to distribute the 1-dimensional space among index servers.
-    \end{enumerate}
-  \end{block}
-  \vspace*{-6pt}
-  \begin{block}{Hilbert space-filling curve of (a) order 1, and (b) order 4}
-    \begin{center}
-      \begin{tabular}{@{(a)}c@{\hspace*{36pt}(b)}c}
-        \includefigure[0.73]{06-31a} &
-        \includefigure[0.73]{06-31b} 
-      \end{tabular}
-    \end{center}
-  \end{block}
-\end{slide}
-\begin{slide}{Space-filling curve}
-  \begin{block}{Once the curve has been drawn}
-    Consider the two-dimensional case
-    \begin{itemize}\tightlist
-    \item a Hilbert curve of order \mathexpr{k} connects \mathexpr{2^{2k}} subsquares \mathexpr{\Rightarrow} has
-      \mathexpr{2^{2k}} indices.
-    \item A range query corresponds to a \blue{rectangle} \mathexpr{R} in the 2-dimensional case
-    \item \mathexpr{R} intersects with a number of subsquares, each one corresponding to an index
-      \mathexpr{\Rightarrow} we now have a \red{series of indices} associated with \mathexpr{R}.
-    \end{itemize}
-  \end{block}
-  \begin{block}{Getting to the entities}
-    Each index is to be mapped to a server, who keeps a reference to the associated entity. One possible
-    solution: \blue{use a DHT}.
-  \end{block}
-\end{slide}
-\section{Named-data networking}
-\subsection{Basics}
-\begin{slide}{Named-data networking}
-  \begin{centerfig}
-    \includefigure{06-32}
-  \end{centerfig}
-  \begin{block}{Basics}
-    \begin{itemize}\tightlist
-    \item Retrieve an entity from the network by using that entity's \red{name} and \red{not address}.
-    \item The network takes that name as input, and \blue{routes a request} to a location where the entity is
-      stored.
-    \item NDN takes over the role of IP in a future architecture of the Internet,
-    \end{itemize}
-  \end{block}
-  \begin{exampleblock}{Example name}
-    \id{/distributed\mbox{\code{-}}systems.net/books/Distributed\ Systems/4/01/Naming}
-  \end{exampleblock}
-\end{slide}
-\subsection{Routing}
-\begin{slide}{Routing}
-  \begin{alertblock}{Question}
-    Is there really a difference in attempting to route a request such as
-    \begin{quote}
-      \id{distributed\mbox{\code{-}}systems.net/books/Distributed\ Systems/4/01/Naming}
-    \end{quote}
-    from the IPv6 address
-    \begin{quote}
-      \id{2001\mbox{\code{:}}610\mbox{\code{:}}508\mbox{\code{:}}108\mbox{\code{:}}192\mbox{\code{:}}87\mbox{\code{:}}108\mbox{\code{:}}15}
-    \end{quote}
-  \end{alertblock}
-  \begin{alertblock}{Key observation}
-    Theres is \red{no fundamental difference}. We decide which part of a name or address (i.e., \blue{a
-      prefix}) should be announced within a \blue{global routing substrate}, just as with IPv4 addresses with
-    BGP routers.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Routing}
-  \begin{centerfig}
-    \includefigure{06-33a} \\
-    Forwarding a request to (a next router on the way to) its destination
-  \end{centerfig}
-  \begin{centerfig}
-    \includefigure{06-33b} \\
-    Returning the request (to a router) on the path toward requester
-  \end{centerfig}
-\end{slide}
-\subsection{Security in named-data networking}
+% \begin{slide}{Alternative: map all attributes to 1 dimension and then index}
+%   \vspace*{-6pt}
+%   \begin{block}{Space-filling curves: principle}
+%     \begin{enumerate}\tightlist
+%     \item Map the \mathexpr{N}-dimensional space covered by the \mathexpr{N} attributes
+%       \mathexpr{\{\id{a^1},\ldots,\id{a^N}\}} into a single dimension
+%     \item Hashing values in order to distribute the 1-dimensional space among index servers.
+%     \end{enumerate}
+%   \end{block}
+%   \vspace*{-6pt}
+%   \begin{block}{Hilbert space-filling curve of (a) order 1, and (b) order 4}
+%     \begin{center}
+%       \begin{tabular}{@{(a)}c@{\hspace*{36pt}(b)}c}
+%         \includefigure[0.73]{06-31a} &
+%         \includefigure[0.73]{06-31b} 
+%       \end{tabular}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Space-filling curve}
+%   \begin{block}{Once the curve has been drawn}
+%     Consider the two-dimensional case
+%     \begin{itemize}\tightlist
+%     \item a Hilbert curve of order \mathexpr{k} connects \mathexpr{2^{2k}} subsquares \mathexpr{\Rightarrow} has
+%       \mathexpr{2^{2k}} indices.
+%     \item A range query corresponds to a \blue{rectangle} \mathexpr{R} in the 2-dimensional case
+%     \item \mathexpr{R} intersects with a number of subsquares, each one corresponding to an index
+%       \mathexpr{\Rightarrow} we now have a \red{series of indices} associated with \mathexpr{R}.
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Getting to the entities}
+%     Each index is to be mapped to a server, who keeps a reference to the associated entity. One possible
+%     solution: \blue{use a DHT}.
+%   \end{block}
+% \end{slide}
+% \section{Named-data networking}
+% \subsection{Basics}
+% \begin{slide}{Named-data networking}
+%   \begin{centerfig}
+%     \includefigure{06-32}
+%   \end{centerfig}
+%   \begin{block}{Basics}
+%     \begin{itemize}\tightlist
+%     \item Retrieve an entity from the network by using that entity's \red{name} and \red{not address}.
+%     \item The network takes that name as input, and \blue{routes a request} to a location where the entity is
+%       stored.
+%     \item NDN takes over the role of IP in a future architecture of the Internet,
+%     \end{itemize}
+%   \end{block}
+%   \begin{exampleblock}{Example name}
+%     \id{/distributed\mbox{\code{-}}systems.net/books/Distributed\ Systems/4/01/Naming}
+%   \end{exampleblock}
+% \end{slide}
+% \subsection{Routing}
+% \begin{slide}{Routing}
+%   \begin{alertblock}{Question}
+%     Is there really a difference in attempting to route a request such as
+%     \begin{quote}
+%       \id{distributed\mbox{\code{-}}systems.net/books/Distributed\ Systems/4/01/Naming}
+%     \end{quote}
+%     from the IPv6 address
+%     \begin{quote}
+%       \id{2001\mbox{\code{:}}610\mbox{\code{:}}508\mbox{\code{:}}108\mbox{\code{:}}192\mbox{\code{:}}87\mbox{\code{:}}108\mbox{\code{:}}15}
+%     \end{quote}
+%   \end{alertblock}
+%   \begin{alertblock}{Key observation}
+%     Theres is \red{no fundamental difference}. We decide which part of a name or address (i.e., \blue{a
+%       prefix}) should be announced within a \blue{global routing substrate}, just as with IPv4 addresses with
+%     BGP routers.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Routing}
+%   \begin{centerfig}
+%     \includefigure{06-33a} \\
+%     Forwarding a request to (a next router on the way to) its destination
+%   \end{centerfig}
+%   \begin{centerfig}
+%     \includefigure{06-33b} \\
+%     Returning the request (to a router) on the path toward requester
+%   \end{centerfig}
+% \end{slide}
+% \subsection{Security in named-data networking}
 \section{Summary}
+\begin{slide}{Summary}
+In the \emph{Naming} section of the lecture notes
+we have discussed the following topics
+\begin{enumerate}
+  \item Names, identifiers, and addresses
+  \item Flat Naming
+  \item Structured Naming
+  \item Attribute-based Naming
+\end{enumerate}
+\end{slide}
