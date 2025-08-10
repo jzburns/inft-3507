@@ -11,7 +11,7 @@
     A component \id{C} depends on \id{C^*} if the \blue{correctness} of \id{C}'s behavior depends on the
     correctness of \id{C^*}'s behavior. (Components are processes or channels.)
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Requirements related to dependability}
     \begin{center}
       \begin{tabular}{|l|l|}\hline
@@ -114,7 +114,7 @@
       \item \red{Commission failure}: a component takes an action that it should not have taken
       \end{itemize}
     \end{block}
-    \onslide<2->
+    \onslide
     \begin{alertblock}{Observation}
       Note that \blue{deliberate} failures, be they omission or commission failures, are typically security
       problems. Distinguishing between deliberate failures and unintentional ones is, in general, impossible.
@@ -184,7 +184,7 @@
     When a group can mask any \mathexpr{k} concurrent member failures (\mathexpr{k} is called \blue{degree of
       fault tolerance}).
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{How large does a \mathexpr{k}-fault tolerant group need to be?}
     \begin{itemize}
     \item With \red{halting failures} (crash/omission/timing failures): we need a total of \mathexpr{k+1}
@@ -194,7 +194,7 @@
       obtained through a majority vote.
     \end{itemize}
   \end{alertblock}
-  \onslide<3->
+  \onslide
   \begin{block}{Important assumptions}
     \begin{itemize}\tightlist
     \item All members are identical
@@ -222,7 +222,7 @@
     \item Every \id{P_i} maintains a list of proposed commands
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Basic algorithm (based on rounds)}
     \begin{enumerate}
     \item In \red{round} \mathexpr{r}, \id{P_i} multicasts its known set of commands \mathexpr{\set{C^r_i}} to
@@ -271,7 +271,7 @@
     \end{itemize}
   \end{block}
 
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Note}
     In practice, only updates are broadcast. At the end, every server has the same view and knows about the
     \id{c} committed operations. Note that effectively, any information at the backups is overwritten.
@@ -279,7 +279,7 @@
 \end{slide}
 \begin{slide}{Raft: when a leader crashes}
   \begin{centerfig}
-    \includefigure[0.83]{08-06}
+    \includefigure[0.65]{08-06}
   \end{centerfig}
   \begin{alertblock}{Crucial observations}
     \begin{itemize}
@@ -350,11 +350,11 @@
   \begin{center}
     \includefigure{08-10}
   \end{center}
-  \onslide<2->
+  \onslide
   \begin{exampleblock}{Scenario}
     What happens when \mathexpr{\msg{learn}(\id{o^1})} as sent by \id{S_2} to \id{S_1} is lost?
   \end{exampleblock}
-  \onslide<3->
+  \onslide
   \begin{block}{Solution}
     \id{S_2} will also have to wait until it knows that \id{S_3} has learned \id{o^1}.
   \end{block}
@@ -370,7 +370,7 @@
     \blue{Reliable failure detection} is practically impossible. A \red{solution} is to set timeouts, but take
     into account that a detected failure may be \blue{false}. 
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{center}
     \includefigure{08-11}
   \end{center}
@@ -379,7 +379,7 @@
   \begin{alertblock}{Observation}
     Paxos needs at least three servers
   \end{alertblock}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Adapted fundamental rule}
     In Paxos with three servers, a server \id{S} cannot execute an operation \id{o} until it has received at
     least one (other) \mathexpr{\msg{learn}(\id{o})} message, so that it knows that a majority of servers will
@@ -396,14 +396,14 @@
     \item A client \blue{cannot be asked to help the servers} to resolve a situation.
     \end{itemize}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Observation}
     If either one of the backups (\id{S_2} or \id{S_3}) crashes, Paxos will behave correctly: operations at
       nonfaulty servers are executed in the same order.
   \end{alertblock}
 \end{slide}
 \begin{slide}{Leader crashes after executing \id{o^1}}
-  \onslide<2->
+  \onslide
   \begin{block}{\id{S_3} is completely ignorant of any activity by \id{S_1}}
     \begin{itemize}
     \item \id{S_2} received \mathexpr{\msg{accept}(\id{o},1)}, detects crash, and becomes leader.
@@ -413,7 +413,7 @@
     \item \id{S_2} retransmits \mathexpr{\msg{accept}(\id{o^1},1)}, allowing \id{S_3} to catch up.
     \end{itemize}
   \end{block}
-  \onslide<3->
+  \onslide
   \begin{block}{\id{S_2} missed \mathexpr{\msg{accept}(\id{o^1},1)}}
     \begin{itemize}
     \item \id{S_2} did detect crash and became new leader
@@ -433,7 +433,7 @@
     As soon as \id{S_2} proposes an operation, it will be using a stale timestamp, allowing \id{S_3} to tell
     \id{S_2} that it missed operation \id{o^1}.
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Observation}
     Paxos (with three servers) behaves correctly when a single server crashes, regardless when that crash took
     place.
@@ -449,7 +449,7 @@
 \end{slide}
 \begin{slide}{But what about progress?}
   \centering\includefigure{08-13}
-  \onslide<2->
+  \onslide
   \begin{block}{Essence of solution}
     When \id{S_2} takes over, it needs to make sure that any \blue{outstanding operations} initiated by
     \id{S_1} have been properly \blue{flushed}, i.e., executed by enough servers. This requires an
@@ -661,7 +661,7 @@
     \end{itemize}
   \end{block}
 
-  \onslide<2->
+  \onslide
   \begin{alertblock}{Fundamental question}
     What are the practical ramifications of the CAP theorem?
   \end{alertblock}
@@ -712,7 +712,7 @@
     \item The client crashes after sending a request.
     \end{enumerate}
   \end{block}
-  \onslide<2->
+  \onslide
   \begin{block}{Two ``easy'' solutions}
     \begin{itemize}
     \item[1:] (cannot locate server): just report back to client
@@ -865,17 +865,17 @@
 \begin{slide}{2PC -- Failing participant}
   \begin{block}{Analysis: participant crashes in state \id{S}, and recovers to \id{S}}
     \begin{itemize}
-    \item<1,5> \red{\id{INIT}}: No problem: participant was unaware of protocol
-    \item<2,5> \red{\id{READY}}: Participant is waiting to either commit or abort. After recovery,
+    \item \red{\id{INIT}}: No problem: participant was unaware of protocol
+    \item \red{\id{READY}}: Participant is waiting to either commit or abort. After recovery,
       participant needs to know which state transition it should make \mathexpr{\Rightarrow} log the
       coordinator's decision
-    \item<3,5> \red{\id{ABORT}}: Merely make entry into abort state \blue{idempotent}, e.g., removing the
+    \item \red{\id{ABORT}}: Merely make entry into abort state \blue{idempotent}, e.g., removing the
       workspace of results
-    \item<4,5> \red{\id{COMMIT}}: Also make entry into commit state idempotent, e.g., copying workspace to
+    \item \red{\id{COMMIT}}: Also make entry into commit state idempotent, e.g., copying workspace to
       storage.
     \end{itemize}
   \end{block}
-  \onslide<5->
+  \onslide
   \begin{alertblock}{Observation} 
     When distributed commit is required, having participants use temporary workspaces to keep their results
     allows for simple recovery in the presence of failures.
@@ -917,24 +917,24 @@
     dependent on other (possibly failed) processes
   \end{block}
 \end{slide}
-  \begin{slide}{Coordinator in Python}
-    \begin{tabular}{l}
-      \begin{adjustbox}{scale=0.8}
-        \begin{minipage}{0.8\linewidth}
-          \includelisting{08-34/coordinator-book}
-        \end{minipage}
-      \end{adjustbox}
-    \end{tabular}
-  \end{slide}
-  \begin{slide}{Participant in Python}
-    \begin{tabular}{l}
-      \begin{adjustbox}{scale=0.8}
-        \begin{minipage}{0.8\linewidth}
-          \includelisting{08-34/participant-book}
-        \end{minipage}
-      \end{adjustbox}
-    \end{tabular}
-  \end{slide}
+  % \begin{slide}{Coordinator in Python}
+  %   \begin{tabular}{l}
+  %     \begin{adjustbox}{scale=0.8}
+  %       \begin{minipage}{0.8\linewidth}
+  %         \includelisting{08-34/coordinator-book}
+  %       \end{minipage}
+  %     \end{adjustbox}
+  %   \end{tabular}
+  % \end{slide}
+  % \begin{slide}{Participant in Python}
+  %   \begin{tabular}{l}
+  %     \begin{adjustbox}{scale=0.8}
+  %       \begin{minipage}{0.8\linewidth}
+  %         \includelisting{08-34/participant-book}
+  %       \end{minipage}
+  %     \end{adjustbox}
+  %   \end{tabular}
+  % \end{slide}
 \section{Recovery}
 \subsection{Introduction}
 \begin{slide}{Recovery: Background}
@@ -973,14 +973,14 @@
   \begin{block}{Simple solution}
     Use a two-phase blocking protocol:
     \begin{itemize}\tightlist
-    \item<2-> A coordinator multicasts a \blue{checkpoint request} message
-    \item<3-> When a participant receives such a message, it takes a checkpoint, stops sending (application)
+    \item A coordinator multicasts a \blue{checkpoint request} message
+    \item When a participant receives such a message, it takes a checkpoint, stops sending (application)
       messages, and reports back that it has taken a checkpoint
-    \item<4-> When all checkpoints have been confirmed at the coordinator, the latter broadcasts a
+    \item When all checkpoints have been confirmed at the coordinator, the latter broadcasts a
       \blue{checkpoint done} message to allow all processes to continue
     \end{itemize}
   \end{block}
-  \onslide<5->
+  \onslide
   \begin{block}{Observation} 
     It is possible to consider only those processes that depend on the recovery of the coordinator, and ignore
     the rest
@@ -999,16 +999,16 @@
   \begin{block}{Essence}
     Each process independently takes checkpoints, with the risk of a cascaded rollback to system startup.
     \begin{itemize}
-    \item<2-> Let \CP{i}{m} denote \mathexpr{m^{\mbox{\scriptsize th}}} checkpoint of process \id{P_i} and
+    \item Let \CP{i}{m} denote \mathexpr{m^{\mbox{\scriptsize th}}} checkpoint of process \id{P_i} and
       \INT{i}{m} the interval between \CP{i}{m-1} and \CP{i}{m}.
-    \item<3-> When process \id{P_i} sends a message in interval \INT{i}{m}, it piggybacks \mathexpr{(i,m)}
-    \item<4-> When process \id{P_j} receives a message in interval \INT{j}{n}, it records the dependency
+    \item When process \id{P_i} sends a message in interval \INT{i}{m}, it piggybacks \mathexpr{(i,m)}
+    \item When process \id{P_j} receives a message in interval \INT{j}{n}, it records the dependency
       \INT{i}{m} \mathexpr{\rightarrow} \INT{j}{n}.
-    \item<5-> The dependency \INT{i}{m} \mathexpr{\rightarrow} \INT{j}{n} is saved to storage when taking
+    \item The dependency \INT{i}{m} \mathexpr{\rightarrow} \INT{j}{n} is saved to storage when taking
       checkpoint \CP{j}{n}.
     \end{itemize}
   \end{block}
-  \onslide<6->
+  \onslide
   \begin{block}{Observation} 
     If process \id{P_i} rolls back to \CP{i}{m-1}, \id{P_j} must roll back to \CP{j}{n-1}. 
   \end{block}
@@ -1083,3 +1083,14 @@
     \end{alertblock}
   \end{slide}
 \section{Summary}
+  \begin{slide}{Summary}
+    In this section on \emph{Fault Tolerance},
+    we discussed the following key concepts:
+    \begin{itemize}
+      \item Process Resilience 
+      \item Reliable client-server communication
+      \item Reliable group communication
+      \item Distributed commit
+      \item Recovery
+    \end{itemize}
+  \end{slide}
