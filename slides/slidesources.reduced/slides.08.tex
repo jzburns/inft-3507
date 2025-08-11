@@ -457,6 +457,7 @@
 %     messages.
 %   \end{block}
 % \end{slide}
+\section{Consensus in faulty systems with arbitrary failures}
 \subsection{Consensus in faulty systems with arbitrary failures}
 \begin{slide}{Consensus under arbitrary failure semantics}
   \begin{block}{Essence}
@@ -699,224 +700,224 @@
     \end{itemize}
   \end{block}
 \end{slide}
-\section{Reliable client-server communication}
-\subsection{Point-to-point communication}
-\subsection{RPC semantics in the presence of failures}
-\begin{slide}{Reliable remote procedure calls}
-  \begin{block}{What can go wrong?}
-    \begin{enumerate}
-    \item The client is unable to locate the server.
-    \item The request message from the client to the server is lost.
-    \item The server crashes after receiving a request.
-    \item The reply message from the server to the client is lost.
-    \item The client crashes after sending a request.
-    \end{enumerate}
-  \end{block}
-  \onslide
-  \begin{block}{Two ``easy'' solutions}
-    \begin{itemize}
-    \item[1:] (cannot locate server): just report back to client
-    \item[2:] (request was lost): just resend message
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Reliable RPC: server crash}
-  \begin{center}
-    \begin{tabular}{c@{\hspace*{36pt}}c@{\hspace*{36pt}}c}
-      \includefigure{08-20a} &
-      \includefigure{08-20b} &
-      \includefigure{08-20c} \\
-      \\
-      (a) & (b) & (c) \\
-    \end{tabular}
-  \end{center}
-  \begin{block}{Problem}
-    Where (a) is the normal case, situations (b) and (c) require different solutions. However, we don't know
-    what happened. Two approaches:
-    \begin{itemize}
-    \item \red{At-least-once-semantics:} The server guarantees it will carry out an operation at least once,
-      no matter what.
-    \item \red{At-most-once-semantics:} The server guarantees it will carry out an operation at most once.
-    \end{itemize}
-  \end{block}
-\end{slide}
-  \begin{slide}{Why fully transparent server recovery is impossible}
-    \begin{block}{Three type of events at the server}
-      (Assume the server is requested to update a document.)
-      \begin{itemize}\tightlist
-      \item[M:] send the completion message
-      \item[P:] complete the processing of the document
-      \item[C:] crash
-      \end{itemize}
-    \end{block}
-    \begin{block}{Six possible orderings}
-      (Actions between brackets never take place)
-      \begin{enumerate}\tightlist
-      \item \mathexpr{M \rightarrow P \rightarrow C}: Crash after reporting completion.
-      \item \mathexpr{M \rightarrow C \rightarrow P}: Crash after reporting completion, but before the update.
-      \item \mathexpr{P \rightarrow M \rightarrow C}: Crash after reporting completion, and after the update.
-      \item \mathexpr{P \rightarrow C (\rightarrow M)}: Update took place, and then a crash.
-      \item \mathexpr{C (\rightarrow P \rightarrow M)}: Crash before doing anything
-      \item \mathexpr{C (\rightarrow M \rightarrow P)}: Crash before doing anything
-      \end{enumerate}
-    \end{block}
-  \end{slide}
-  \begin{slide}{Why fully transparent server recovery is impossible}
-    \begin{centerfig}
-      \includefigure[0.83]{08-21}
-    \end{centerfig}
-  \end{slide}
-\begin{slide}{Reliable RPC: lost reply messages}
-  \begin{block}{The real issue}
-    What the client notices, is that it is not getting an answer. However, it \blue{cannot decide} whether
-    this is caused by a \blue{lost request}, \blue{a crashed server}, or a \blue{lost response}.
-  \end{block}
-  \begin{block}{Partial solution}
-    Design the server such that its operations are \red{idempotent}: repeating the same operation is the same
-    as carrying it out exactly once:
-    \begin{itemize}\tightlist
-    \item pure read operations
-    \item strict overwrite operations 
-    \end{itemize}
-    Many operations are \blue{inherently nonidempotent}, such as many banking transactions.
-  \end{block}
-\end{slide}
-\begin{slide}{Reliable RPC: client crash}
-  \begin{block}{Problem}
-    The server is doing work and holding resources for nothing (called doing an \red{orphan} computation).
-  \end{block}
-  \begin{block}{Solution}
-    \begin{itemize}
-    \item \blue{Orphan is killed} (or rolled back) by the client when it recovers
-    \item Client broadcasts \blue{new epoch number} when recovering \mathexpr{\Rightarrow} server kills
-      client's orphans
-    \item Require computations to \blue{complete in a \mathexpr{T} time units}. Old ones are simply removed.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\section{Reliable group communication}
-\subsection{Introduction}
-\begin{slide}{Simple reliable group communication}
-  \begin{block}{Intuition}
-    A message sent to a process group \mathexpr{\set{G}} should be delivered to each member of
-    \mathexpr{\set{G}}. \red{Important}: make distinction between receiving and delivering messages.
-  \end{block}
-  \begin{centerfig}
-    \includefigure{08-22}
-  \end{centerfig}
-\end{slide}
-\begin{slide}{Less simple reliable group communication}
-  \begin{block}{Reliable communication in the presence of faulty processes}
-    Group communication is reliable when it can be guaranteed that a message is \blue{received and
-      subsequently delivered} by all \blue{nonfaulty group members}.
-  \end{block}
-  \begin{block}{Tricky part}
-    Agreement is needed on what the group actually looks like before a received message can be delivered.
-  \end{block}
-\end{slide}
-\begin{slide}{Simple reliable group communication}
-  \begin{block}{Reliable communication, but assume nonfaulty processes}
-    Reliable group communication now boils down to \red{reliable multicasting}: is a message received and
-    delivered to each recipient, \blue{as intended by the sender}.
-  \end{block}
-  \begin{centerfig}
-    \begin{tabular}{c}
-      \includefigure{08-24a} \\
-      \includefigure{08-24b} \\
-    \end{tabular}
-  \end{centerfig}
-\end{slide}
-\subsection{Scalability in reliable multicasting}
-\subsection{Atomic multicast}
-\section{Distributed commit}
-\begin{slide}{Distributed commit protocols}
-  \begin{block}{Problem}
-    Have an operation being performed by each member of a process group, or none at all.
-    \begin{itemize}
-    \item \blue{Reliable multicasting}: a message is to be delivered to all recipients.
-    \item \blue{Distributed transaction}: each local transaction must succeed.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Two-phase commit protocol (2PC)}
-  \begin{block}{Essence}
-    The client who initiated the computation acts as \red{coordinator}; processes required
-    to commit are the \blue{participants}.
-    \begin{itemize}
-    \item \red{Phase 1a:} Coordinator sends \msg{vote-request} to participants (also called a \blue{pre-write})
-    \item \red{Phase 1b:} When participant receives \msg{vote-request} it returns either \msg{vote-commit} or
-      \msg{vote-abort} to coordinator. If it sends \msg{vote-abort}, it aborts its local computation
-    \item \red{Phase 2a:} Coordinator collects all votes; if all are \msg{vote-commit}, it sends
-      \msg{global-commit} to all participants, otherwise it sends \msg{global-abort}
-    \item \red{Phase 2b:} Each participant waits for \msg{global-commit} or \msg{global-abort} and handles
-      accordingly.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{2PC - Finite state machines}
-  \begin{centerfig}
-    \begin{tabular}{cc}
-      \includefigure{08-32a} &
-      \includefigure{08-32b} \\
-      Coordinator & Participant \\
-    \end{tabular}
-  \end{centerfig}
-\end{slide}
-\begin{slide}{2PC -- Failing participant}
-  \begin{block}{Analysis: participant crashes in state \id{S}, and recovers to \id{S}}
-    \begin{itemize}
-    \item \red{\id{INIT}}: No problem: participant was unaware of protocol
-    \item \red{\id{READY}}: Participant is waiting to either commit or abort. After recovery,
-      participant needs to know which state transition it should make \mathexpr{\Rightarrow} log the
-      coordinator's decision
-    \item \red{\id{ABORT}}: Merely make entry into abort state \blue{idempotent}, e.g., removing the
-      workspace of results
-    \item \red{\id{COMMIT}}: Also make entry into commit state idempotent, e.g., copying workspace to
-      storage.
-    \end{itemize}
-  \end{block}
-  \onslide
-  \begin{alertblock}{Observation} 
-    When distributed commit is required, having participants use temporary workspaces to keep their results
-    allows for simple recovery in the presence of failures.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{2PC -- Failing participant}
-  \begin{block}{Alternative} 
-    When a recovery is needed to \id{READY} state, check state of other participants \mathexpr{\Rightarrow} no
-    need to log coordinator's decision.
-  \end{block}
-  \begin{exampleblock}{Recovering participant \id{P} contacts another participant \id{Q}}
-    \begin{center}\footnotesize
-      \renewcommand{\arraystretch}{1.2}
-      \begin{tabular}{|l|l|}\hline
-        \textbf{State of \id{Q}} 	& \textbf{Action by \id{P}} 	\\ \hline
-        \id{COMMIT}	&	Make transition to \id{COMMIT} 			\\ \hline
-        \id{ABORT}	&	Make transition to \id{ABORT}			\\ \hline
-        \id{INIT}	&	Make transition to \id{ABORT}			\\ \hline
-        \id{READY}	&	Contact another participant			\\ \hline
-      \end{tabular}
-    \end{center}
-  \end{exampleblock}
-  \begin{block}{Result}
-    If all participants are in the \id{READY} state, the protocol blocks. Apparently, the coordinator is
-    failing. \red{Note:} The protocol prescribes that we need the decision from the coordinator.
-  \end{block}
-\end{slide}
-\begin{slide}{2PC -- Failing coordinator}
-  \begin{block}{Observation} 
-    The real problem lies in the fact that the coordinator's final decision may not be available for some time
-    (or actually lost).
-  \end{block}
-  \begin{block}{Alternative} 
-    Let a participant \id{P} in the \id{READY} state timeout when it hasn't received the coordinator's
-    decision; \id{P} tries to find out what other participants know (as discussed).
-  \end{block}
-  \begin{block}{Observation} 
-    Essence of the problem is that a recovering participant cannot make a \blue{local} decision: it is
-    dependent on other (possibly failed) processes
-  \end{block}
-\end{slide}
+% \section{Reliable client-server communication}
+% \subsection{Point-to-point communication}
+% \subsection{RPC semantics in the presence of failures}
+% \begin{slide}{Reliable remote procedure calls}
+%   \begin{block}{What can go wrong?}
+%     \begin{enumerate}
+%     \item The client is unable to locate the server.
+%     \item The request message from the client to the server is lost.
+%     \item The server crashes after receiving a request.
+%     \item The reply message from the server to the client is lost.
+%     \item The client crashes after sending a request.
+%     \end{enumerate}
+%   \end{block}
+%   \onslide
+%   \begin{block}{Two ``easy'' solutions}
+%     \begin{itemize}
+%     \item[1:] (cannot locate server): just report back to client
+%     \item[2:] (request was lost): just resend message
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Reliable RPC: server crash}
+%   \begin{center}
+%     \begin{tabular}{c@{\hspace*{36pt}}c@{\hspace*{36pt}}c}
+%       \includefigure{08-20a} &
+%       \includefigure{08-20b} &
+%       \includefigure{08-20c} \\
+%       \\
+%       (a) & (b) & (c) \\
+%     \end{tabular}
+%   \end{center}
+%   \begin{block}{Problem}
+%     Where (a) is the normal case, situations (b) and (c) require different solutions. However, we don't know
+%     what happened. Two approaches:
+%     \begin{itemize}
+%     \item \red{At-least-once-semantics:} The server guarantees it will carry out an operation at least once,
+%       no matter what.
+%     \item \red{At-most-once-semantics:} The server guarantees it will carry out an operation at most once.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+%   \begin{slide}{Why fully transparent server recovery is impossible}
+%     \begin{block}{Three type of events at the server}
+%       (Assume the server is requested to update a document.)
+%       \begin{itemize}\tightlist
+%       \item[M:] send the completion message
+%       \item[P:] complete the processing of the document
+%       \item[C:] crash
+%       \end{itemize}
+%     \end{block}
+%     \begin{block}{Six possible orderings}
+%       (Actions between brackets never take place)
+%       \begin{enumerate}\tightlist
+%       \item \mathexpr{M \rightarrow P \rightarrow C}: Crash after reporting completion.
+%       \item \mathexpr{M \rightarrow C \rightarrow P}: Crash after reporting completion, but before the update.
+%       \item \mathexpr{P \rightarrow M \rightarrow C}: Crash after reporting completion, and after the update.
+%       \item \mathexpr{P \rightarrow C (\rightarrow M)}: Update took place, and then a crash.
+%       \item \mathexpr{C (\rightarrow P \rightarrow M)}: Crash before doing anything
+%       \item \mathexpr{C (\rightarrow M \rightarrow P)}: Crash before doing anything
+%       \end{enumerate}
+%     \end{block}
+%   \end{slide}
+%   \begin{slide}{Why fully transparent server recovery is impossible}
+%     \begin{centerfig}
+%       \includefigure[0.83]{08-21}
+%     \end{centerfig}
+%   \end{slide}
+% \begin{slide}{Reliable RPC: lost reply messages}
+%   \begin{block}{The real issue}
+%     What the client notices, is that it is not getting an answer. However, it \blue{cannot decide} whether
+%     this is caused by a \blue{lost request}, \blue{a crashed server}, or a \blue{lost response}.
+%   \end{block}
+%   \begin{block}{Partial solution}
+%     Design the server such that its operations are \red{idempotent}: repeating the same operation is the same
+%     as carrying it out exactly once:
+%     \begin{itemize}\tightlist
+%     \item pure read operations
+%     \item strict overwrite operations 
+%     \end{itemize}
+%     Many operations are \blue{inherently nonidempotent}, such as many banking transactions.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Reliable RPC: client crash}
+%   \begin{block}{Problem}
+%     The server is doing work and holding resources for nothing (called doing an \red{orphan} computation).
+%   \end{block}
+%   \begin{block}{Solution}
+%     \begin{itemize}
+%     \item \blue{Orphan is killed} (or rolled back) by the client when it recovers
+%     \item Client broadcasts \blue{new epoch number} when recovering \mathexpr{\Rightarrow} server kills
+%       client's orphans
+%     \item Require computations to \blue{complete in a \mathexpr{T} time units}. Old ones are simply removed.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \section{Reliable group communication}
+% \subsection{Introduction}
+% \begin{slide}{Simple reliable group communication}
+%   \begin{block}{Intuition}
+%     A message sent to a process group \mathexpr{\set{G}} should be delivered to each member of
+%     \mathexpr{\set{G}}. \red{Important}: make distinction between receiving and delivering messages.
+%   \end{block}
+%   \begin{centerfig}
+%     \includefigure{08-22}
+%   \end{centerfig}
+% \end{slide}
+% \begin{slide}{Less simple reliable group communication}
+%   \begin{block}{Reliable communication in the presence of faulty processes}
+%     Group communication is reliable when it can be guaranteed that a message is \blue{received and
+%       subsequently delivered} by all \blue{nonfaulty group members}.
+%   \end{block}
+%   \begin{block}{Tricky part}
+%     Agreement is needed on what the group actually looks like before a received message can be delivered.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Simple reliable group communication}
+%   \begin{block}{Reliable communication, but assume nonfaulty processes}
+%     Reliable group communication now boils down to \red{reliable multicasting}: is a message received and
+%     delivered to each recipient, \blue{as intended by the sender}.
+%   \end{block}
+%   \begin{centerfig}
+%     \begin{tabular}{c}
+%       \includefigure{08-24a} \\
+%       \includefigure{08-24b} \\
+%     \end{tabular}
+%   \end{centerfig}
+% \end{slide}
+% \subsection{Scalability in reliable multicasting}
+% \subsection{Atomic multicast}
+% \section{Distributed commit}
+% \begin{slide}{Distributed commit protocols}
+%   \begin{block}{Problem}
+%     Have an operation being performed by each member of a process group, or none at all.
+%     \begin{itemize}
+%     \item \blue{Reliable multicasting}: a message is to be delivered to all recipients.
+%     \item \blue{Distributed transaction}: each local transaction must succeed.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Two-phase commit protocol (2PC)}
+%   \begin{block}{Essence}
+%     The client who initiated the computation acts as \red{coordinator}; processes required
+%     to commit are the \blue{participants}.
+%     \begin{itemize}
+%     \item \red{Phase 1a:} Coordinator sends \msg{vote-request} to participants (also called a \blue{pre-write})
+%     \item \red{Phase 1b:} When participant receives \msg{vote-request} it returns either \msg{vote-commit} or
+%       \msg{vote-abort} to coordinator. If it sends \msg{vote-abort}, it aborts its local computation
+%     \item \red{Phase 2a:} Coordinator collects all votes; if all are \msg{vote-commit}, it sends
+%       \msg{global-commit} to all participants, otherwise it sends \msg{global-abort}
+%     \item \red{Phase 2b:} Each participant waits for \msg{global-commit} or \msg{global-abort} and handles
+%       accordingly.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{2PC - Finite state machines}
+%   \begin{centerfig}
+%     \begin{tabular}{cc}
+%       \includefigure{08-32a} &
+%       \includefigure{08-32b} \\
+%       Coordinator & Participant \\
+%     \end{tabular}
+%   \end{centerfig}
+% \end{slide}
+% \begin{slide}{2PC -- Failing participant}
+%   \begin{block}{Analysis: participant crashes in state \id{S}, and recovers to \id{S}}
+%     \begin{itemize}
+%     \item \red{\id{INIT}}: No problem: participant was unaware of protocol
+%     \item \red{\id{READY}}: Participant is waiting to either commit or abort. After recovery,
+%       participant needs to know which state transition it should make \mathexpr{\Rightarrow} log the
+%       coordinator's decision
+%     \item \red{\id{ABORT}}: Merely make entry into abort state \blue{idempotent}, e.g., removing the
+%       workspace of results
+%     \item \red{\id{COMMIT}}: Also make entry into commit state idempotent, e.g., copying workspace to
+%       storage.
+%     \end{itemize}
+%   \end{block}
+%   \onslide
+%   \begin{alertblock}{Observation} 
+%     When distributed commit is required, having participants use temporary workspaces to keep their results
+%     allows for simple recovery in the presence of failures.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{2PC -- Failing participant}
+%   \begin{block}{Alternative} 
+%     When a recovery is needed to \id{READY} state, check state of other participants \mathexpr{\Rightarrow} no
+%     need to log coordinator's decision.
+%   \end{block}
+%   \begin{exampleblock}{Recovering participant \id{P} contacts another participant \id{Q}}
+%     \begin{center}\footnotesize
+%       \renewcommand{\arraystretch}{1.2}
+%       \begin{tabular}{|l|l|}\hline
+%         \textbf{State of \id{Q}} 	& \textbf{Action by \id{P}} 	\\ \hline
+%         \id{COMMIT}	&	Make transition to \id{COMMIT} 			\\ \hline
+%         \id{ABORT}	&	Make transition to \id{ABORT}			\\ \hline
+%         \id{INIT}	&	Make transition to \id{ABORT}			\\ \hline
+%         \id{READY}	&	Contact another participant			\\ \hline
+%       \end{tabular}
+%     \end{center}
+%   \end{exampleblock}
+%   \begin{block}{Result}
+%     If all participants are in the \id{READY} state, the protocol blocks. Apparently, the coordinator is
+%     failing. \red{Note:} The protocol prescribes that we need the decision from the coordinator.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{2PC -- Failing coordinator}
+%   \begin{block}{Observation} 
+%     The real problem lies in the fact that the coordinator's final decision may not be available for some time
+%     (or actually lost).
+%   \end{block}
+%   \begin{block}{Alternative} 
+%     Let a participant \id{P} in the \id{READY} state timeout when it hasn't received the coordinator's
+%     decision; \id{P} tries to find out what other participants know (as discussed).
+%   \end{block}
+%   \begin{block}{Observation} 
+%     Essence of the problem is that a recovering participant cannot make a \blue{local} decision: it is
+%     dependent on other (possibly failed) processes
+%   \end{block}
+% \end{slide}
   % \begin{slide}{Coordinator in Python}
   %   \begin{tabular}{l}
   %     \begin{adjustbox}{scale=0.8}
@@ -1087,10 +1088,9 @@
     In this section on \emph{Fault Tolerance},
     we discussed the following key concepts:
     \begin{itemize}
-      \item Process Resilience 
-      \item Reliable client-server communication
-      \item Reliable group communication
-      \item Distributed commit
+      \item Process Resilience
+      \item Consensus in faulty systems with arbitrary failures
+      \item Practical Byzantine Fault Tolerance (PBFT) 
       \item Recovery
     \end{itemize}
   \end{slide}
