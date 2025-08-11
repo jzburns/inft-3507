@@ -288,175 +288,175 @@
     \end{itemize}
   \end{alertblock}
 \end{slide}
-\subsection{Example: Paxos}
-\begin{slide}{Realistic consensus: Paxos}
-  \begin{block}{Assumptions (rather weak ones, and realistic)}
-    \begin{itemize}
-    \item A \blue{partially synchronous} system (in fact, it may even be asynchronous).
-    \item \blue{Communication} between processes may be \blue{unreliable}: messages may be lost, duplicated,
-      or reordered.
-    \item \blue{Corrupted message can be detected} (and thus subsequently ignored).
-    \item All \blue{operations are deterministic}: once an execution is started, it is known exactly what it
-      will do.
-    \item Processes may exhibit \blue{crash failures}, but \red{not arbitrary failures}.
-    \item Processes \red{do not collude}.
-    \end{itemize}
-  \end{block}
-  \begin{alertblock}{Understanding Paxos}
-    We will build up Paxos from scratch to understand where many consensus algorithms actually come from.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Paxos essentials}
-  \begin{block}{Starting point}
-    \begin{itemize}
-    \item We assume a client-server configuration, with initially one \red{primary server}.
-    \item To make the server more robust, we start with adding a \red{backup server}.
-    \item To ensure that all commands are executed in the same order at both servers, the primary assigns
-      \blue{unique sequence numbers} to all commands. In Paxos, the primary is called the \red{leader}.
-    \item Assume that actual commands can always be restored (either from clients or servers)
-      \mathexpr{\Rightarrow} we consider only \blue{control messages}.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Two-server situation}
-  \begin{center}
-    \includefigure{08-08}
-  \end{center}
-\end{slide}
-\begin{slide}{Handling lost messages}
-  \begin{block}{Some Paxos terminology}
-    \begin{itemize}
-    \item The leader sends an \red{accept} message \mathexpr{\msg{accept}\id{(o},t)} to backups when assigning
-      a timestamp \mathexpr{t} to command \id{o}.
-    \item A backup responds by sending a \red{learn} message: \mathexpr{\msg{learn}\id{(o},t)}
-    \item When the leader notices that operation \id{o} has not yet been learned, it retransmits
-      \mathexpr{\msg{accept}\id{(o},t)} with the original timestamp.
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Two servers and one crash: problem}
-  \centering\includefigure{08-09a}
-  \begin{block}{Problem}
-    Primary crashes after executing an operation, but the backup never received the accept message.
-  \end{block}
-\end{slide}
-\begin{slide}{Two servers and one crash: solution}
-  \centering\includefigure{08-09b}
-  \begin{block}{Solution}
-    Never execute an operation before it is clear that is has been learned.
-  \end{block}
-\end{slide}
-\begin{slide}{Three servers and two crashes: still a problem?}
-  \begin{center}
-    \includefigure{08-10}
-  \end{center}
-  \onslide
-  \begin{exampleblock}{Scenario}
-    What happens when \mathexpr{\msg{learn}(\id{o^1})} as sent by \id{S_2} to \id{S_1} is lost?
-  \end{exampleblock}
-  \onslide
-  \begin{block}{Solution}
-    \id{S_2} will also have to wait until it knows that \id{S_3} has learned \id{o^1}.
-  \end{block}
-\end{slide}
-\begin{slide}{Paxos: fundamental rule}
-  \begin{alertblock}{General rule}
-      In Paxos, a server \id{S} cannot execute an operation \id{o} until it has received a
-      \mathexpr{\msg{learn}(\id{o})} from all other nonfaulty servers.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Failure detection}
-  \begin{block}{Practice}
-    \blue{Reliable failure detection} is practically impossible. A \red{solution} is to set timeouts, but take
-    into account that a detected failure may be \blue{false}. 
-  \end{block}
-  \onslide
-  \begin{center}
-    \includefigure{08-11}
-  \end{center}
-\end{slide}
-\begin{slide}{Required number of servers}
-  \begin{alertblock}{Observation}
-    Paxos needs at least three servers
-  \end{alertblock}
-  \onslide
-  \begin{alertblock}{Adapted fundamental rule}
-    In Paxos with three servers, a server \id{S} cannot execute an operation \id{o} until it has received at
-    least one (other) \mathexpr{\msg{learn}(\id{o})} message, so that it knows that a majority of servers will
-    execute \id{o}.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Required number of servers}
-  \begin{block}{Assumptions before taking the next steps}
-    \begin{itemize}\tightlist
-    \item Initially, \id{S_1} is the leader. 
-    \item A server can \blue{reliably detect it has missed a message}, and recover from that miss.
-    \item When a new leader needs to be elected, the remaining servers follow a \blue{strictly deterministic
-      algorithm}, such as \id{S_1} \mathexpr{\rightarrow} \id{S_2} \mathexpr{\rightarrow} \id{S_3}.
-    \item A client \blue{cannot be asked to help the servers} to resolve a situation.
-    \end{itemize}
-  \end{block}
-  \onslide
-  \begin{alertblock}{Observation}
-    If either one of the backups (\id{S_2} or \id{S_3}) crashes, Paxos will behave correctly: operations at
-      nonfaulty servers are executed in the same order.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Leader crashes after executing \id{o^1}}
-  \onslide
-  \begin{block}{\id{S_3} is completely ignorant of any activity by \id{S_1}}
-    \begin{itemize}
-    \item \id{S_2} received \mathexpr{\msg{accept}(\id{o},1)}, detects crash, and becomes leader.
-    \item \id{S_3} even never received \mathexpr{\msg{accept}(\id{o},1)}. 
-    \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^2},2) \Rightarrow} \id{S_3} sees unexpected timestamp
-      and tells \id{S_2} that it missed \id{o^1}. 
-    \item \id{S_2} retransmits \mathexpr{\msg{accept}(\id{o^1},1)}, allowing \id{S_3} to catch up.
-    \end{itemize}
-  \end{block}
-  \onslide
-  \begin{block}{\id{S_2} missed \mathexpr{\msg{accept}(\id{o^1},1)}}
-    \begin{itemize}
-    \item \id{S_2} did detect crash and became new leader
-    \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^1},1) \Rightarrow} \id{S_3} retransmits
-      \mathexpr{\msg{learn}(\id{o^1})}. 
-    \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^2},1) \Rightarrow} \id{S_3} tells \id{S_2} that it
-      apparently missed \mathexpr{\msg{accept}(\id{o^1},1)} from \id{S_1}, so that \id{S_2} can catch up. 
-    \end{itemize}
-  \end{block}
-\end{slide}
-\begin{slide}{Leader crashes after sending \mathexpr{\msg{accept}(\id{o^1},1)}}
-  \begin{block}{\id{S_3} is completely ignorant of any activity by \id{S_1}}
-    As soon as \id{S_2} announces that \id{o^2} is to be accepted, \id{S_3} will notice that it missed an
-    operation and can ask \id{S_2} to help recover.
-  \end{block}
-  \begin{block}{\id{S_2} had missed \mathexpr{\msg{accept}(\id{o^1},1)}}
-    As soon as \id{S_2} proposes an operation, it will be using a stale timestamp, allowing \id{S_3} to tell
-    \id{S_2} that it missed operation \id{o^1}.
-  \end{block}
-  \onslide
-  \begin{alertblock}{Observation}
-    Paxos (with three servers) behaves correctly when a single server crashes, regardless when that crash took
-    place.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{False crash detections}
-  \centering\includefigure{08-12}
-  \begin{block}{Problem and solution}
-    \id{S_3} receives \mathexpr{\msg{accept}(\id{o^1},1)}, but much later than
-    \mathexpr{\msg{accept}(\id{o^2},1)}. If it knew who the \blue{current} leader was, it could safely reject
-    the delayed accept message \mathexpr{\Rightarrow} leaders should include their ID in messages.
-  \end{block}
-\end{slide}
-\begin{slide}{But what about progress?}
-  \centering\includefigure{08-13}
-  \onslide
-  \begin{block}{Essence of solution}
-    When \id{S_2} takes over, it needs to make sure that any \blue{outstanding operations} initiated by
-    \id{S_1} have been properly \blue{flushed}, i.e., executed by enough servers. This requires an
-    \red{explicit leadership takeover} by which other servers are informed before sending out new accept
-    messages.
-  \end{block}
-\end{slide}
+% \subsection{Example: Paxos}
+% \begin{slide}{Realistic consensus: Paxos}
+%   \begin{block}{Assumptions (rather weak ones, and realistic)}
+%     \begin{itemize}
+%     \item A \blue{partially synchronous} system (in fact, it may even be asynchronous).
+%     \item \blue{Communication} between processes may be \blue{unreliable}: messages may be lost, duplicated,
+%       or reordered.
+%     \item \blue{Corrupted message can be detected} (and thus subsequently ignored).
+%     \item All \blue{operations are deterministic}: once an execution is started, it is known exactly what it
+%       will do.
+%     \item Processes may exhibit \blue{crash failures}, but \red{not arbitrary failures}.
+%     \item Processes \red{do not collude}.
+%     \end{itemize}
+%   \end{block}
+%   \begin{alertblock}{Understanding Paxos}
+%     We will build up Paxos from scratch to understand where many consensus algorithms actually come from.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Paxos essentials}
+%   \begin{block}{Starting point}
+%     \begin{itemize}
+%     \item We assume a client-server configuration, with initially one \red{primary server}.
+%     \item To make the server more robust, we start with adding a \red{backup server}.
+%     \item To ensure that all commands are executed in the same order at both servers, the primary assigns
+%       \blue{unique sequence numbers} to all commands. In Paxos, the primary is called the \red{leader}.
+%     \item Assume that actual commands can always be restored (either from clients or servers)
+%       \mathexpr{\Rightarrow} we consider only \blue{control messages}.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Two-server situation}
+%   \begin{center}
+%     \includefigure{08-08}
+%   \end{center}
+% \end{slide}
+% \begin{slide}{Handling lost messages}
+%   \begin{block}{Some Paxos terminology}
+%     \begin{itemize}
+%     \item The leader sends an \red{accept} message \mathexpr{\msg{accept}\id{(o},t)} to backups when assigning
+%       a timestamp \mathexpr{t} to command \id{o}.
+%     \item A backup responds by sending a \red{learn} message: \mathexpr{\msg{learn}\id{(o},t)}
+%     \item When the leader notices that operation \id{o} has not yet been learned, it retransmits
+%       \mathexpr{\msg{accept}\id{(o},t)} with the original timestamp.
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Two servers and one crash: problem}
+%   \centering\includefigure{08-09a}
+%   \begin{block}{Problem}
+%     Primary crashes after executing an operation, but the backup never received the accept message.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Two servers and one crash: solution}
+%   \centering\includefigure{08-09b}
+%   \begin{block}{Solution}
+%     Never execute an operation before it is clear that is has been learned.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Three servers and two crashes: still a problem?}
+%   \begin{center}
+%     \includefigure{08-10}
+%   \end{center}
+%   \onslide
+%   \begin{exampleblock}{Scenario}
+%     What happens when \mathexpr{\msg{learn}(\id{o^1})} as sent by \id{S_2} to \id{S_1} is lost?
+%   \end{exampleblock}
+%   \onslide
+%   \begin{block}{Solution}
+%     \id{S_2} will also have to wait until it knows that \id{S_3} has learned \id{o^1}.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Paxos: fundamental rule}
+%   \begin{alertblock}{General rule}
+%       In Paxos, a server \id{S} cannot execute an operation \id{o} until it has received a
+%       \mathexpr{\msg{learn}(\id{o})} from all other nonfaulty servers.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Failure detection}
+%   \begin{block}{Practice}
+%     \blue{Reliable failure detection} is practically impossible. A \red{solution} is to set timeouts, but take
+%     into account that a detected failure may be \blue{false}. 
+%   \end{block}
+%   \onslide
+%   \begin{center}
+%     \includefigure{08-11}
+%   \end{center}
+% \end{slide}
+% \begin{slide}{Required number of servers}
+%   \begin{alertblock}{Observation}
+%     Paxos needs at least three servers
+%   \end{alertblock}
+%   \onslide
+%   \begin{alertblock}{Adapted fundamental rule}
+%     In Paxos with three servers, a server \id{S} cannot execute an operation \id{o} until it has received at
+%     least one (other) \mathexpr{\msg{learn}(\id{o})} message, so that it knows that a majority of servers will
+%     execute \id{o}.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Required number of servers}
+%   \begin{block}{Assumptions before taking the next steps}
+%     \begin{itemize}\tightlist
+%     \item Initially, \id{S_1} is the leader. 
+%     \item A server can \blue{reliably detect it has missed a message}, and recover from that miss.
+%     \item When a new leader needs to be elected, the remaining servers follow a \blue{strictly deterministic
+%       algorithm}, such as \id{S_1} \mathexpr{\rightarrow} \id{S_2} \mathexpr{\rightarrow} \id{S_3}.
+%     \item A client \blue{cannot be asked to help the servers} to resolve a situation.
+%     \end{itemize}
+%   \end{block}
+%   \onslide
+%   \begin{alertblock}{Observation}
+%     If either one of the backups (\id{S_2} or \id{S_3}) crashes, Paxos will behave correctly: operations at
+%       nonfaulty servers are executed in the same order.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Leader crashes after executing \id{o^1}}
+%   \onslide
+%   \begin{block}{\id{S_3} is completely ignorant of any activity by \id{S_1}}
+%     \begin{itemize}
+%     \item \id{S_2} received \mathexpr{\msg{accept}(\id{o},1)}, detects crash, and becomes leader.
+%     \item \id{S_3} even never received \mathexpr{\msg{accept}(\id{o},1)}. 
+%     \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^2},2) \Rightarrow} \id{S_3} sees unexpected timestamp
+%       and tells \id{S_2} that it missed \id{o^1}. 
+%     \item \id{S_2} retransmits \mathexpr{\msg{accept}(\id{o^1},1)}, allowing \id{S_3} to catch up.
+%     \end{itemize}
+%   \end{block}
+%   \onslide
+%   \begin{block}{\id{S_2} missed \mathexpr{\msg{accept}(\id{o^1},1)}}
+%     \begin{itemize}
+%     \item \id{S_2} did detect crash and became new leader
+%     \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^1},1) \Rightarrow} \id{S_3} retransmits
+%       \mathexpr{\msg{learn}(\id{o^1})}. 
+%     \item If \id{S_2} sends \mathexpr{\msg{accept}(\id{o^2},1) \Rightarrow} \id{S_3} tells \id{S_2} that it
+%       apparently missed \mathexpr{\msg{accept}(\id{o^1},1)} from \id{S_1}, so that \id{S_2} can catch up. 
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \begin{slide}{Leader crashes after sending \mathexpr{\msg{accept}(\id{o^1},1)}}
+%   \begin{block}{\id{S_3} is completely ignorant of any activity by \id{S_1}}
+%     As soon as \id{S_2} announces that \id{o^2} is to be accepted, \id{S_3} will notice that it missed an
+%     operation and can ask \id{S_2} to help recover.
+%   \end{block}
+%   \begin{block}{\id{S_2} had missed \mathexpr{\msg{accept}(\id{o^1},1)}}
+%     As soon as \id{S_2} proposes an operation, it will be using a stale timestamp, allowing \id{S_3} to tell
+%     \id{S_2} that it missed operation \id{o^1}.
+%   \end{block}
+%   \onslide
+%   \begin{alertblock}{Observation}
+%     Paxos (with three servers) behaves correctly when a single server crashes, regardless when that crash took
+%     place.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{False crash detections}
+%   \centering\includefigure{08-12}
+%   \begin{block}{Problem and solution}
+%     \id{S_3} receives \mathexpr{\msg{accept}(\id{o^1},1)}, but much later than
+%     \mathexpr{\msg{accept}(\id{o^2},1)}. If it knew who the \blue{current} leader was, it could safely reject
+%     the delayed accept message \mathexpr{\Rightarrow} leaders should include their ID in messages.
+%   \end{block}
+% \end{slide}
+% \begin{slide}{But what about progress?}
+%   \centering\includefigure{08-13}
+%   \onslide
+%   \begin{block}{Essence of solution}
+%     When \id{S_2} takes over, it needs to make sure that any \blue{outstanding operations} initiated by
+%     \id{S_1} have been properly \blue{flushed}, i.e., executed by enough servers. This requires an
+%     \red{explicit leadership takeover} by which other servers are informed before sending out new accept
+%     messages.
+%   \end{block}
+% \end{slide}
 \subsection{Consensus in faulty systems with arbitrary failures}
 \begin{slide}{Consensus under arbitrary failure semantics}
   \begin{block}{Essence}
