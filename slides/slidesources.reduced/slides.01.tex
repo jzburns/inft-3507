@@ -22,22 +22,28 @@
   \end{alertblock}
 \end{slide}
 \begin{slide}{Alternative approach}
-  \begin{block}{Two views on realizing distributed systems}
-    \begin{itemize}
-    \item \blue{Integrative view}: connecting existing networked computer systems into a larger a system.
-    \item \blue{Expansive view}: an existing networked computer systems is extended with additional
-      computers 
+  \begin{block}{Theoretical Definitions}
+    \begin{itemize}\tightlist
+    \item \emph{Decentralized computing} - a networked computer system in which processes and resources are
+      \emph{necessarily} spread across multiple computers.
+    \item \emph{Distributed computing} - is a networked computer system in which processes and resources are
+      \emph{sufficiently} spread across multiple computers.
     \end{itemize}
   \end{block}
-  \onslide
-  \begin{block}{Two definitions}
-    \begin{itemize}
-    \item A \blue{decentralized system} is a networked computer system in which processes and resources are
-      \red{necessarily} spread across multiple computers.
-    \item A \blue{distributed system} is a networked computer system in which processes and resources are
-      \red{sufficiently} spread across multiple computers.
-    \end{itemize}
-  \end{block}
+  \begin{alertblock}{Modern ("Cloud") Definitions}
+  \begin{itemize}\tightlist
+    \item \emph{Decentralized computing} - independent nodes operating without a central authority, making autonomous decisions
+    \item \emph{Distributed computing} - multiple interconnected nodes working collaboratively to solve a task, coordinated by a central system
+  \end{itemize}
+\end{alertblock}
+  \begin{itemize}\tightlist
+    \item Both use multiple nodes but differ in control structure, 
+    coordination, and application focus, balancing autonomy 
+    versus efficiency
+    \item A \emph{node} is a compute resource with some local storage
+    eg, a process, a container, a virtual machine, a dedicated server, 
+    a cluster of servers
+  \end{itemize}
 \end{slide}
 %   \begin{slide}{Some common misconceptions}
 %     \begin{block}{Centralized solutions do not scale}
