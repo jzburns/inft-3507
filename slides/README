@@ -1,17 +1,1 @@
-To compile your own set of slides:
-
-1. You need a full-fledged Tex/Latex environment. 
-
-1. Be sure to have downloaded all figures and unzipped the file 'figs-and-code.zip' 
-   in the same directory as where 'makeslides.zip' was unzipped.
-
-2. To compile a set of PDF slides for Chapter 03, type 'tools/makeslides.py 03 S'.
-
-3. To compile a set of PDF handouts for Chapter 03, type 'tools/makeslides.py 03 H'.
-
-The Python code as well as the file 'slidebase.tex' is fairly straightforward and can
-be easily customized if wished.
-
-Enjoy!
-
-Maarten van Steen
+Slides are here
