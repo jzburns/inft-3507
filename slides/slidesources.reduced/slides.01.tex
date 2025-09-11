@@ -440,7 +440,7 @@
   \end{slide}
   \begin{slide}{Performance analysis}
     \begin{block}{Utilization \mathexpr{U} of a service is the fraction of time that it is busy}
-      \[ U = \sum_{k > 0} p_k = 1 - p_0 = \frac{\lambda}{\mu} \Rightarrow p_k = (1-U) U^k \]
+      \[ U = \frac{\lambda}{\mu} \Rightarrow p_k = (1-U) U^k \]
     \end{block}
     \begin{block}{Average number of requests in the system}
       \[ \average{N} = \sum_{k\geq 0} k \cdot p_k = \sum_{k \geq 0} k \cdot (1-U)U^k = (1-U)\sum_{k\geq 0} k\cdot U^k
