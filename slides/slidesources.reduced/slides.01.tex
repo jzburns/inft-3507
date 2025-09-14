@@ -142,7 +142,6 @@
         \blue{Transparency} & \blue{Description} \\ \whline
         \red{Access}        & Hide differences in data representation and how an object is accessed \\ \hline
         \red{Location}      & Hide where an object is located \\ \hline
-        \red{Relocation}    & Hide that an object may be moved to another location while in use \\ \hline
         \red{Migration}     & Hide that an object may move to another location \\ \hline
         \red{Replication}   & Hide that an object is replicated \\ \hline
         \red{Concurrency}   & Hide that an object may be shared by several independent users \\ \hline
@@ -443,8 +442,8 @@
       \[ U = \frac{\lambda}{\mu} \Rightarrow p_k = (1-U) U^k \]
     \end{block}
     \begin{block}{Average number of requests in the system}
-      \[ \average{N} = \sum_{k\geq 0} k \cdot p_k = \sum_{k \geq 0} k \cdot (1-U)U^k = (1-U)\sum_{k\geq 0} k\cdot U^k
-      = \frac{(1-U)U}{(1-U)^2} = \frac{U}{1-U} \]
+      \[ \average{N} = \sum_{k\geq 0} k \cdot p_k = \sum_{k \geq 0} k \cdot (1-U)U^k = (1-U)\sum_{k\geq 0} k\cdot U^k \]
+      which simplifies to \[ \frac{U}{1-U} \]
     \end{block}
     \begin{block}{Average throughput}
       \[ X = \underbrace{U \cdot \mu}_{\mbox{\tiny server at work}} + \underbrace{(1-U) \cdot 0}_{\mbox{\tiny
