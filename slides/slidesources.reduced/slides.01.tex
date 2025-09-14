@@ -260,7 +260,10 @@
     Conditional probability that \id{C} has been functioning correctly during \mathexpr{[0,t)} given
       \id{C} was functioning correctly at the time \mathexpr{T=0}.
   \end{block}
-
+  \emph{Confidence} in a component is a negative exponential function, for example,
+  timesteps $1 \leq t \leq 100$ and the probability 
+  of a failure $p=0.005$
+  \[ Confidence = e^{-1*p*t} \]
   \begin{block}{Traditional metrics}
     \begin{itemize}\firmlist
     \item \red{Mean Time To Failure} (\blue{\MTTF}): The average time until a component fails.
