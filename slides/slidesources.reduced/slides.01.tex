@@ -256,14 +256,22 @@
   \end{block}
 \end{slide}
 \begin{slide}{Reliability versus availability}
-  \begin{block}{Reliability \mathexpr{R(t)} of component \id{C}}
-    Conditional probability that \id{C} has been functioning correctly during \mathexpr{[0,t)} given
-      \id{C} was functioning correctly at the time \mathexpr{T=0}.
-  \end{block}
-  \emph{Confidence} in a component is a negative exponential function, for example,
-  timesteps $1 \leq t \leq 100$ and the probability 
-  of a failure $p=0.005$
-  \[ Confidence = e^{-1*p*t} \]
+  \begin{itemize}\firmlist
+  \item Traditional reliability measurements do not capture 
+  \emph{confidience} in a component. 
+  \item This can be modelled with negative exponential 
+  function (representing the loss in confidience over time). 
+  \item For example, timesteps 
+  $1 \leq t \leq 1000$ and the probability 
+  of a failure (availability) $p=0.05$ (ie, 95\% uptime) and $S$ is a 
+  \emph{sensitivity} measure $0 \leq S \leq 1$, where $S=0$ is
+  not sensitive and $S=1$ very sensitive:
+  \[ \hat{R} = e^{-Spt} \]
+  \item Let's look at a demonstration.
+  \item Q: Can you think of a system where S=1 and one where S=0?   
+\end{itemize}
+\end{slide}
+\begin{slide}{Traditional reliability - MTTF/MTTR}  
   \begin{block}{Traditional metrics}
     \begin{itemize}\firmlist
     \item \red{Mean Time To Failure} (\blue{\MTTF}): The average time until a component fails.
@@ -272,6 +280,7 @@
     \end{itemize}
   \end{block}
 \end{slide}
+
 \begin{slide}{Terminology}
   \begin{block}{Failure, error, fault}
     \begin{center}
