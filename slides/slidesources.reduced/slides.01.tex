@@ -449,33 +449,35 @@ system reliability over time.
       \item Processing capacity service: \mathexpr{\mu} requests per second
       \end{itemize}
     \end{block}
-    \begin{alertblock}{Fraction of time having \mathexpr{k} requests in the system}
-      \[ p_k = \bigl(1 - \frac{\lambda}{\mu}\bigr)\bigl(\frac{\lambda}{\mu}\bigr)^k \]
-    \end{alertblock}
+    % \begin{alertblock}{Fraction of time having \mathexpr{k} requests in the system}
+    %   \[ p_k = \bigl(1 - \frac{\lambda}{\mu}\bigr)\bigl(\frac{\lambda}{\mu}\bigr)^k \]
+    % \end{alertblock}
   \end{slide}
   \begin{slide}{Performance analysis}
     \begin{block}{Utilization \mathexpr{U} of a service is the fraction of time that it is busy}
-      \[ U = \frac{\lambda}{\mu} \Rightarrow p_k = (1-U) U^k \]
+      %%\[ U = \frac{\lambda}{\mu} \Rightarrow p_k = (1-U) U^k \]
+      \[ U = \frac{\lambda}{\mu} \]
     \end{block}
     \begin{block}{Average number of requests in the system}
-      \[ \average{N} = \sum_{k\geq 0} k \cdot p_k = \sum_{k \geq 0} k \cdot (1-U)U^k = (1-U)\sum_{k\geq 0} k\cdot U^k \]
-      which simplifies to \[ \average{N} = \frac{U}{1-U} \]
+      % \[ \average{N} = \sum_{k\geq 0} k \cdot p_k = \sum_{k \geq 0} k \cdot (1-U)U^k = (1-U)\sum_{k\geq 0} k\cdot U^k \]
+      \[ \average{N} = \frac{U}{1-U} \]
     \end{block}
     \begin{block}{Average throughput}
-      \[ X = \underbrace{U \cdot \mu}_{\mbox{\tiny server at work}} + \underbrace{(1-U) \cdot 0}_{\mbox{\tiny
-        server idle}} = \frac{\lambda}{\mu} \cdot \mu = \lambda \]
+      \[ X = \frac{\lambda}{\mu} \cdot \mu = \lambda \]
+      via the Principle of Equilibrium (or conservation)
     \end{block}
   \end{slide}
   \begin{slide}{Performance analysis}
     \begin{block}{Response time: total time take to process a request after submission}
-      \[ R = \frac{\average{N}}{X} = \frac{S}{1-U} \Rightarrow \frac{R}{S} = \frac{1}{1-U} \]
-    with \mathexpr{S = \frac{1}{\mu}} being the service time.
+      From Little's Law:
+      \[ \average{N} = XR \Rightarrow R = \frac{\average{N}}{X}\]
+      \[ \Rightarrow R = \frac{1}{\mu\cdot(1-U)} \]
     \end{block}
     \begin{block}{Observations}
       \begin{itemize}
       \item If \mathexpr{U} is small, response-to-service time is close to 1: a request is immediately
         processed
-      \item If \mathexpr{U} goes up to 1, the system comes to a grinding halt. \newline Solution: decrease \mathexpr{S}.
+      \item If \mathexpr{U} goes up to 1, the system comes to a grinding halt. \newline Solution: increase $\mu$.
       \end{itemize}
     \end{block}
   \end{slide}
