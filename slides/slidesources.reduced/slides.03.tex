@@ -375,7 +375,7 @@
     customers (although performance isolation may not be reached).
   \end{alertblock}
 \end{slide}
-\section{Clients}
+% \section{Clients}
 % \subsection{Networked user interfaces}
 % \begin{slide}{Client-server interaction}
 %   \begin{block}{Distinguish application-level and middleware-level solutions}
@@ -414,62 +414,62 @@
 %     \end{itemize}
 %   \end{block}
 % \end{slide}
-\subsection{Virtual desktop environment}
-\begin{slide}{Virtual desktop environment}
-  \begin{block}{Logical development}
-    With an increasing number of cloud-based applications, the question is how to use those applications from
-    a user's premise?
-    \begin{itemize}\firmlist
-    \item \red{Issue}: develop the ultimate networked user interface
-    \item \red{Answer}: use a Web browser to establish a seamless experience
-    \end{itemize}
-  \end{block}
-  \begin{centerfig}
-    \includefigure[0.18]{chrome-book} \\
-    The Google Chromebook
-  \end{centerfig}
-\end{slide}
-\begin{slide}{The anatomy of a Web browser}
-  \begin{centerfig}
-    \includefigure[0.83]{03-17}
-  \end{centerfig}
-\end{slide}
-\subsection{Client-side software for distribution transparency}
-\begin{slide}{Client-side software}
-  \begin{block}{Generally tailored for distribution transparency}
-    \begin{itemize}\tightlist
-    \item \blue{Access transparency}: client-side stubs for RPCs
-    \item \blue{Location/migration transparency}: let client-side software keep track of actual location
-    \item \blue{Replication transparency}: multiple invocations handled by client stub:
-      \begin{center}
-        \includefigure{03-18}
-      \end{center}
-    \item \blue{Failure transparency}: can often be placed only at client (we're trying to mask server and
-      communication failures).
-    \end{itemize}
-  \end{block}
-\end{slide}
-\section{Servers}
-\subsection{General design issues}
-\begin{slide}{Servers: General organization}
-  \begin{block}{Basic model} 
-    A process implementing a specific service on behalf of a collection of clients. It waits for an incoming
-    request from a client and subsequently ensures that the request is taken care of, after which it waits for
-    the next incoming request.
-  \end{block}
-  \onslide
-  \begin{block}{Two basic types}
-    \begin{itemize}
-    \item \red{Iterative server}: Server handles the request before attending a next request.
-    \item \red{Concurrent server}: Uses a \blue{dispatcher}, which picks up an incoming request that is then
-      passed on to a separate thread/process.
-    \end{itemize}
-  \end{block}
-  \begin{alertblock}{Observation}
-    Concurrent servers are the norm: they can easily handle multiple requests, notably in the presence of
-    blocking operations (to disks or other servers).
-  \end{alertblock}
-\end{slide}
+% \subsection{Virtual desktop environment}
+% \begin{slide}{Virtual desktop environment}
+%   \begin{block}{Logical development}
+%     With an increasing number of cloud-based applications, the question is how to use those applications from
+%     a user's premise?
+%     \begin{itemize}\firmlist
+%     \item \red{Issue}: develop the ultimate networked user interface
+%     \item \red{Answer}: use a Web browser to establish a seamless experience
+%     \end{itemize}
+%   \end{block}
+%   \begin{centerfig}
+%     \includefigure[0.18]{chrome-book} \\
+%     The Google Chromebook
+%   \end{centerfig}
+% \end{slide}
+% \begin{slide}{The anatomy of a Web browser}
+%   \begin{centerfig}
+%     \includefigure[0.83]{03-17}
+%   \end{centerfig}
+% \end{slide}
+% \subsection{Client-side software for distribution transparency}
+% \begin{slide}{Client-side software}
+%   \begin{block}{Generally tailored for distribution transparency}
+%     \begin{itemize}\tightlist
+%     \item \blue{Access transparency}: client-side stubs for RPCs
+%     \item \blue{Location/migration transparency}: let client-side software keep track of actual location
+%     \item \blue{Replication transparency}: multiple invocations handled by client stub:
+%       \begin{center}
+%         \includefigure{03-18}
+%       \end{center}
+%     \item \blue{Failure transparency}: can often be placed only at client (we're trying to mask server and
+%       communication failures).
+%     \end{itemize}
+%   \end{block}
+% \end{slide}
+% \section{Servers}
+% \subsection{General design issues}
+% \begin{slide}{Servers: General organization}
+%   \begin{block}{Basic model} 
+%     A process implementing a specific service on behalf of a collection of clients. It waits for an incoming
+%     request from a client and subsequently ensures that the request is taken care of, after which it waits for
+%     the next incoming request.
+%   \end{block}
+%   \onslide
+%   \begin{block}{Two basic types}
+%     \begin{itemize}
+%     \item \red{Iterative server}: Server handles the request before attending a next request.
+%     \item \red{Concurrent server}: Uses a \blue{dispatcher}, which picks up an incoming request that is then
+%       passed on to a separate thread/process.
+%     \end{itemize}
+%   \end{block}
+%   \begin{alertblock}{Observation}
+%     Concurrent servers are the norm: they can easily handle multiple requests, notably in the presence of
+%     blocking operations (to disks or other servers).
+%   \end{alertblock}
+% \end{slide}
 % \begin{slide}{Contacting a server}
 %   \begin{block}{Observation: most services are tied to a specific port}
 %     \begin{center}
@@ -513,62 +513,62 @@
 %     \end{itemize}
 %   \end{block}
 % \end{slide}
-\begin{slide}{Servers and state}
-  \begin{block}{Stateless servers}
-    Never keep \blue{accurate} information about the status of a client after having handled a request:
-    \begin{itemize}\tightlist
-    \item Don't record whether a file has been opened (simply close it again after access)
-    \item Don't promise to invalidate a client's cache
-    \item Don't keep track of your clients
-    \end{itemize}
-  \end{block}
-  \onslide
-  \begin{block}{Consequences}
-    \begin{itemize}\tightlist
-    \item Clients and servers are \blue{completely independent}
-    \item \blue{State inconsistencies} due to client or server crashes \blue{are reduced}
-    \item Possible \blue{loss of performance} because, e.g., a server cannot anticipate client behavior (think of
-      prefetching file blocks)
-    \end{itemize}
-  \end{block}
-  \onslide
-  \begin{alertblock}{Question}
-    Does connection-oriented communication fit into a stateless design?
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Servers and state}
-  \begin{block}{Stateful servers}
-    Keeps track of the status of its clients:
-    \begin{itemize}\tightlist
-    \item Record that a file has been opened, so that prefetching can be done
-    \item Knows which data a client has cached, and allows clients to keep local copies of shared data
-    \end{itemize}
-  \end{block}
-  \onslide
-  \begin{alertblock}{Observation} 
-    The \blue{performance of stateful servers can be extremely high}, provided clients are allowed to keep
-    local copies. As it turns out, \blue{reliability is often not a major problem}.
-  \end{alertblock}
-\end{slide}
-\subsection{Object servers}
-\begin{slide}{Object servers}
-  \begin{columns}[T]
-    \begin{column}{0.35\textwidth}
-      \includefigure[0.71]{03-20}
-    \end{column}
-    \begin{column}{0.6\textwidth}
-      \begin{itemize}
-      \item \blue{Activation policy}: which actions to take when an invocation request comes in:
-        \begin{itemize}\firmlist
-        \item Where are code and data of the object?
-        \item Which threading model to use?
-        \item Keep modified state of object, if any?
-        \end{itemize}
-      \item \blue{Object adapter}: implements a specific activation policy
-      \end{itemize}
-    \end{column}
-  \end{columns}
-\end{slide}
+% \begin{slide}{Servers and state}
+%   \begin{block}{Stateless servers}
+%     Never keep \blue{accurate} information about the status of a client after having handled a request:
+%     \begin{itemize}\tightlist
+%     \item Don't record whether a file has been opened (simply close it again after access)
+%     \item Don't promise to invalidate a client's cache
+%     \item Don't keep track of your clients
+%     \end{itemize}
+%   \end{block}
+%   \onslide
+%   \begin{block}{Consequences}
+%     \begin{itemize}\tightlist
+%     \item Clients and servers are \blue{completely independent}
+%     \item \blue{State inconsistencies} due to client or server crashes \blue{are reduced}
+%     \item Possible \blue{loss of performance} because, e.g., a server cannot anticipate client behavior (think of
+%       prefetching file blocks)
+%     \end{itemize}
+%   \end{block}
+%   \onslide
+%   \begin{alertblock}{Question}
+%     Does connection-oriented communication fit into a stateless design?
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Servers and state}
+%   \begin{block}{Stateful servers}
+%     Keeps track of the status of its clients:
+%     \begin{itemize}\tightlist
+%     \item Record that a file has been opened, so that prefetching can be done
+%     \item Knows which data a client has cached, and allows clients to keep local copies of shared data
+%     \end{itemize}
+%   \end{block}
+%   \onslide
+%   \begin{alertblock}{Observation} 
+%     The \blue{performance of stateful servers can be extremely high}, provided clients are allowed to keep
+%     local copies. As it turns out, \blue{reliability is often not a major problem}.
+%   \end{alertblock}
+% \end{slide}
+% \subsection{Object servers}
+% \begin{slide}{Object servers}
+%   \begin{columns}[T]
+%     \begin{column}{0.35\textwidth}
+%       \includefigure[0.71]{03-20}
+%     \end{column}
+%     \begin{column}{0.6\textwidth}
+%       \begin{itemize}
+%       \item \blue{Activation policy}: which actions to take when an invocation request comes in:
+%         \begin{itemize}\firmlist
+%         \item Where are code and data of the object?
+%         \item Which threading model to use?
+%         \item Keep modified state of object, if any?
+%         \end{itemize}
+%       \item \blue{Object adapter}: implements a specific activation policy
+%       \end{itemize}
+%     \end{column}
+%   \end{columns}
+% \end{slide}
 % \begin{slide}{Example: Ice runtime system -- a server}
 %   \begin{centerfig}
 %     \includelisting{03-21/server2}    
@@ -589,57 +589,57 @@
 %     \includefigure{03-22}
 %   \end{centerfig}
 % \end{slide}
-\subsection{Server clusters}
-\begin{slide}{Three different tiers}
-  \begin{block}{Common organization}
-    \begin{center}
-      \includefigure{03-23}
-    \end{center}
-  \end{block}
-  \begin{alertblock}{Crucial element} 
-    The first tier is generally responsible for passing requests to an appropriate server: \blue{request
-      dispatching}
-  \end{alertblock}
-\end{slide}
-\begin{slide}{Request Handling}
-  \begin{block}{Observation} 
-    Having the first tier handle all communication from/to the cluster may lead to a \blue{bottleneck}.
-  \end{block}
-  \begin{exampleblock}{A solution: TCP handoff} 
-    \begin{center}
-      \includefigure{03-24}
-    \end{center}
-  \end{exampleblock}
-\end{slide}
-\begin{slide}{When servers are spread across the Internet}
-  \begin{block}{Observation}
-    Spreading servers across the Internet may introduce administrative problems. These can be largely
-    circumvented by using data centers from a single cloud provider.
-  \end{block}
-  \begin{block}{Request dispatching: if locality is important}
-    Common approach: use DNS:
-    \begin{enumerate}\tightlist
-    \item Client looks up specific service through DNS - client's IP address is part of request
-    \item DNS server keeps track of replica servers for the requested service, and returns address of most
-      local server.
-    \end{enumerate}
-  \end{block}
-  \begin{alertblock}{Client transparency}
-    To keep client unaware of distribution, let DNS resolver act on behalf of client. Problem is that the
-    resolver may actually be \blue{far from local} to the actual client.
-  \end{alertblock}
-\end{slide}
-\begin{slide}{A simplified version of the Akamai CDN}
-  \begin{centerfig}
-    \includefigure{03-25}
-  \end{centerfig}
-  \onslide
-  \begin{alertblock}{Important note}
-    The cache is often sophisticated enough to hold more than just passive data. Much of the application code
-    of the origin server can be moved to the cache as well.
-  \end{alertblock}
-\end{slide}
-\section{Code migration}
+% \subsection{Server clusters}
+% \begin{slide}{Three different tiers}
+%   \begin{block}{Common organization}
+%     \begin{center}
+%       \includefigure{03-23}
+%     \end{center}
+%   \end{block}
+%   \begin{alertblock}{Crucial element} 
+%     The first tier is generally responsible for passing requests to an appropriate server: \blue{request
+%       dispatching}
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{Request Handling}
+%   \begin{block}{Observation} 
+%     Having the first tier handle all communication from/to the cluster may lead to a \blue{bottleneck}.
+%   \end{block}
+%   \begin{exampleblock}{A solution: TCP handoff} 
+%     \begin{center}
+%       \includefigure{03-24}
+%     \end{center}
+%   \end{exampleblock}
+% \end{slide}
+% \begin{slide}{When servers are spread across the Internet}
+%   \begin{block}{Observation}
+%     Spreading servers across the Internet may introduce administrative problems. These can be largely
+%     circumvented by using data centers from a single cloud provider.
+%   \end{block}
+%   \begin{block}{Request dispatching: if locality is important}
+%     Common approach: use DNS:
+%     \begin{enumerate}\tightlist
+%     \item Client looks up specific service through DNS - client's IP address is part of request
+%     \item DNS server keeps track of replica servers for the requested service, and returns address of most
+%       local server.
+%     \end{enumerate}
+%   \end{block}
+%   \begin{alertblock}{Client transparency}
+%     To keep client unaware of distribution, let DNS resolver act on behalf of client. Problem is that the
+%     resolver may actually be \blue{far from local} to the actual client.
+%   \end{alertblock}
+% \end{slide}
+% \begin{slide}{A simplified version of the Akamai CDN}
+%   \begin{centerfig}
+%     \includefigure{03-25}
+%   \end{centerfig}
+%   \onslide
+%   \begin{alertblock}{Important note}
+%     The cache is often sophisticated enough to hold more than just passive data. Much of the application code
+%     of the origin server can be moved to the cache as well.
+%   \end{alertblock}
+% \end{slide}
+% \section{Code migration}
 % \subsection{Reasons for migrating code}
 % \begin{slide}{Reasons to migrate code}
 %   \begin{block}{Load distribution}
@@ -749,7 +749,5 @@ in Distributed Systems, namely:
   \item Multithreading
   \item Virtualization
   \item Containerization
-  \item VDE
-  \item Stateful and Stateless Servers
 \end{itemize}  
 \end{slide}
