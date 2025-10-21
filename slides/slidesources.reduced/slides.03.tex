@@ -12,10 +12,17 @@
 \begin{slide}{Context switching}
   \begin{block}{Observations}
     \begin{enumerate}
-    \item Threads share the same address space. Thread context switching can be done entirely independent of
-      the operating system.
-    \item Process switching is generally (somewhat) more expensive as it involves getting the OS in the loop,
-      i.e., trapping to the kernel.
+    \item Threads share the same address space. Thread context switching 
+    is much faster than process context switching:
+    \begin{enumerate}
+      \item only registers and program counter need to be saved and restored
+    \end{enumerate}
+    \item Process context switching is more expensive (in time and space) as     
+    \begin{enumerate}
+      \item TLB needs to be flushed 
+      \item page table is reloaded 
+      \item address space changes
+    \end{enumerate}
     \item Creating and destroying threads is much cheaper than doing so for processes.
     \end{enumerate}
   \end{block}
@@ -220,7 +227,6 @@
       \begin{tabular}{|l|l|}\hline
         Multithreading          & Parallelism, blocking system calls \\ \hline
         Single-threaded process & No parallelism, blocking system calls \\ \hline
-        Finite-state machine    & Parallelism, nonblocking system calls \\ \hline
       \end{tabular}
     \end{center}
   \end{block}
@@ -228,35 +234,33 @@
 \section{Virtualization}
 \subsection{Principle of virtualization}
 \begin{slide}{Virtualization}
-  \begin{block}{Observation} 
     \begin{itemize}\tightlist
-    \item Hardware \blue{changes faster} than software
-    \item Ease of \blue{portability} and code migration
-    \item \blue{Isolation} of failing or attacked components
+      \item Equivalence: Virtual machines (VMs) provide an environment 
+      identical to physical hardware, ensuring software runs unmodified.
+      \item Resource Control: The virtual machine monitor (VMM) 
+      maintains full control over system resources, preventing VMs from accessing unauthorized resources.
+      \item Efficiency: Most instructions execute directly on 
+      hardware for near-native performance, with sensitive instructions trapped by the VMM.
+      \item Isolation: VMs are fully isolated, ensuring no 
+      interference or data leaks between VMs or the VMM, using mechanisms like memory and I/O virtualization. 
     \end{itemize}
-  \end{block}
-  \begin{block}{Principle: mimicking interfaces}
-    \begin{center}
-      \begin{tabular}{c@{\hspace*{24pt}}c}
-        \includefigure{03-08a} & 
-        \includefigure{03-08b} \\
-      \end{tabular}
-    \end{center}
-  \end{block}
+    \begin{block}{Privileged instructions}
+      Privileged instructions: allowed to be executed only by the kernel.
+    \end{block}
 \end{slide}
-\begin{slide}{Mimicking interfaces}
-  \begin{block}{Four types of interfaces at three different levels}
-    \begin{enumerate}\tightlist
-    \item \red{Instruction set architecture}: the set of machine instructions, with two subsets:
-      \begin{itemize}\tightlist
-      \item Privileged instructions: allowed to be executed only by the operating system.
-      \item General instructions: can be executed by any program.
-      \end{itemize}
-    \item \red{System calls} as offered by an operating system.
-    \item \red{Library calls}, known as an \red{application programming interface} (API)
-    \end{enumerate}
-  \end{block}
-\end{slide}
+% \begin{slide}{Mimicking interfaces}
+%   \begin{block}{Four types of interfaces at three different levels}
+%     \begin{enumerate}\tightlist
+%     \item \red{Instruction set architecture}: the set of machine instructions, with two subsets:
+%       \begin{itemize}\tightlist
+%       \item Privileged instructions: allowed to be executed only by the operating system.
+%       \item General instructions: can be executed by any program.
+%       \end{itemize}
+%     \item \red{System calls} as offered by an operating system.
+%     \item \red{Library calls}, known as an \red{application programming interface} (API)
+%     \end{enumerate}
+%   \end{block}
+% \end{slide}
 \begin{slide}{Ways of virtualization}
   \begin{center}
     \begin{tabular}{ccc}
