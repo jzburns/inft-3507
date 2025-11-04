@@ -491,7 +491,7 @@
     \[
     \mathbb{P}[k] = \binom{m}{k} p^k (1 - p)^{m-k}
     \]
-    \item \mathexpr{f} coordinators reset \mathexpr{\Rightarrow} \blue{correctness is violated when there is
+    \item for \mathexpr{m > N/2}, if \mathexpr{f} coordinators reset \mathexpr{\Rightarrow} \blue{correctness is violated when there is
       only a minority of nonfaulty coordinators}: when \red{\mathexpr{N-(m-f) \geq m}}, or, \red{\mathexpr{f
         \geq 2m-N}}.
     \item The probability of a violation is \mathexpr{\sum_{k=2m-N}^m \mathbb{P}[k]}.
@@ -553,12 +553,20 @@
         \end{tabular}
       \end{center}
     \end{block}
+    Decentralized Case messages per entry/exit for \mathexpr{k \ge 1} attempts:
+    \begin{itemize}\firmlist
+      \item send \mathexpr{N} messages to coordinators receive N responses. 
+      \item If it does not get a majority, release \mathexpr{N/2} votes. 
+      \item If it did get enough votes, send \mathexpr{N} release messages later. 
+      \item A process may need to go through \mathexpr{k \ge 1} attempts
+    \end{itemize}
   \end{frame}
 \subsection{Example: Simple locking with ZooKeeper}
 \begin{frame}{Example: ZooKeeper}
   \begin{block}{Basics (and keeping it simple)}
     \begin{itemize}\firmlist
     \item Centralized server setup
+    \item Distributed Nodes
     \item All client-server communication is \blue{nonblocking}: a client immediately gets a response
     \item ZooKeeper maintains a \blue{tree-based namespace}, akin to that of a filesystem
     \item Clients can \blue{create}, \blue{delete}, or \blue{update} nodes, as well as \blue{check existence}. 
