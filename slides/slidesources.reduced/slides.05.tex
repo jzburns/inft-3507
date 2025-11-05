@@ -573,25 +573,6 @@
     \end{itemize}
   \end{block}
 \end{frame}
-\begin{frame}{ZooKeeper race condition}
-  \begin{alertblock}{Note}
-    ZooKeeper allows a client to be \red{notified} when a node, or a branch in the tree, changes. This may
-    easily lead to \red{race conditions}. 
-  \end{alertblock}
-
-  \begin{exampleblock}{Consider a simple locking mechanism}
-    \begin{enumerate}\firmlist
-    \item A client \id{C_1} creates a node \id{/lock}.
-    \item A client \id{C_2} wants to acquire the lock but is notified that the associated node already exists.
-    \item Before \id{C_2} subscribes to a notification, \id{C_1} releases the lock, i.e., deletes \id{/lock}.
-    \item Client \id{C_2} subscribes to changes to \id{/lock} and blocks locally.
-    \end{enumerate}
-  \end{exampleblock}
-
-  \begin{alertblock}{Solution}
-    Use version numbers
-  \end{alertblock}
-\end{frame}
 \begin{frame}{ZooKeeper versioning}
   \begin{centerfig}
     \includefigure{05-19}
