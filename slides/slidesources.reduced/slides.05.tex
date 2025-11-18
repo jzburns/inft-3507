@@ -884,6 +884,25 @@
 \end{frame}
 \section{Gossip-based coordination}
 \subsection{Aggregation}
+
+\begin{slide}{Gossip-based coordination}
+  \begin{enumerate}[tightlist]
+    \item Nodes randomly select a few other nodes (peers) periodically and 
+    exchange state information (e.g., membership, failure detection, key-value updates, 
+    or metadata). 
+    \item Information spreads exponentially fast, similar to how gossip or a 
+    virus spreads in a population, achieving eventual consistency with very high probability 
+    in logarithmic rounds.
+    \item Advantages: Extremely robust to network partitions, node failures, 
+    and churn; no single point of failure; low coordination overhead; scales to thousands or tens of thousands of nodes with minimal latency impact; self-healing membership and failure detection (e.g., SWIM, HyParView, or Lifeguard protocols).
+    \item Trade-offs \& Common Uses: Provides only probabilistic guarantees 
+    (not strict consistency); latency of propagation is O(log N); 
+    widely used for failure detection (accrual detectors), 
+    \item lightweight broadcast instead of heavy consensus protocols 
+    like Paxos or Raft when strong consistency isnt required.
+  \end{enumerate}
+\end{slide}
+
 \begin{frame}{Gossip-based coordination: aggregation}
   \begin{block}{Typical apps}
     \begin{itemize}
