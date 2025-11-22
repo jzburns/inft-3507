@@ -117,9 +117,7 @@ sure you give them a unique topic name
 ### 1. Source Code
 
 - Publisher program  
-- Four subscriber programs  
-- Rule-loading logic  
-
+- Four subscriber programs
 
 ### 2. Sample Output
 
@@ -130,6 +128,7 @@ Include:
 
 ### 3. Youtube hosted (delisted) video  (min 10 mins)
 
+``README.md`` containing the URL for a Youtube hosted (delisted) video
 Explain:
 - What content-based subscription means  
 - Why Pub/Sub does not support it natively  
