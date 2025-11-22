@@ -1,0 +1,291 @@
+\documentclass[10pt,aspectratio=169,xcolor=dvipsnames]{beamer}
+%\documentclass[handout,xcolor=dvipsnames]{beamer}
+%\documentclass[xcolor=dvipsnames]{beamer}
+
+\newcommand{\chap}{00}
+\renewcommand{\chap}{05}
+\newcommand{\NotesFrame}{%
+  \setbeamercolor{frametitle}{bg=white}
+  \addtocounter{framenumber}{-1}
+  \begin{frame}{}
+    \setlength{\arrayrulewidth}{0.1pt}
+    \begin{tabular}{p{\textwidth}}\hline
+	  \\ \hline \\ \hline	\\ \hline \\ \hline \\ \hline
+	  \\ \hline \\ \hline	\\ \hline \\ \hline \\ \hline
+	  \\ \hline \\ \hline	\\ \hline \\ \hline \\ \hline
+    \end{tabular}
+  \end{frame}
+  \setbeamercolor{frametitle}{bg=yellow!85!orange}
+}
+%@@NOTES
+
+\newcommand{\slidesources}{slidesources.reduced}
+%@@SLIDESOURCES
+
+\newcommand{\pdfdir}{pdf/}
+\newcommand{\pngdir}{png/}
+\newcommand{\figdir}{figs-and-code/}
+%@@FIGDIRS
+
+\usepackage{adjustbox}
+\usepackage{alltt}
+\usepackage{array}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{ifthen,calc}
+\usepackage{microtype}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{times,mathptmx}
+\usepackage{url}
+\usepackage{xmpmulti}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\definecolor{keywords}{RGB}{255,0,90}
+\definecolor{comments}{RGB}{0,150,0}
+\definecolor{blue}{rgb}{0.2,0.2,0.7}
+\definecolor{green}{rgb}{0.3,0.6,0.3}
+\definecolor{red}{RGB}{200,0,0}
+
+\newcolumntype{I}{!{\vrule width 1.5pt}}
+\lstloadlanguages{Python}
+\lstset{
+  numberstyle={\tiny\ttfamily},
+  numbers=left,
+  numbersep=6pt,
+  language = Python,
+  keywordstyle={\color{keywords}\bfseries},
+  commentstyle={\color{comments}\itshape},
+  stringstyle=\color{red},
+  showstringspaces=false,
+  escapeinside={(*@}{@*)},
+  basicstyle={\linespread{0.9}\scriptsize\ttfamily}
+}
+\lstset{keepspaces=true,basewidth={0.5em,0.45em}}
+
+\usepackage[english]{babel}
+\usetheme{Warsaw}
+\usecolortheme{sidebartab}%  from Boadilla
+
+
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamerfont{block title}{size={\normalsize}}
+\setbeamercolor{block title}{fg=white}
+\setbeamercolor{block title example}{fg=green}
+\setbeamercolor{itemize item}{fg=blue}
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\hspace*{2ex}\insertpart
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,right]{subsection in head/foot}%
+    \usebeamerfont{subsection in head/foot}\insertsection\hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+\makeatletter
+\setbeamertemplate{footline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+    \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+    \insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\makeatother
+
+\newenvironment{slide}[1]{%
+  \begin{frame}[t]{\large #1}%
+    \small
+    \transfade[duration=0.5]
+    %    \setbeamercovered{transparent}%
+    \linespread{1.1}
+}{%
+  \end{frame}
+  \mode<handout>{%
+    \NotesFrame
+  }
+}
+
+% \AtBeginSection{\frame{\sectionpage}}
+% \AtBeginSubsection{\frame{\subsectionpage}}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+\newcommand{\scalefigure}{0.83}
+\newcommand{\includefigurew}[2][\textwidth]{\includegraphics[width=\textwidth]{\pngdir#2.png}}
+
+\newcommand{\includefigure}[2][\scalefigure]{%
+  \setbox0=\hbox{\includegraphics{\pdfdir#2.pdf}}
+  \scalebox{#1}{\includegraphics[width=\the\wd0, height=\the\ht0]{\pngdir#2.png}}
+}
+
+\newcommand{\slideset}[1]{\slidesources/slides.#1}
+\newcommand{\includeslides}[1]{%
+  \ifthenelse{\equal{#1}{\chap}}{%
+    \include{\slideset{#1}}}{}}
+
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newlength{\savedwidth}
+\newcommand{\whline}{\noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 1.5pt}\hline\noalign{\global\arrayrulewidth\savedwidth}}
+
+\newcommand{\PBS}[1]{\let\temp=\\#1\let\\=\temp}
+\newcommand{\RRCOL}{\PBS\raggedright\hspace{0pt}}
+\newcommand{\code}[1]{\textls[-100]{\normalsize\texttt{#1}}}
+\newcommand{\codesn}[1]{\textls[-100]{\texttt{#1}}}
+
+\newcommand{\DB}{\func{DB}}
+\newcommand{\WO}{\func{WriteOrder}}
+\newcommand{\RW}{\func{RelevantWrites}}
+\newcommand{\CR}{\func{Complete}}
+\newcommand{\MT}[1]{\mbox{\normalsize #1}}
+
+\newcommand{\tightlist}{%
+  \setlength{\parskip}{0pt}%
+  \setlength{\itemsep}{0pt}
+}
+
+\newcommand{\firmlist}{%
+  \setlength{\parskip}{0pt}%
+  \setlength{\itemsep}{3pt}
+}
+
+\renewcommand{\arraystretch}{1.2}
+
+\newenvironment{centerfig}{%
+  \begin{center}}{%
+  \end{center}\vspace*{-6pt}}
+
+%---------------------------------------------------------
+
+%\newcommand{\TBD}[1]{\textbf{TBD: #1}}
+
+\newcommand{\mts}[1]{{\mbox{\scriptsize\emph{#1}}}}
+\newcommand{\msg}[1]{{\mbox{\textsc{#1}}}}
+\newcommand{\id}[1]{\mbox{$\mathsf{\mathit{#1}}$}}
+\newcommand{\idsn}[1]{\mbox{\footnotesize$\mathsf{\mathit{#1}}$}}
+\newcommand{\ts}[1]{\mbox{\itshape\scriptsize #1}}
+\newcommand{\func}[1]{\mbox{\emph{#1}}}
+\newcommand{\average}[1]{\overline{#1}}
+
+\newcommand{\MTTF}{\mbox{\emph{MTTF}}}
+\newcommand{\MTTR}{\mbox{\emph{MTTR}}}
+\newcommand{\MTBF}{\mbox{\emph{MTBF}}}
+\newcommand{\set}[1]{\mbox{$\mathbf{#1}$}}
+\newcommand{\dollar}{\$}
+\newcommand{\mathexpr}[1]{$#1$}
+\newcommand{\arc}[1]{{\langle\overrightarrow{#1}\rangle}}
+
+\newcommand{\CP}[2]{\mbox{\mathexpr{\func{CP}_{#1}({#2})}}}
+\newcommand{\INT}[2]{\mbox{\mathexpr{\func{INT}_{#1}({#2})}}}
+\newcommand{\DEP}[1]{\mbox{\textbf{DEP}(\id{#1})}}
+\newcommand{\COPY}[1]{\mbox{\textbf{COPY}(\id{#1})}}
+\newcommand{\FAIL}{\mbox{\textbf{FAIL}}}
+
+\newcommand{\lstpath}[1]{}
+\newcommand{\setlstpath}[1]{\renewcommand{\lstpath}{#1}}
+\newcommand{\includelisting}[1]{\lstinputlisting{\lstpath#1.py}}
+\newcommand{\oper}[1]{\mbox{$\mathsf{#1}$}}
+
+\newcommand{\lseq}{\mbox{[}}
+\newcommand{\rseq}{\mbox{]}}
+\newcommand{\sseq}{,\ }
+
+%----------------------------------------------------------
+
+\newcommand{\czero}{}
+\newcommand{\ci}{Introduction}
+\newcommand{\cii}{Architectures}
+\newcommand{\ciii}{Processes}
+\newcommand{\civ}{Communication}
+\newcommand{\cv}{Coordination}
+\newcommand{\cvi}{Naming}
+\newcommand{\cvii}{Consistency and Replication}
+\newcommand{\cviii}{Fault Tolerance}
+\newcommand{\cix}{Security}
+
+\newtheorem{algorithm}{Algorithm}
+
+%----------------------------------------------------------
+
+\title{\textbf{Principles of Distributed Systems} \\ {\small inft-3507}}
+\author{Dr. J.Burns}
+\date{Autumn 2025}
+\institute{\textbf{ADA University}}
+
+\begin{document}
+
+\graphicspath{{./\figdir\chap/}} % Search in the figs directory
+\setlstpath{./\figdir\chap/}     % Search in the figs directory
+
+\begin{frame}[plain]
+  
+  \titlepage
+  \vspace*{-60pt}
+  % \begin{block}{}
+  \begin{center}\large\color{blue}
+    \textbf{
+    \ifthenelse{\equal{00}{\chap}}{\ }{\ }
+    \ifthenelse{\equal{01}{\chap}}{\begin{center} Section 1: \ci    \end{center}}{}
+    \ifthenelse{\equal{02}{\chap}}{\begin{center} Section 2: \cii   \end{center}}{}
+    \ifthenelse{\equal{03}{\chap}}{\begin{center} Section 3: \ciii  \end{center}}{}
+    \ifthenelse{\equal{04}{\chap}}{\begin{center} Section 4: \civ   \end{center}}{}
+    \ifthenelse{\equal{05}{\chap}}{\begin{center} Section 5: \cv    \end{center}}{}
+    \ifthenelse{\equal{06}{\chap}}{\begin{center} Section 6: \cvi   \end{center}}{}
+    \ifthenelse{\equal{07}{\chap}}{\begin{center} Section 7: \cvii  \end{center}}{}
+    \ifthenelse{\equal{08}{\chap}}{\begin{center} Section 8: \cviii \end{center}}{}
+    \ifthenelse{\equal{09}{\chap}}{\begin{center} Section 9: \cix   \end{center}}{}
+    }
+  \end{center}
+  \vfill
+  \begin{center}
+  {\tiny \emph{\textbf{This content is based on the 
+  following public resources:
+  https://www.distributed-systems.net/index.php/books/ds4/}
+  }}
+
+  
+\end{center}
+  % \end{block}
+
+\end{frame}
+
+%-----------------------------------------------------------------------
+
+\includeslides{00}
+\includeslides{01}
+\includeslides{02}
+\includeslides{03}
+\includeslides{04}
+\includeslides{05}
+\includeslides{06}
+\includeslides{07}
+\includeslides{08}
+\includeslides{09}
+
+\end{document}

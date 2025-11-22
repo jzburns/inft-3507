@@ -15,7 +15,7 @@
     facilities for (remote) procedure call, messaging, or streaming.
   \end{block}
 \end{slide}
-\subsection{Layered architectures}
+\section{Layered architectures}
 \begin{slide}{Layered architecture}
   \begin{block}{Different layered organizations}
     \begin{center}
@@ -28,13 +28,13 @@
     \end{center}
   \end{block}
 \end{slide}
-\begin{slide}{Example: communication protocols}
-  \begin{block}{Protocol, service, interface}
-    \begin{center}
-      \includefigure{02-02}
-    \end{center}
-  \end{block}
-\end{slide}
+% \begin{slide}{Example: communication protocols}
+%   \begin{block}{Protocol, service, interface}
+%     \begin{center}
+%       \includefigure{02-02}
+%     \end{center}
+%   \end{block}
+% \end{slide}
   % \begin{slide}{Two-party communication}
   %   \begin{block}{Server}
   %     \begin{tabular}{l}
@@ -69,11 +69,12 @@
     \end{center}
   \end{block}
 \end{slide}
-\subsection{Service-oriented architectures}
-\begin{slide}{Object-based style}
+\section{RPC and REST Architectures}
+\begin{slide}{RPC - Object-based style}
   \begin{block}{Essence}
     Components are objects, connected to each other through procedure calls. Objects may be placed on
-    different machines; calls can thus execute across a network.
+    different machines; calls can thus execute across a network. This
+    is known as a Remote Procedure Call (RPC)
   \end{block}
   \begin{block}{}
     \begin{tabular}{c@{\hspace*{24pt}}c}
@@ -88,15 +89,16 @@
 \end{slide}
 \begin{slide}{RESTful architectures}
   \begin{block}{Essence}
-    View a distributed system as a collection of resources, individually managed by components. Resources may
-    be added, removed, retrieved, and modified by (remote) applications.
     \begin{enumerate}\tightlist
-    \item Resources are identified through a single naming scheme
-    \item All services offer the same interface
-    \item Messages sent to or from a service are fully self-described
-    \item After executing an operation at a service, that component forgets everything about the caller
+      \item \textbf{Architectural Style}: REST is an architectural style for networked applications, focusing on stateless, client-server communication over HTTP, designed for scalability and simplicity.
+      \item \textbf{Resource-Based}: Resources in REST are uniquely identified by URIs and manipulated using standard HTTP methods such as GET, POST, PUT, DELETE, and PATCH.
+      \item \textbf{Statelessness}: Each client request to the server is independent, containing all necessary information, eliminating server-side session state to enhance scalability.
+      \item \textbf{Layered System}: REST employs a layered architecture, allowing intermediaries like proxies or load balancers to improve performance and security transparently.
+      \item \textbf{Cacheability}: REST responses can be cached when explicitly defined, improving performance by reducing server load and latency for frequently accessed resources.
     \end{enumerate}
   \end{block}
+\end{slide}
+\begin{slide}{REST Services}
   \begin{block}{Basic operations}\scriptsize
     \begin{center}
       \begin{tabular}{|l|l|} \hline
@@ -108,6 +110,11 @@
       \end{tabular}
     \end{center}
   \end{block}
+\begin{itemize}
+    \item REST is a scalable, stateless architectural style for networked applications using HTTP.
+    \item It focuses on resources identified by URIs, manipulated via standard methods (GET, POST, PUT, DELETE).
+    \item Features a layered, cacheable design to enhance performance and flexibility.
+\end{itemize}
 \end{slide}
 \begin{slide}{Example: Amazon's Simple Storage Service}
   \begin{block}{Essence}
@@ -161,28 +168,28 @@
   %     Are there any to draw?
   %   \end{block}
   % \end{slide}
-\subsection{Publish-subscribe architectures}
-\begin{slide}{Coordination}
-  \begin{block}{Temporal and referential coupling}
-    \begin{center}
-      \sffamily\footnotesize
-      \renewcommand{\arraystretch}{1}
-      \begin{tabular}{|rIc|c|} \hline
-                                  & \textbf{Temporally coupled} & \textbf{Temporally coupled} \\ \whline
-        \textbf{Referentially coupled}    & Direct              & Mailbox     \\ \hline
-        \textbf{Referentially decoupled}    & Event-based              & Shared data space      \\ \hline
-      \end{tabular}
-    \end{center}
-  \end{block}
-  \begin{block}{Event-based and Shared data space}
-    \begin{center}
-      \begin{tabular}{@{}cc}
-        \vtop{\null\hbox{\includefigure{02-10a}}} &
-        \vtop{\null\hbox{\includefigure{02-10b}}}
-      \end{tabular}
-    \end{center}
-  \end{block}
-\end{slide}
+\section{Publish-subscribe architectures}
+% \begin{slide}{Coordination}
+%   \begin{block}{Temporal and referential coupling}
+%     \begin{center}
+%       \sffamily\footnotesize
+%       \renewcommand{\arraystretch}{1}
+%       \begin{tabular}{|rIc|c|} \hline
+%                                   & \textbf{Temporally coupled} & \textbf{Temporally coupled} \\ \whline
+%         \textbf{Referentially coupled}    & Direct              & Mailbox     \\ \hline
+%         \textbf{Referentially decoupled}    & Event-based              & Shared data space      \\ \hline
+%       \end{tabular}
+%     \end{center}
+%   \end{block}
+%   \begin{block}{Event-based and Shared data space}
+%     \begin{center}
+%       \begin{tabular}{@{}cc}
+%         \vtop{\null\hbox{\includefigure{02-10a}}} &
+%         \vtop{\null\hbox{\includefigure{02-10b}}}
+%       \end{tabular}
+%     \end{center}
+%   \end{block}
+% \end{slide}
   % \begin{slide}{Example: Linda tuple space}
   %   \begin{block}{Three simple operations}
   %     \begin{itemize}\tightlist
@@ -207,6 +214,19 @@
   %     \blue{Chuck}: & \includelisting{02-11/chuck} \\ 
   %   \end{tabular}
   % \end{slide}
+\begin{slide}{Publish and Subscribe}
+\begin{itemize}
+    \item \textbf{Pub-Sub Model}: Publishers send messages to topics, subscribers receive them asynchronously.
+    \item \textbf{Decoupling}: Publishers and subscribers operate independently, enhancing scalability.
+    \item \textbf{Asynchronous Communication}: Messages are delivered without requiring immediate response.
+    \item \textbf{Topics}: Messages are categorized into topics for targeted delivery.
+    \item \textbf{Scalability}: Handles large-scale systems with dynamic subscribers.
+    \item \textbf{Flexibility}: Supports multiple subscribers per topic.
+    \item \textbf{Reliability}: Message queues ensure delivery despite failures.
+    \item \textbf{Loose Coupling}: Reduces dependencies between system components.
+    \item \textbf{Event-Driven}: Triggers actions based on message events.
+    \item \textbf{Efficiency}: Asynchronous processing optimizes resource use.
+\end{itemize}\end{slide}    
 \begin{slide}{Publish and subscribe}
   \begin{block}{Issue: how to match events?}
     \begin{itemize}\firmlist
@@ -266,40 +286,40 @@
 %     \end{center}
 %   \end{block}
 % \end{slide}
-\subsection{Modifiable middleware}
-\section{Layered-system architectures}
-\subsection{Simple client-server architecture}
-\begin{slide}{Centralized system architectures}
-  \begin{block}{Basic Client--Server Model}
-    Characteristics:
-    \begin{itemize}\tightlist
-    \item There are processes offering services (\red{servers}) 
-    \item There are processes that use services (\red{clients})
-    \item Clients and servers can be on different machines
-    \item Clients follow request/reply model regarding using services
-    \end{itemize}
-    \begin{center}
-      \includefigure{02-16}
-    \end{center}
-  \end{block}
-\end{slide}
-\subsection{Multitiered Architectures}
-\begin{slide}{Multi-tiered centralized system architectures}
-  \begin{block}{Some traditional organizations}
-    \begin{itemize}\tightlist
-    \item \red{Single-tiered:} dumb terminal/mainframe configuration
-    \item \red{Two-tiered:} client/single server configuration
-    \item \red{Three-tiered:} each layer on separate machine
-    \end{itemize}
-  \end{block}
-  \begin{block}{Traditional two-tiered configurations}
-    \newcommand{\ispace}{\hspace*{1.8cm}}
-    \begin{center}
-      \includefigure{02-17} \newline
-      (a)\ispace(b)\ispace(c)\ispace(d)\ispace(e)
-    \end{center}
-  \end{block}
-\end{slide}
+% \subsection{Modifiable middleware}
+% \section{Layered-system architectures}
+% \subsection{Simple client-server architecture}
+% \begin{slide}{Centralized system architectures}
+%   \begin{block}{Basic Client--Server Model}
+%     Characteristics:
+%     \begin{itemize}\tightlist
+%     \item There are processes offering services (\red{servers}) 
+%     \item There are processes that use services (\red{clients})
+%     \item Clients and servers can be on different machines
+%     \item Clients follow request/reply model regarding using services
+%     \end{itemize}
+%     \begin{center}
+%       \includefigure{02-16}
+%     \end{center}
+%   \end{block}
+% \end{slide}
+% \subsection{Multitiered Architectures}
+% \begin{slide}{Multi-tiered centralized system architectures}
+%   \begin{block}{Some traditional organizations}
+%     \begin{itemize}\tightlist
+%     \item \red{Single-tiered:} dumb terminal/mainframe configuration
+%     \item \red{Two-tiered:} client/single server configuration
+%     \item \red{Three-tiered:} each layer on separate machine
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Traditional two-tiered configurations}
+%     \newcommand{\ispace}{\hspace*{1.8cm}}
+%     \begin{center}
+%       \includefigure{02-17} \newline
+%       (a)\ispace(b)\ispace(c)\ispace(d)\ispace(e)
+%     \end{center}
+%   \end{block}
+% \end{slide}
 % \begin{slide}{Being client and server at the same time}
 %   \begin{block}{Three-tiered architecture}
 %     \vspace*{12pt}
@@ -554,10 +574,10 @@
     sense remains to be seen.
   \end{alertblock}
 \end{slide}
-\subsection{Blockchain architectures}
+\section{Blockchain architectures}
 \begin{slide}{Blockchains}
   \begin{block}{Principle working of a blockchain system}
-    \centering\includefigure{02-29}
+    \centering\includefigure[0.65]{02-29}
   \end{block}
   \onslide
   \begin{block}{Observations}
@@ -618,9 +638,8 @@ We have discussed architectureal principles
 in Distributed Systems, namely:
 \begin{itemize}
   \item Layered architectures
-  \item Object and RESTful styles
-  \item Coordination within the architecture
-  \item Multi-tiered centralized system architectures
+  \item RPC and RESTful styles
+  \item Publish and Subscribe
   \item Structured and unstructured P2P
   \item Cloud Edge Computing
   \item Blockchain

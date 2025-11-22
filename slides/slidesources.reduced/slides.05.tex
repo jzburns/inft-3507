@@ -1,7 +1,7 @@
 \part{Coordination}
 % \section{Clock synchronization}
 % \subsection{Physical clocks}
-% \begin{slide}{Physical clocks}
+% \begin{frame}{Physical clocks}
 %   \begin{alertblock}{Problem}
 %     Sometimes we simply need the exact time, not just an ordering.
 %   \end{alertblock}
@@ -16,9 +16,9 @@
 %     UTC is \blue{broadcast} through short-wave radio and satellite. Satellites can give an accuracy of about
 %     \mathexpr{\pm 0.5} ms.
 %   \end{block}
-% \end{slide}
+% \end{frame}
 % \subsection{Clock synchronization algorithms}
-% \begin{slide}{Clock synchronization}
+% \begin{frame}{Clock synchronization}
 %   \begin{block}{Precision}
 %     The goal is to keep the deviation \blue{between two clocks on any two machines} within a specified bound,
 %     known as the \red{precision} \mathexpr{\pi}:
@@ -35,8 +35,8 @@
 %     \item \red{External synchronization}: keep clocks \blue{accurate}
 %     \end{itemize}
 %   \end{alertblock}
-% \end{slide}
-% \begin{slide}{Clock drift}
+% \end{frame}
+% \begin{frame}{Clock drift}
 %   \begin{block}{Clock specifications}
 %     \begin{itemize}\tightlist
 %     \item A clock comes specified with its \red{maximum clock drift rate} \mathexpr{\rho}.
@@ -63,8 +63,8 @@
 %       \end{block}
 %     \end{column}
 %   \end{columns}
-% \end{slide}
-% \begin{slide}{Detecting and adjusting incorrect times}
+% \end{frame}
+% \begin{frame}{Detecting and adjusting incorrect times}
 %   \begin{block}{Getting the current time from a timeserver}
 %     \begin{centerfig}
 %       \includefigure{05-05}
@@ -79,13 +79,13 @@
 %     \delta = \bigl((T_4-T_1) - (T_3 -T_2)\bigr)/{2}
 %     \]
 %   \end{block}
-%   \onslide
+%   
 %   \begin{exampleblock}{Network Time Protocol}
 %     Collect \mathexpr{(\theta,\delta)} pairs. Choose \mathexpr{\theta} for which associated delay
 %     \mathexpr{\delta} was minimal.
 %   \end{exampleblock}
-% \end{slide}
-% \begin{slide}{Reference broadcast synchronization}
+% \end{frame}
+% \begin{frame}{Reference broadcast synchronization}
 %   \begin{block}{Essence}
 %     \begin{itemize}\tightlist
 %     \item A node broadcasts a reference message \id{m} \mathexpr{\Rightarrow} each receiving node \id{p}
@@ -112,15 +112,15 @@
 %       \end{block}
 %     \end{column}
 %   \end{columns}
-% \end{slide}
+% \end{frame}
 % \section{Logical clocks}
 % \subsection{Lamport's logical clocks}
-% \begin{slide}{The Happened-before relationship}
+% \begin{frame}{The Happened-before relationship}
 %   \begin{alertblock}{Issue}
 %     What usually matters is not that all processes agree on exactly what time it is, but that they agree on
 %     the \red{order in which events occur}. \blue{Requires a notion of ordering}.
 %   \end{alertblock}
-%   \onslide
+%   
 %   \begin{block}{The \red{happened-before} relation}
 %     \begin{itemize}\tightlist
 %     \item If \mathexpr{a} and \mathexpr{b} are two events in the same process, and \mathexpr{a} comes before
@@ -133,13 +133,13 @@
 %   \begin{alertblock}{Note}
 %     This introduces a \blue{partial ordering of events} in a system with concurrently operating processes.
 %   \end{alertblock}
-% \end{slide}
-% \begin{slide}{Logical clocks}
+% \end{frame}
+% \begin{frame}{Logical clocks}
 %   \begin{alertblock}{Problem}
 %     How do we maintain a global view of the system's behavior that is consistent with the happened-before
 %     relation?
 %   \end{alertblock}
-%   \onslide
+%   
 %   \begin{block}{Attach a time\-stamp \mathexpr{C(e)} to each event \mathexpr{e}, satisfying the following properties:}
 %     \begin{enumerate}\tightlist
 %     \item[\blue{P1}] If \mathexpr{a} and \mathexpr{b} are two events in the same process, and \mathexpr{a
@@ -148,13 +148,13 @@
 %       receipt of that message, then also \mathexpr{C(a) < C(b)}.
 %     \end{enumerate}
 %   \end{block}
-%   \onslide
+%   
 %   \begin{alertblock}{Problem}
 %     How to attach a time\-stamp to an event when there's no global clock \mathexpr{\Rightarrow} maintain a
 %     \blue{consistent} set of logical clocks, one per process.
 %   \end{alertblock}
-% \end{slide}
-% \begin{slide}{Logical clocks: solution}
+% \end{frame}
+% \begin{frame}{Logical clocks: solution}
 %   \begin{block}{Each process \id{P_i} maintains a \blue{local} counter \id{C_i} and adjusts this counter}
 %     \begin{enumerate}\tightlist
 %     \item For each new event that takes place within \id{P_i}, \id{C_i} is incremented by 1.
@@ -172,8 +172,8 @@
 %       process IDs}.
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Logical clocks: example}
+% \end{frame}
+% \begin{frame}{Logical clocks: example}
 %   \begin{block}{Consider three processes with \red{event counters} operating at different rates}
 %     \begin{center}
 %       \begin{tabular}{c@{\hspace*{48pt}}c}
@@ -182,15 +182,15 @@
 %       \end{tabular}
 %     \end{center}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Logical clocks: where implemented}
+% \end{frame}
+% \begin{frame}{Logical clocks: where implemented}
 %   \begin{block}{Adjustments implemented in middleware}
 %     \begin{center}
 %       \includefigure{05-08}
 %     \end{center}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Example: Totally ordered multicast}
+% \end{frame}
+% \begin{frame}{Example: Totally ordered multicast}
 %   \begin{block}{Concurrent updates on a replicated database are seen in the same order everywhere}
 %     \begin{itemize}\tightlist
 %     \item \id{P_1} adds \dollar 100 to an account (initial value: \dollar 1000)
@@ -205,8 +205,8 @@
 %     In absence of proper synchronization: \newline replica \#1 \mathexpr{\leftarrow} \dollar 1111, while
 %     replica \#2 \mathexpr{\leftarrow} \dollar 1110.
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Example: Totally ordered multicast}
+% \end{frame}
+% \begin{frame}{Example: Totally ordered multicast}
 %   \begin{block}{Solution}
 %     \begin{itemize}\tightlist
 %     \item Process \id{P_i} sends \blue{timestamped message} \id{m_i} to all others. The message itself is put in a
@@ -215,7 +215,7 @@
 %       \blue{acknowledged} to every other process.
 %     \end{itemize}
 %   \end{block}
-%   \onslide
+%   
 %   \begin{alertblock}{\id{P_j} passes a message \id{m_i} to its application if:}
 %     \begin{itemize}\tightlist
 %     \item[(1)] \id{m_i} is at the head of \id{queue_j}
@@ -223,31 +223,31 @@
 %       timestamp.
 %     \end{itemize}
 %   \end{alertblock}
-%   \onslide
+%   
 %   \begin{block}{Note}
 %     We are assuming that communication is \red{reliable} and \red{FIFO ordered}.
 %   \end{block}
-% \end{slide}
-%   \begin{slide}{Lamport's clocks for mutual exclusion}
+% \end{frame}
+%   \begin{frame}{Lamport's clocks for mutual exclusion}
 %     \begin{tabular}{@{\hspace*{1em}}l}
 %       \includelisting{05-10/process-book-a}
 %     \end{tabular}
-%   \end{slide}
-%   \begin{slide}{Lamport's clocks for mutual exclusion}
+%   \end{frame}
+%   \begin{frame}{Lamport's clocks for mutual exclusion}
 %     \begin{tabular}{@{\hspace*{1em}}l}
 %       \includelisting{05-10/process-book-b}
 %     \end{tabular}
-%   \end{slide}
-%   \begin{slide}{Lamport's clocks for mutual exclusion}
+%   \end{frame}
+%   \begin{frame}{Lamport's clocks for mutual exclusion}
 %     \begin{block}{Analogy with totally ordered multicast}
 %       \begin{itemize}\firmlist
 %       \item With totally ordered multicast, all processes build identical queues, delivering messages in the same order
 %       \item Mutual exclusion is about agreeing in which order processes are allowed to enter a critical region
 %       \end{itemize}
 %     \end{block}
-%   \end{slide}
+%   \end{frame}
 % \subsection{Vector clocks}
-% \begin{slide}{Vector clocks}
+% \begin{frame}{Vector clocks}
 %   \begin{block}{Observation}
 %     Lamport's clocks do not guarantee that if \mathexpr{C(a) < C(b)} that \mathexpr{a} \blue{causally
 %       preceded} \mathexpr{b}.
@@ -265,14 +265,14 @@
 %         Event \mathexpr{a}: \id{m_1} is received at \mathexpr{T = 16}; \newline
 %         Event \mathexpr{b}: \id{m_2} is sent at \mathexpr{T = 20}.
 %       \end{block}
-%       \onslide
+%       
 %       \begin{alertblock}{Note}
 %         We \blue{cannot} conclude that \mathexpr{a} causally precedes \mathexpr{b}.
 %       \end{alertblock}
 %     \end{column}
 %   \end{columns}
-% \end{slide}
-% \begin{slide}{Causal dependency}
+% \end{frame}
+% \begin{frame}{Causal dependency}
 %   \begin{block}{Definition}
 %     We say that $b$ may causally depend on $a$ if $ts(a) < ts(b)$, with:
 %     \begin{itemize}
@@ -287,8 +287,8 @@
 %         $b$.
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Capturing potential causality}
+% \end{frame}
+% \begin{frame}{Capturing potential causality}
 %   \begin{block}{Solution: each \id{P_i} maintains a vector \id{VC_i}}
 %     \begin{itemize}
 %     \item \mathexpr{\id{VC_i}[i]} is the local logical clock at process \id{P_i}.
@@ -306,8 +306,8 @@
 %       delivers the message to the application.
 %     \end{enumerate}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Vector clocks: Example}
+% \end{frame}
+% \begin{frame}{Vector clocks: Example}
 %   \begin{block}{Capturing potential causality when exchanging messages}
 %     \begin{tabular}{@{}cc}
 %       \includefigure[0.65]{05-12a} &
@@ -331,8 +331,8 @@
 %       \end{tabular}
 %     \end{center}
 %   \end{block}
-% \end{slide}
-%   \begin{slide}{Causally ordered multicasting}
+% \end{frame}
+%   \begin{frame}{Causally ordered multicasting}
 %     \begin{block}{Observation}
 %       We can now ensure that a message is delivered only if all causally preceding messages have already been
 %       delivered.
@@ -341,32 +341,65 @@
 %       \id{P_i} increments \mathexpr{\id{VC_i}[i]} only when sending a message, and \id{P_j} ``adjusts''
 %       \id{VC_j} when receiving a message (i.e., effectively does not change \mathexpr{\id{VC_j}[j]}).
 %     \end{block}
-%     \onslide
+%     
 %     \begin{alertblock}{\id{P_j} postpones delivery of \id{m} until:}
 %       \begin{enumerate}\tightlist
 %       \item \mathexpr{ts(\id{m})[i] = \id{VC_j}[i] + 1}
 %       \item \mathexpr{ts(\id{m})[k] \leq \id{VC_j}[k]} for all \mathexpr{k \neq i}
 %       \end{enumerate}
 %     \end{alertblock}
-%   \end{slide}
-%   \begin{slide}{Causally ordered multicasting}
+%   \end{frame}
+%   \begin{frame}{Causally ordered multicasting}
 %     \begin{block}{Enforcing causal communication}
 %       \begin{centerfig}
 %         \includefigure{05-13}
 %       \end{centerfig}
 %     \end{block}
-%     \onslide
+%     
 %     \begin{exampleblock}{Example}
 %       Take \mathexpr{\id{VC_3} = [0,2,2], ts(\id{m}) = [1,3,0]} from \id{P_1}. What information does \id{P_3}
 %       have, and what will it do when receiving \id{m} (from \id{P_1})?
 %     \end{exampleblock}
-%   \end{slide}
+%   \end{frame}
 \section{Mutual exclusion}
 \subsection{Overview}
-\begin{slide}{Mutual exclusion}
+\begin{frame}[fragile]{Process Critical Sections}
   \begin{alertblock}{Problem}
-    Several processes in a distributed system want exclusive access to some resource.
-  \end{alertblock}
+    Several processes in a distributed system want exclusive access to 
+    some resource - and we want to avoid concurrent access to this
+    resource: The processes all have a region of code
+    where the concurrency takes place. This is called the 
+    \textbf{Critical Section}
+  \end{alertblock}  
+  \begin{block}{Critical Section}
+    A \textbf{critical section} is a code segment within a process (or thread) 
+    that accesses or modifies shared resources (e.g., variables, data structures, 
+    files, database or devices) and must be executed atomically — as an indivisible 
+    unit—by at most one \textbf{one concurrent process or thread} at a time.    
+  \end{block}
+ \end{frame}
+  
+ \begin{frame}[fragile]{Mutual exclusion: Example} 
+  \begin{verbatim}
+    do {
+        // Non-critical section (local work, safe for concurrency)
+        
+        // Entry section (acquire synchronization primitive)
+        while (!can_enter_critical_section());  // Busy-wait or block
+        
+        // *** CRITICAL SECTION ***
+        // Shared resource access/modification (e.g., balance += amount;)
+        // Must be atomic w.r.t. other threads
+        
+        // Exit section (release synchronization primitive)
+        signal_exit_critical_section();
+        
+        // Non-critical section
+    } while (true);
+  \end{verbatim}
+\end{frame}
+
+\begin{frame}{Mutual exclusion}
   \begin{block}{Basic solutions}
     \begin{description}
       \item[Permission-based:] A process wanting to enter its critical region, or access a resource, needs
@@ -375,9 +408,9 @@
         critical region, or pass it on when not interested.
     \end{description}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{A centralized algorithm}
-\begin{slide}{Permission-based, centralized}
+\begin{frame}{Permission-based, centralized}
   \begin{block}{Simply use a coordinator}
     \begin{centerfig}
       \begin{tabular}{ccc}
@@ -394,10 +427,10 @@
     \item[(c)] When \id{P_1} releases the resource, it tells the coordinator, which then replies to \id{P_2}.
     \end{itemize}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{A distributed algorithm}
-\begin{slide}{Mutual exclusion: Ricart \& Agrawala}
-  \begin{block}{The same as Lamport except that acknowledgments are not sent}
+\begin{frame}{Mutual exclusion: Ricart \& Agrawala}
+  \begin{block}{Acknowledgments are not sent (the caller blocks)}
     Return a response to a request only when:
     \begin{itemize}\tightlist
     \item The receiving process has no interest in the shared resource; or
@@ -406,8 +439,8 @@
     \end{itemize}
     In all other cases, reply is \blue{deferred}, implying some more local administration.
   \end{block}
-\end{slide}
-\begin{slide}{Mutual exclusion: Ricart \& Agrawala}
+\end{frame}
+\begin{frame}{Mutual exclusion: Ricart \& Agrawala}
   \begin{block}{Example with three processes}
     \begin{center}
       \begin{tabular}{@{}c@{\hspace*{36pt}}c@{\hspace*{36pt}}c@{}}
@@ -423,9 +456,9 @@
      \item[(c)] When process \id{P_0} is done, it sends an \id{OK} also, so \id{P_2} can now go ahead.
     \end{itemize}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{A token-ring algorithm}
-\begin{slide}{Mutual exclusion: Token ring algorithm}
+\begin{frame}{Mutual exclusion: Token ring algorithm}
   \begin{block}{Essence} 
     Organize processes in a \blue{logical} ring, and let a token be passed between them. The one that holds
     the token is allowed to enter the critical region (if it wants to).
@@ -435,9 +468,9 @@
       \includefigure{05-16}
     \end{centerfig}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{A decentralized algorithm}
-\begin{slide}{Decentralized mutual exclusion}
+\begin{frame}{Decentralized mutual exclusion}
   \begin{block}{Principle}
     Assume every resource is replicated \mathexpr{N} times, with each replica having its own coordinator
     \mathexpr{\Rightarrow} access requires a \blue{majority vote} from \mathexpr{m > N/2} coordinators. A
@@ -447,8 +480,8 @@
     When a coordinator crashes, it will recover quickly, but will have forgotten about permissions it had
     granted.
   \end{block}
-\end{slide}
-\begin{slide}{Decentralized mutual exclusion}
+\end{frame}
+\begin{frame}{Decentralized mutual exclusion}
   \begin{block}{How robust is this system?}
     \begin{itemize}
     \item Let \mathexpr{p = \Delta t / T} be the probability that a coordinator resets during a time interval
@@ -458,14 +491,14 @@
     \[
     \mathbb{P}[k] = \binom{m}{k} p^k (1 - p)^{m-k}
     \]
-    \item \mathexpr{f} coordinators reset \mathexpr{\Rightarrow} \blue{correctness is violated when there is
+    \item for \mathexpr{m > N/2}, if \mathexpr{f} coordinators reset \mathexpr{\Rightarrow} \blue{correctness is violated when there is
       only a minority of nonfaulty coordinators}: when \red{\mathexpr{N-(m-f) \geq m}}, or, \red{\mathexpr{f
         \geq 2m-N}}.
     \item The probability of a violation is \mathexpr{\sum_{k=2m-N}^m \mathbb{P}[k]}.
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Decentralized mutual exclusion}
+\end{frame}
+\begin{frame}{Decentralized mutual exclusion}
   \begin{block}{Violation probabilities for various parameter values}
     \begin{center}
       \small\footnotesize
@@ -500,12 +533,11 @@
       \end{tabular}
     \end{center}
   \end{block}
-  \onslide
-  \begin{alertblock}{So....}
+  \begin{alertblock}{So}
     What can we conclude?
   \end{alertblock}
-\end{slide}
-  \begin{slide}{Mutual exclusion: comparison}
+\end{frame}
+  \begin{frame}{Mutual exclusion: comparison}
     \begin{block}{}
       \begin{center}
         \footnotesize
@@ -521,38 +553,27 @@
         \end{tabular}
       \end{center}
     \end{block}
-  \end{slide}
+    Decentralized Case messages per entry/exit for \mathexpr{k \ge 1} attempts:
+    \begin{itemize}\firmlist
+      \item send \mathexpr{N} messages to coordinators receive N responses. 
+      \item If it does not get a majority, release \mathexpr{N/2} votes. 
+      \item If it did get enough votes, send \mathexpr{N} release messages later. 
+      \item A process may need to go through \mathexpr{k \ge 1} attempts
+    \end{itemize}
+  \end{frame}
 \subsection{Example: Simple locking with ZooKeeper}
-\begin{slide}{Example: ZooKeeper}
+\begin{frame}{Example: ZooKeeper}
   \begin{block}{Basics (and keeping it simple)}
     \begin{itemize}\firmlist
     \item Centralized server setup
+    \item Distributed Nodes
     \item All client-server communication is \blue{nonblocking}: a client immediately gets a response
     \item ZooKeeper maintains a \blue{tree-based namespace}, akin to that of a filesystem
     \item Clients can \blue{create}, \blue{delete}, or \blue{update} nodes, as well as \blue{check existence}. 
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{ZooKeeper race condition}
-  \begin{alertblock}{Note}
-    ZooKeeper allows a client to be \red{notified} when a node, or a branch in the tree, changes. This may
-    easily lead to \red{race conditions}. 
-  \end{alertblock}
-
-  \begin{exampleblock}{Consider a simple locking mechanism}
-    \begin{enumerate}\firmlist
-    \item A client \id{C_1} creates a node \id{/lock}.
-    \item A client \id{C_2} wants to acquire the lock but is notified that the associated node already exists.
-    \item Before \id{C_2} subscribes to a notification, \id{C_1} releases the lock, i.e., deletes \id{/lock}.
-    \item Client \id{C_2} subscribes to changes to \id{/lock} and blocks locally.
-    \end{enumerate}
-  \end{exampleblock}
-
-  \begin{alertblock}{Solution}
-    Use version numbers
-  \end{alertblock}
-\end{slide}
-\begin{slide}{ZooKeeper versioning}
+\end{frame}
+\begin{frame}{ZooKeeper versioning}
   \begin{centerfig}
     \includefigure{05-19}
   \end{centerfig}
@@ -565,8 +586,8 @@
     \item \red{\id{R(n,k)a}}: value \id{a} from node \id{n} is returned with its current version \id{k}.
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{ZooKeeper locking protocol}
+\end{frame}
+\begin{frame}{ZooKeeper locking protocol}
   \begin{block}{It is now very simple}
     \begin{enumerate}\firmlist
     \item \red{lock}: A client \id{C_1} creates a node \id{/lock}.
@@ -578,9 +599,9 @@
 
     
   \end{block}
-\end{slide}
+\end{frame}
 \section{Election algorithms}
-\begin{slide}{Election algorithms}
+\begin{frame}{Election algorithms}
   \begin{block}{Principle} 
     An algorithm requires that some process acts as a coordinator. The question is how to select this special
     process \blue{dynamically}.
@@ -589,7 +610,6 @@
     In many systems, the coordinator is chosen manually (e.g.,\ file servers). This leads to centralized
     solutions \mathexpr{\Rightarrow} single point of failure.
   \end{block}
-  \onslide
   \begin{block}{Teasers}
     \begin{enumerate}
     \item If a coordinator is chosen dynamically, to what extent can we speak about a centralized or
@@ -600,8 +620,8 @@
       % Fully distributed solutions are not necessarily better (think of Ricart-Agrawala)
     \end{enumerate}
   \end{block}
-\end{slide}
-\begin{slide}{Basic assumptions}
+\end{frame}
+\begin{frame}{Basic assumptions}
   \begin{block}{}
     \begin{itemize}
     \item All processes have unique id's
@@ -609,9 +629,9 @@
     \item Election means identifying the process with the highest id that is up
     \end{itemize}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{The bully algorithm}
-\begin{slide}{Election by bullying}
+\begin{frame}{Election by bullying}
   \begin{block}{Principle}
     Consider \mathexpr{N} processes \mathexpr{\{\id{P_0},\ldots,\id{P_{N-1}}\}} and let
     \mathexpr{id(\id{P_k}) = k}. When a process \id{P_k} notices that the coordinator is no longer responding to
@@ -623,8 +643,8 @@
     \item If one of the higher-ups answers, it takes over and \mathexpr{P_k}'s job is done.
     \end{enumerate}
   \end{block}
-\end{slide}
-\begin{slide}{Election by bullying}
+\end{frame}
+\begin{frame}{Election by bullying}
   \begin{block}{The bully election algorithm}
     \begin{center}
       \begin{tabular}{ccc}
@@ -645,9 +665,9 @@
     %%   \item[(e)] Process 6 wins and tells everyone.  
     %% \end{itemize}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{A ring algorithm}
-\begin{slide}{Election in a ring}
+\begin{frame}{Election in a ring}
   \begin{block}{Principle}
     Process priority is obtained by organizing processes into a (logical) ring. The process with the highest
     priority should be elected as coordinator.
@@ -660,8 +680,8 @@
       processes. The one with the highest priority is elected as coordinator.
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Election in a ring}
+\end{frame}
+\begin{frame}{Election in a ring}
   \begin{block}{Election algorithm using a ring}
     \begin{center}
       \includefigure{05-21}
@@ -671,9 +691,9 @@
     \item The dashed one, the messages by \id{P_3}
     \end{itemize}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{Example: Leader election in ZooKeeper}
-\begin{slide}{Example: Leader election \red{in} ZooKeeper server group}
+\begin{frame}{Example: Leader election \red{in} ZooKeeper server group}
   \begin{block}{Basics}
     \begin{itemize}\firmlist
     \item Each server \id{s} in the server group has an identifier \blue{\func{id}(\id{s})}
@@ -695,8 +715,8 @@
       \end{itemize}
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Example: Leader election \red{in} ZooKeeper server group}
+\end{frame}
+\begin{frame}{Example: Leader election \red{in} ZooKeeper server group}
   \begin{block}{When \id{s^*} receives (\id{voteID},\id{voteTX})}
     \begin{itemize}%\firmlist
 
@@ -719,9 +739,9 @@
     When \id{s^*} believes it should be the leader, it broadcasts
     \mathexpr{\langle\func{id}(\id{s^*}),\func{tx}(\id{s^*})\rangle}. \blue{Essentially, we're bullying}.
   \end{alertblock}
-\end{slide}
+\end{frame}
 \subsection{Example: Leader election in Raft}
-\begin{slide}{Example: Leader election in Raft}
+\begin{frame}{Example: Leader election in Raft}
   \begin{block}{Basics}
     \begin{itemize}\firmlist
     \item We have a (relatively small) group of servers
@@ -731,8 +751,8 @@
     \item A leader is to regularly broadcast messages (perhaps just a simple \blue{heartbeat})
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Example: Leader election in Raft}
+\end{frame}
+\begin{frame}{Example: Leader election in Raft}
   \begin{block}{Selecting a new leader}
     When follower \id{s^*} hasn't received anything from the alleged leader \id{s} for some time, \id{s^*}
     broadcasts that it volunteers to be the next leader, increasing the term by 1. \id{s^*} enters the
@@ -747,15 +767,14 @@
     \end{itemize}
   \end{block}
 
-  \onslide
   \begin{alertblock}{Observation}
     By slightly differing the timeout values per follower for deciding when to start an election, we can avoid
     concurrent elections, and the election will rapidly converge.
   \end{alertblock}
 
-\end{slide}
+\end{frame}
 \subsection{Elections in large-scale systems}
-\begin{slide}{Elections by proof of work}
+\begin{frame}{Elections by proof of work}
   \begin{block}{Basics}
     \begin{itemize}\firmlist
     \item Consider a potentially large group of processes
@@ -777,8 +796,8 @@
       procedure
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Elections by proof of work}
+\end{frame}
+\begin{frame}{Elections by proof of work}
   \begin{block}{Controlled race}
     \begin{itemize}
     \item Assume a globally known secure hash function \mathexpr{H^*}. Let \mathexpr{H_i} be the hash function
@@ -792,12 +811,12 @@
       \end{itemize}
     \end{itemize}
   \end{block}
-  \onslide
+
   \begin{alertblock}{Observation}
     By controlling \mathexpr{K}, we control the difficulty of finding \mathexpr{\tilde{h}}. If \mathexpr{p}
     is the probability that a random guess for \mathexpr{\tilde{h}} will suffice: \mathexpr{p=(1/2)^{K}}.
   \end{alertblock}
-  \onslide
+  
   \begin{block}{Current practice}
     In many PoW-based blockchain systems, \mathexpr{K=64}
     \begin{itemize}%\firmlist
@@ -805,8 +824,8 @@
     \item With \mathexpr{K=64}, it takes about 100 years on a laptop to find \mathexpr{\tilde{h}}
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Elections by proof of stake}
+\end{frame}
+\begin{frame}{Elections by proof of stake}
   \begin{block}{Basics}
     We assume a blockchain system in which \mathexpr{N} \red{secure tokens} are used:
     \begin{itemize}
@@ -825,9 +844,9 @@
   \begin{alertblock}{Observation}
     The more tokens a process owns, the higher the probability it will be selected as leader.
   \end{alertblock}
-\end{slide}
+\end{frame}
 \subsection{Elections in wireless environments}
-\begin{slide}{A solution for wireless networks}
+\begin{frame}{A solution for wireless networks}
   \begin{block}{A sample network}
     \begin{center}
       \begin{tabular}{cc}
@@ -839,8 +858,8 @@
   \begin{block}{Essence}
     Find the node with the highest capacity to select as the next leader.
   \end{block}
-\end{slide}
-\begin{slide}{A solution for wireless networks}
+\end{frame}
+\begin{frame}{A solution for wireless networks}
   \begin{block}{A sample network}
     \begin{center}
       \begin{tabular}{cc}
@@ -849,8 +868,8 @@
       \end{tabular}
     \end{center}
   \end{block}
-\end{slide}
-\begin{slide}{A solution for wireless networks}
+\end{frame}
+\begin{frame}{A solution for wireless networks}
   \begin{block}{A sample network}
     \begin{center}
       \begin{tabular}{cc}
@@ -862,30 +881,28 @@
   \begin{block}{Essence}
     A node reports back only the node that it found to have the highest capacity.
   \end{block}
-\end{slide}
+\end{frame}
 \section{Gossip-based coordination}
 \subsection{Aggregation}
-% \begin{slide}{Gossip-based coordination}
-%   \begin{enumerate}[tightlist]
-%     \item Nodes randomly select a few other nodes (peers) periodically and 
-%     exchange state information (e.g., membership, failure detection, key-value updates, 
-%     or metadata). 
-%     \item Information spreads exponentially fast, similar to how gossip or a 
-%     virus spreads in a population, achieving eventual consistency with very high probability 
-%     in logarithmic rounds.
-%     \item Advantages: Extremely robust to network partitions, node failures, 
-%     and churn; no single point of failure; low coordination overhead; scales to thousands or tens of thousands of nodes with minimal latency impact; self-healing membership and failure detection (e.g., SWIM, HyParView, or Lifeguard protocols).
-%     \item Trade-offs \& Common Uses: Provides only probabilistic guarantees 
-%     (not strict consistency); latency of propagation is O(log N); 
-%     widely used for failure detection (accrual detectors), 
-%     cluster membership, anti-entropy repairs, rumor mongering for 
-%     CRDT updates, and lightweight broadcast instead of heavy 
-%     consensus protocols like Paxos or Raft when strong consistency 
-%     isnt required.
-%   \end{enumerate}
-% \end{slide}
+\begin{slide}{Gossip-based coordination}
+  \begin{itemize}[tightlist]
+    \item Nodes randomly select a few other nodes (peers) periodically and 
+    exchange state information (e.g., membership, failure detection, key-value updates, 
+    or metadata). 
+    \item Information spreads exponentially fast, similar to how gossip or a 
+    virus spreads in a population, achieving eventual consistency with very high probability 
+    in logarithmic rounds.
+    \item Advantages: Extremely robust to network partitions, node failures, 
+    and churn; no single point of failure; low coordination overhead; scales to thousands or tens of thousands of nodes with minimal latency impact; self-healing membership and failure detection (e.g., SWIM, HyParView, or Lifeguard protocols).
+    \item Trade-offs \& Common Uses: Provides only probabilistic guarantees 
+    (not strict consistency); latency of propagation is O(log N); 
+    widely used for failure detection (accrual detectors), 
+    \item Lightweight broadcast instead of heavy consensus protocols 
+    like Paxos or Raft when strong consistency isnt required.
+  \end{itemize}
+\end{slide}
 
-\begin{slide}{Gossip-based coordination: aggregation}
+\begin{frame}{Gossip-based coordination: aggregation}
   \begin{block}{Typical apps}
     \begin{itemize}
     \item \red{Data dissemination}: Perhaps the most important one. Note that there are many variants of
@@ -896,9 +913,9 @@
     \item What happens in the case that initially \mathexpr{{v_i} = 1} and \mathexpr{{v_j} = 0, j \neq i}?
     \end{itemize}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{A peer-sampling service}
-\begin{slide}{Gossip-based coordination: peer sampling}
+\begin{frame}{Gossip-based coordination: peer sampling}
   \begin{block}{Problem}
     For many gossip-based applications, you need to \blue{select a peer uniformly at random} from the entire
     network. In principle, this means you need to know all other peers. \red{Impossible}?
@@ -916,9 +933,9 @@
     Statistically, it turns out that the selection of a peer from the local list is indistinguishable from
     selecting uniformly at random peer from the entire network
   \end{alertblock}
-\end{slide}
+\end{frame}
 \subsection{Gossip-based overlay construction}
-\begin{slide}{Gossip-based overlay construction}
+\begin{frame}{Gossip-based overlay construction}
   \begin{block}{Essence}
     Maintain two local lists of neighbors. The lowest is used for providing a \blue{peer-sampling service};
     the highest list is used to carefully select \blue{application-dependent neighbors}.
@@ -926,8 +943,8 @@
   \begin{centerfig}
     \includefigure{05-26}
   \end{centerfig}
-\end{slide}
-\begin{slide}{Gossip-based overlay construction: a 2D torus}
+\end{frame}
+\begin{frame}{Gossip-based overlay construction: a 2D torus}
   Consider a logical \mathexpr{N \times N} grid, with a node on each point of the grid.
   \begin{itemize}
   \item Every node must maintain a list of \mathexpr{c} nearest neighbors
@@ -945,14 +962,14 @@
       start (\mathexpr{N=50})& after 5 rounds & after 20 rounds
     \end{tabular}
   \end{centerfig}
-\end{slide}
-  % \begin{slide}{A gossip-based 2D torus in Python (outline)}
+\end{frame}
+  % \begin{frame}{A gossip-based 2D torus in Python (outline)}
   %   \begin{centerfig}
   %     \includelisting{05-28/outline}
   %   \end{centerfig}
-  % \end{slide}
+  % \end{frame}
 \subsection{Secure gossiping}
-\begin{slide}{Secure gossiping}
+\begin{frame}{Secure gossiping}
   \begin{alertblock}{Dramatic attack}
     Consider when exchanging references, a set of \blue{colluding nodes} systematically returns links only to
     each other \mathexpr{\Rightarrow} we are dealing with \red{hub attack}.
@@ -965,8 +982,8 @@
     the number of nodes with links \blue{only} to the attackers. After less than 300 rounds, the attackers
     have full control.
   \end{block}
-\end{slide}
-\begin{slide}{A solution: gathering statistics}
+\end{frame}
+\begin{frame}{A solution: gathering statistics}
   This is what measuring indegree distributions tells us: which fraction of nodes (y-axis) have how many other
   nodes pointing to them (x-axis)?
   \begin{centerfig}
@@ -986,14 +1003,14 @@
     updating its local list. An attacker is in limbo: will its response be used for statistical purposes or
     for functional purposes?
   \end{block}
-  \onslide
+  
   \begin{alertblock}{Observation}
     When gathering statistics may reveal colluders, a colluding node will be \red{forced} to behave according
     to the protocol.
   \end{alertblock}
-\end{slide}
+\end{frame}
 \section{Distributed event matching}
-\begin{slide}{Distributed event matching}
+\begin{frame}{Distributed event matching}
   \begin{centerfig}
     \includefigure{02-12}
   \end{centerfig}
@@ -1004,13 +1021,13 @@
       \id{N}.
     \end{itemize}
   \end{block}
-  \onslide
+  
   \begin{alertblock}{Hard part}
     Implementing the \blue{match} function in a scalable manner.
   \end{alertblock}
-\end{slide}
+\end{frame}
 \subsection{Centralized implementations}
-\begin{slide}{General approach}
+\begin{frame}{General approach}
   \begin{block}{What is needed}
     \begin{itemize}\firmlist
     \item \red{\mathexpr{\func{sub2node}(\id{S})}}: map a subscription \id{S} to a nonempty subset \set{S} of servers
@@ -1033,8 +1050,8 @@
       \end{itemize}
     \end{itemize}
   \end{alertblock}
-\end{slide}
-\begin{slide}{Selective routing}
+\end{frame}
+\begin{frame}{Selective routing}
   \begin{centerfig}
     \begin{tabular}{cc}
       \includefigure{05-32a} &
@@ -1046,7 +1063,7 @@
   \item[(a)]~first broadcast subscriptions
   \item[(b)]~forward notifications only to relevant rendezvous nodes
   \end{itemize}
-  \onslide
+  
   \begin{block}{Example of a (partially filled) routing table}
     \begin{centerfig}
       \sffamily\footnotesize
@@ -1059,8 +1076,8 @@
       \end{tabular}
     \end{centerfig}
   \end{block}
-\end{slide}
-\begin{slide}{Gossiping: Sub-2-Sub}
+\end{frame}
+\begin{frame}{Gossiping: Sub-2-Sub}
   \begin{block}{Basics}
     \begin{itemize}\tightlist
     \item \red{Goal}: To realize scalability, make sure that subscribers with the same interests form just a
@@ -1078,7 +1095,7 @@
     \item We are interested only in notifications that fall into \mathexpr{\set{\overline{S}} = \cup \set{S_i}}.
     \end{itemize}
   \end{block}
-  \onslide
+  
   \begin{alertblock}{Goal}
     Partition \set{\overline{S}} into \mathexpr{M} disjoint subspaces
     \mathexpr{\set{\overline{S}_1},\ldots,\set{\overline{S}_M}} such that
@@ -1089,8 +1106,8 @@
       (\set{\overline{S}_m} \subseteq \set{S_i}) \)
     \end{itemize}
   \end{alertblock}
-\end{slide}
-\begin{slide}{Gossiping: Sub-2-Sub}
+\end{frame}
+\begin{frame}{Gossiping: Sub-2-Sub}
   \begin{centerfig}
     \includefigure{05-34}
   \end{centerfig}
@@ -1108,9 +1125,9 @@
     \end{itemize}
   \end{block}
   
-\end{slide}
+\end{frame}
 \subsection{Secure publish-subscribe solutions}
-\begin{slide}{Secure publish-subscribe}
+\begin{frame}{Secure publish-subscribe}
   \begin{alertblock}{We are facing nasty dilemma's}
     \begin{itemize}
     \item \red{Referential decoupling}: messages should be able to flow from a publisher to subscribers while
@@ -1120,7 +1137,7 @@
       sensitive information \mathexpr{\Rightarrow} we now have a \red{routing problem}.
     \end{itemize}
   \end{alertblock}
-  \onslide
+  
   \begin{block}{Solution}
     \begin{itemize}
     \item Allow for searching (and matching) on encrypted data, without the need for decryption.
@@ -1128,8 +1145,8 @@
       search for matches on keywords.
     \end{itemize}
   \end{block}
-\end{slide}
-% \begin{slide}{Public-Key Encryption with Keyword Search (PEKS)}
+\end{frame}
+% \begin{frame}{Public-Key Encryption with Keyword Search (PEKS)}
 %   \begin{block}{Basics}
 %     \begin{itemize}
 %     \item Use a public key \id{PK}, message \id{m} and its \mathexpr{n} keywords
@@ -1147,17 +1164,17 @@
 %     \includefigure{05-35} \\
 %     {\footnotesize \mathexpr{\id{KW_i^*} = \func{PEKS}(\id{PK}, \id{KW_i})}}
 %   \end{centerfig}
-% \end{slide}
+% \end{frame}
 % \section{Location systems}
-% \begin{slide}{Positioning nodes}
+% \begin{frame}{Positioning nodes}
 %   \begin{block}{Issue}
 %     In large-scale distributed systems in which nodes are dispersed across a wide-area network, we often need
 %     to take some notion of \blue{proximity} or \blue{distance} into account \mathexpr{\Rightarrow} it starts
 %     with determining a (relative) \red{location} of a node.
 %   \end{block}
-% \end{slide}
+% \end{frame}
 % \subsection{GPS: Global Positioning System}
-% \begin{slide}{Computing position}
+% \begin{frame}{Computing position}
 %   \begin{block}{Observation} 
 %     A node \id{P} needs \mathexpr{d+1} \blue{landmarks} to compute its own position in a
 %     \mathexpr{d}-dimensional space. Consider two-dimensional case.
@@ -1177,8 +1194,8 @@
 %       \end{block}
 %     \end{column}
 %   \end{columns}
-% \end{slide}
-% \begin{slide}{Global Positioning System}
+% \end{frame}
+% \begin{frame}{Global Positioning System}
 %   \begin{block}{Assuming that the clocks of the satellites are accurate and synchronized}
 %     \begin{itemize}\tightlist
 %     \item It takes a while before a signal reaches the receiver
@@ -1199,9 +1216,9 @@
 %   \begin{block}{Observation}
 %     4 satellites \mathexpr{\Rightarrow} 4 equations in 4 unknowns (with \mathexpr{\red{\Delta_r}} as one of them)
 %   \end{block}
-% \end{slide}
+% \end{frame}
 % \subsection{When GPS is not an option}
-% \begin{slide}{WiFi-based location services}
+% \begin{frame}{WiFi-based location services}
 %   \begin{block}{Basic idea}
 %     \begin{itemize}\tightlist
 %     \item Assume we have a database of known access points (APs) with coordinates
@@ -1225,9 +1242,9 @@
 %     \item Number of sampled detection points \mathexpr{N} may be too low.
 %     \end{itemize}
 %   \end{alertblock}
-% \end{slide}
+% \end{frame}
 % \subsection{Logical positioning of nodes}
-% \begin{slide}{Computing position}
+% \begin{frame}{Computing position}
 %   \begin{columns}[T]
 %     \begin{column}{0.45\textwidth}
 %       \begin{block}{Problems}
@@ -1258,8 +1275,8 @@
 %       positioned.
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Computing position}
+% \end{frame}
+% \begin{frame}{Computing position}
 %   \begin{block}{Choosing the dimension \mathexpr{m}}
 %     The hidden parameter is the dimension \mathexpr{m} with \mathexpr{N > m}. A node \id{P} measures its
 %     distance to each of the \mathexpr{N} landmarks and computes its coordinates by minimizing
@@ -1272,8 +1289,8 @@
 %     Practice shows that \mathexpr{m} can be as small as 6 or 7 to achieve latency estimations within a factor
 %     2 of the actual value.
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Vivaldi}
+% \end{frame}
+% \begin{frame}{Vivaldi}
 %   \begin{block}{Principle: network of springs exerting forces}
 %     Consider a collection of \mathexpr{N} nodes \mathexpr{\id{P_1}, \ldots, \id{P_N}}, each \id{P_i} having
 %     coordinates \mathexpr{\vec{x_i}}. Two nodes exert a \red{mutual force}:
@@ -1295,9 +1312,9 @@
 %       \cdot \vec{u}}.
 %     \end{enumerate}
 %   \end{block}
-% \end{slide}
+% \end{frame}
 \section{Summary}
-\begin{slide}{Summary}
+\begin{frame}{Summary}
 The topics discussed in the \emph{coordination} section 
 of the lecture notes include
 \begin{enumerate}
@@ -1306,4 +1323,4 @@ of the lecture notes include
   \item Gossip-based Coordination
   \item Distributed Event Matching
 \end{enumerate}
-\end{slide}
+\end{frame}
