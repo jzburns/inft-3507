@@ -16,8 +16,6 @@ Because Google Pub/Sub does **not** natively support filtering on message bodies
 
 The publisher simply emits messages; the subscribers implement the content-based behavior.
 
-
-
 ## GCP Project
 1. You may only use GCP pub-sub for this project
 1. By now you should all be added to ``inft-3507``,
@@ -25,10 +23,7 @@ therefore, I prefer you all work in this project
 1. If you already have your own GCP account and project
 configured correctly, you may use this if you wish
 
-
-
 ## What You Will Build
-
 
 ### 1. Publisher
 You will write a publisher that:
@@ -42,8 +37,6 @@ it should start back at the top.
 - The publisher should sleep for 2 seconds before publishing to the next topic.
 
 The publisher does **not** filter or classify messages — it just publishes them.
-
-
 
 ### 2. Subscribers (Content-Based Filtering)
 You will create **four subscribers**, each configured with its own set of **regex rules**.
@@ -59,8 +52,6 @@ Each subscriber should:
 
 This work simulates **content-based subscriptions** layered on top of Pub/Sub’s topic-based delivery model.
 
-
-
 ## Dynamic Rule Loading
 To demonstrate dynamic configuration in distributed systems:
 
@@ -71,7 +62,6 @@ This lets you test adjustments to filtering behavior at runtime.
 
 
 ## Input Files
-
 
 ### 1. Log File
 Please use ``logs.csv`` - you do **not** need to create your own log files.
@@ -113,6 +103,9 @@ sure you give them a unique topic name
 
 
 ## Deliverables
+These deliverables **must** be placed into the 
+github classrooms private repo. No other approach
+will be accepted.
 
 ### 1. Source Code
 
@@ -152,3 +145,8 @@ Create your topic names from the GCP commandline or in
 your Publisher code, rather than at the console
 (**+ 5 points**)
 
+## Warning
+1. **_If any part of your submission contains suspicious content, you will receive a grade of 0._**. 
+1. For your information, I define suspicious as also including similarity with the work of others as 
+well as including AI or other assisted elements.
+1. **_You have been warned._**. 
