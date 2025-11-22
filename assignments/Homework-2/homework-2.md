@@ -1,6 +1,7 @@
-# INFT-3507 Homework 2 Assignment
-# Cut-off date: December 22nd at 8PM
-# Content-Based Subscriptions Using Google Cloud Pub/Sub (Regex Filtering)
+# INFT-3507 Principles of Distributed Systems
+### Homework 2 Assignment
+### Cut-off date: December 22nd at 8PM
+## Content-Based Subscriptions Using Google Cloud Pub/Sub (Regex Filtering)
 
 ## Overview
 In this assignment, you will implement a distributed messaging system using **Google Cloud Pub/Sub**. The goal is to demonstrate **content-based subscription**, where subscribers decide whether to process a message based on the *content of the message body*.
