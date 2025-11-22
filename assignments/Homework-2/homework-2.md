@@ -3,6 +3,7 @@
 ### Cut-off date: December 22nd at 8PM
 ## Content-Based Subscriptions Using Google Cloud Pub/Sub (Regex Filtering)
 
+
 ## Overview
 In this assignment, you will implement a distributed messaging system using **Google Cloud Pub/Sub**. The goal is to demonstrate **content-based subscription**, where subscribers decide whether to process a message based on the *content of the message body*.
 
@@ -15,16 +16,19 @@ Because Google Pub/Sub does **not** natively support filtering on message bodies
 
 The publisher simply emits messages; the subscribers implement the content-based behavior.
 
----
+
+
 ## GCP Project
----
 1. You may only use GCP pub-sub for this project
 1. By now you should all be added to ``inft-3507``,
 therefore, I prefer you all work in this project
 1. If you already have your own GCP account and project
 configured correctly, you may use this if you wish
----
+
+
+
 ## What You Will Build
+
 
 ### 1. Publisher
 You will write a publisher that:
@@ -39,7 +43,7 @@ it should start back at the top.
 
 The publisher does **not** filter or classify messages — it just publishes them.
 
----
+
 
 ### 2. Subscribers (Content-Based Filtering)
 You will create **four subscribers**, each configured with its own set of **regex rules**.
@@ -55,7 +59,7 @@ Each subscriber should:
 
 This work simulates **content-based subscriptions** layered on top of Pub/Sub’s topic-based delivery model.
 
----
+
 
 ## Dynamic Rule Loading
 To demonstrate dynamic configuration in distributed systems:
@@ -65,9 +69,9 @@ To demonstrate dynamic configuration in distributed systems:
 
 This lets you test adjustments to filtering behavior at runtime.
 
----
 
 ## Input Files
+
 
 ### 1. Log File
 Please use ``logs.csv`` - you do **not** need to create your own log files.
@@ -89,39 +93,43 @@ and filters for text that contains ``"User user[0-9]{3} reset MFA"``
 1. subscriber #2 also subscribes to the ``WARN`` topic
 and filters for ``".*brute-force.*"``
 
----
 
 ## What You Will Demonstrate
+
 - Topic-based distribution using Pub/Sub  
 - **True content-based subscription** implemented at the subscriber level  
 - Configuration-driven subscriber behavior  
 - Dynamic reloading of rules  
 - Semantic filtering based on message meaning  
 
----
----
+
 ## A note on Topic Creation and Topic Naming
+
 1. Because we will have many students attempting this 
 assignment, they cannot all use the topic name ``DEBUG, WARN`` etc.
 1. When you create your topic (which you can do in the console, or at the command line (see Bonus)), make
 sure you give them a unique topic name
 1. For example, for gmail_id ``jb72997@gmail.com`` you can create a topic called ``WARN-jb72997``, ``DEBUG-jb72997`` etc.
----
+
 
 ## Deliverables
 
 ### 1. Source Code
+
 - Publisher program  
 - Four subscriber programs  
 - Rule-loading logic  
 
+
 ### 2. Sample Output
+
 Include:
 
 - Subscriber output showing matches  
 - Evidence that rule changes take effect dynamically  
 
 ### 3. Youtube hosted (delisted) video  (min 10 mins)
+
 Explain:
 - What content-based subscription means  
 - Why Pub/Sub does not support it natively  
@@ -129,19 +137,20 @@ Explain:
 - How dynamic rule loading works
 
 **This video must demonstrate understanding of the code you present**
----
+
 
 ## Grading (100 pts)
 
 | Category | Points |
-|---------|--------|
+||--|
 | Publisher implementation including file read and sleep | 25 |
 | Subscriber filtering logic using Regex | 25 |
 | Subscriber Dynamic rule reloading | 25 |
 | Quality and accuracy of the video discussion | 25 |
----
+
 
 ## Bonus
 Create your topic names from the GCP commandline or in
 your Publisher code, rather than at the console
 (**+ 5 points**)
+
