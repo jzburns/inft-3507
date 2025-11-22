@@ -147,7 +147,7 @@ Explain:
 | Subscriber filtering logic using Regex | 25 |
 | Subscriber Dynamic rule reloading | 25 |
 | Quality and accuracy of the video discussion | 25 |
-
+||--|
 
 ## Bonus
 Create your topic names from the GCP commandline or in
