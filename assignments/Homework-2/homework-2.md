@@ -164,6 +164,6 @@ Should you wish to attempt the bonus question, you must show evidence of this wo
 
 ## Warning
 1. **_If any part of your submission contains suspicious content, you will receive a grade of 0._**. 
-1. For your information, I define suspicious as also including similarity with the work of others as 
-well as including AI or other assisted elements.
+1. **_For your information, I define suspicious as also including similarity with the work of others as 
+well as including AI or other assisted elements_**.
 1. **_You have been warned._**. 
