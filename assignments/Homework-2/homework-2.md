@@ -158,7 +158,7 @@ will cause all your topics and subscriptions to be deleted by the script/code.
 **Use whichever programming language/script you want**
 
 Should you wish to attempt the bonus question, you must show evidence of this working in your 
-``README.md`` and commit the code to your github repo.
+``README.md``, discuss it in the video, and commit the code to your github repo.
 
 (**+ up to 3% extra, giving a maximum of 13%**)
 
