@@ -1,6 +1,5 @@
-# INFT-3507 Principles of Distributed Systems
+# INFT-3507 / INFT-6000 Principles of Distributed Systems
 ### Homework 2 Assignment
-### Cut-off date: December 22nd at 8PM
 ## Content-Based Subscriptions Using Google Cloud Pub/Sub (Regex Filtering)
 
 
