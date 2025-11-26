@@ -140,23 +140,27 @@ Explain:
 | Quality and accuracy of the video discussion | 25 |
 
 ## Bonus
-Write a script to automate the creation and deletion of the topics for your code. For example:
+Write a script/program to automate the creation and deletion of the topics for your code. 
+For example:
+
 ```
 ./script.sh setup
 ```
-will cause your topics and subscriptions to be created from the script/code.
+will cause your topics and subscriptions to be created by the script/code.
 
 and of course, the ``teardown``
 
 ```
 ./script.sh teardown
 ```
-will cause all your topics and subscriptions to be deleted automatically. 
+will cause all your topics and subscriptions to be deleted automatically.
+
+**Use whichever programming language/script you want**
 
 Should you wish to attempt the bonus question, you must show evidence of this working in your 
 ``README.md`` and commit the code to your github repo.
 
-(**+ 3% extra, giving a maximum of 13%**)
+(**+ up to 3% extra, giving a maximum of 13%**)
 
 ## Warning
 1. **_If any part of your submission contains suspicious content, you will receive a grade of 0._**. 
