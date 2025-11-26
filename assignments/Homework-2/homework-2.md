@@ -140,9 +140,23 @@ Explain:
 | Quality and accuracy of the video discussion | 25 |
 
 ## Bonus
-Create your topic names from the GCP commandline or in
-your Publisher code, rather than at the console
-(**+ 5 points**)
+Write a script to automate the creation and deletion of the topics for your code. For example:
+```
+./script.sh setup
+```
+will cause your topics and subscriptions to be created from the script/code.
+
+and of course, the ``teardown``
+
+```
+./script.sh teardown
+```
+will cause all your topics and subscriptions to be deleted automatically. 
+
+Should you wish to attempt the bonus question, you must show evidence of this working in your 
+``README.md`` and commit the code to your github repo.
+
+(**+ 3% extra, giving a maximum of 13%**)
 
 ## Warning
 1. **_If any part of your submission contains suspicious content, you will receive a grade of 0._**. 
