@@ -17,7 +17,7 @@ The publisher simply emits messages; the subscribers implement the content-based
 
 ## GCP Project
 1. You may only use GCP pub-sub for this project
-1. By now you should all be added to ``inft-3507``,
+1. By now you should all be added to ``inft-3507`` or very soon, added to ``inft-6000``,
 therefore, I prefer you all work in this project
 1. If you already have your own GCP account and project
 configured correctly, you may use this if you wish
