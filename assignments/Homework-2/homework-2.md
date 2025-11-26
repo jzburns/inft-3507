@@ -153,7 +153,7 @@ and of course, the ``teardown``
 ```
 ./script.sh teardown
 ```
-will cause all your topics and subscriptions to be deleted automatically.
+will cause all your topics and subscriptions to be deleted by the script/code.
 
 **Use whichever programming language/script you want**
 
