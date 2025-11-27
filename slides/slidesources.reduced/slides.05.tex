@@ -885,7 +885,7 @@
 \section{Gossip-based coordination}
 \subsection{Aggregation}
 \begin{slide}{Gossip-based coordination}
-  \begin{itemize}[tightlist]
+  \begin{itemize}
     \item Nodes randomly select a few other nodes (peers) periodically and 
     exchange state information (e.g., membership, failure detection, key-value updates, 
     or metadata). 
@@ -995,8 +995,7 @@
 %      \includefigure[\idscale]{05-30d} &
       \includefigure[\idscale]{05-30e} 
 %      \includefigure[\idscale]{05-30f} 
-    \end{tabular
-     }
+    \end{tabular}
   \end{centerfig}
   \begin{block}{Basic approach}
     When a benign node initiates an exchange, it may either use the result for gathering statistics, or for
@@ -1009,6 +1008,7 @@
     to the protocol.
   \end{alertblock}
 \end{frame}
+
 \section{Distributed event matching}
 \begin{frame}{Distributed event matching}
   \begin{centerfig}
@@ -1124,8 +1124,8 @@
       \end{itemize}
     \end{itemize}
   \end{block}
-  
 \end{frame}
+
 \subsection{Secure publish-subscribe solutions}
 \begin{frame}{Secure publish-subscribe}
   \begin{alertblock}{We are facing nasty dilemma's}
@@ -1137,15 +1137,34 @@
       sensitive information \mathexpr{\Rightarrow} we now have a \red{routing problem}.
     \end{itemize}
   \end{alertblock}
-  
+  \end{frame}
+
+  \begin{frame}{Encrypted Everything?}
+    Why "just encrypt everything" doesn't work
+    If you encrypt messages (using asymmetric key encryption):
+    \begin{itemize}
+      \item Broker can't read them
+      \item But the broker also can't route them,
+      because:
+      \item It doesn't know which subscription matches
+      which message
+      \item So the broker either:
+      \item Sees everything (bad for security), or
+      \item Sees nothing (bad for routing)
+    \end{itemize}
+    This is the core dilemma.
+  \end{frame}
+
+  \begin{frame}{Use Encrypted Search}
   \begin{block}{Solution}
     \begin{itemize}
     \item Allow for searching (and matching) on encrypted data, without the need for decryption.
-    \item \blue{PEKS}: accompany encryptyed messages with a collection of (again encrypted) keywords and
-      search for matches on keywords.
+    \item \textbf{PEKS}: accompany encryptyed messages with a collection of
+    (again encrypted) keywords and search for matches on keywords.
     \end{itemize}
   \end{block}
 \end{frame}
+
 % \begin{frame}{Public-Key Encryption with Keyword Search (PEKS)}
 %   \begin{block}{Basics}
 %     \begin{itemize}
