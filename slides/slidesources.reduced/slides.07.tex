@@ -2,21 +2,22 @@
 \section{Introduction}
 \subsection{Reasons for replication}
 \begin{slide}{Replication}
+    Assume a simple model in which we make a copy of a 
+    specific part of a system (meaning code and data).
   \begin{block}{Why replicate}
-    Assume a simple model in which we make a copy of a specific part of a system (meaning code and data).
-    \begin{itemize}
+    \begin{itemize}\tightlist
     \item \red{Increase reliability}: if one copy does not live up to specifications, switch over to the other
       copy while repairing the failing one.
     \item \red{Performance}: simply spread requests between different replicated parts to keep load balanced,
       or to ensure quick responses by taking proximity into account.
     \end{itemize}
-    \begin{alertblock}{The problem}
-      Having multiple copies, means that when any copy changes, that change should be made at all copies:
-      \blue{replicas need to be kept the same}, that is, be kept \red{consistent}.
-    \end{alertblock}
-  \end{block}
-  
+  \end{block}  
+  \begin{alertblock}{The problem}
+    Having multiple copies, means that when any copy changes, that change should be made at all copies:
+    \blue{replicas need to be kept the same}, that is, be kept \red{consistent}.
+  \end{alertblock}
 \end{slide}
+
 \begin{slide}{Performance and scalability}
   \begin{block}{Main issue} 
     To keep replicas consistent, we generally need to ensure that all \blue{conflicting} operations are done
