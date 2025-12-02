@@ -1137,6 +1137,27 @@
       sensitive information \mathexpr{\Rightarrow} we now have a \red{routing problem}.
     \end{itemize}
   \end{alertblock}
+  This is a real concern when the broker / message bus is untrusted or 
+  semi-trusted (e.g., cloud provider, third-party MQTT broker, 
+  Kafka cluster you don’t fully control)
+  \end{frame}
+
+  \begin{frame}{Secure publish-subscribe}
+    Some real world examples:
+    \begin{itemize}\tightlist
+      \item Financial market data feeds: Bloomberg, Refinitiv, or cloud feeds cannot let the 
+      provider see which banks are interested in ``Argentina default"
+      \item Privacy-preserving: ride-sharing / location pub-subDrivers publish encrypted location blocks; 
+      riders only want their 1 km grid square
+      \item Military / classified pub-sub: Topics themselves are 
+      classified (\textbf{DRONE-STRIKE-X17})
+    \end{itemize}
+  \textbf{We must use secure pub/sub whenever}:
+    \begin{itemize}\tightlist
+      \item The broker is not fully trusted with message confidentiality, and
+      \item Subscriptions are fine-grained (keywords, topics, attributes), and
+      \item Publishers and subscribers are not in the same closed trust domain (open or Internet-facing system).  
+    \end{itemize}
   \end{frame}
 
   \begin{frame}{Encrypted Everything?}
@@ -1155,14 +1176,37 @@
     This is the core dilemma.
   \end{frame}
 
-  \begin{frame}{Use Encrypted Search}
+  \begin{frame}[fragile]{Use Encrypted Search}
   \begin{block}{Solution}
-    \begin{itemize}
+    \begin{itemize}\tightlist
     \item Allow for searching (and matching) on encrypted data, without the need for decryption.
     \item \textbf{PEKS}: accompany encryptyed messages with a collection of
     (again encrypted) keywords and search for matches on keywords.
     \end{itemize}
   \end{block}
+  \begin{verbatim}
+  Subscriber:
+    1. has private key sk
+    2. decides he wants all documents containing “confidential”
+    3. computes T = Trapdoor(sk, "confidential")
+    4. sends T (in the clear, over TLS) to the server/cloud
+  \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{PEKS}
+  \begin{block}{Broker (Router/Server) tasks:}  
+  \begin{verbatim}
+  for each stored ciphertext C_i:
+    if Test(public_key, C_i, trapdoor_bytes) == True:
+        return this document to the Subscriber
+  \end{verbatim}
+\end{block}
+    \begin{itemize}\tightlist
+      \item No encryption of the trapdoor is required,
+      \item No shared secret between the Subscriber and the server is needed beyond 
+      normal transport-layer security (TLS).
+      \item In this way, \textbf{PEKS} trapdoors are passed in all real systems.
+    \end{itemize}  
 \end{frame}
 
 % \begin{frame}{Public-Key Encryption with Keyword Search (PEKS)}
@@ -1341,5 +1385,7 @@ of the lecture notes include
   \item Election Algorithms
   \item Gossip-based Coordination
   \item Distributed Event Matching
+  \item Gossip-based Pub-Sub
+  \item Secure Gossip-based Pub-Sub
 \end{enumerate}
 \end{frame}
