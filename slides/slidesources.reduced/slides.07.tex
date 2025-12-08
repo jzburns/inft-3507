@@ -145,12 +145,14 @@
   \end{block}
   \vspace*{-6pt}
   \begin{centerfig}
-    \includefigure[1]{07-09a} \\
+    \includefigure[0.85]{07-09a} \\
     A violation of a causally-consistent store \\
     \vspace*{12pt}
-    \includefigure[1]{07-09b} \\
-    A correct sequence of events in a causally-consistent store
+    \includefigure[0.85]{07-09b} \\
   \end{centerfig}
+  The second example is \textbf{Causally Consistent}, but not 
+  \textbf{Sequentially Consistent} because it cannot be explained 
+  by any one total ordering of operations.
 \end{slide}
   \begin{slide}{Consistency models, serializability, transactions}
     \begin{block}{Overwhelming, but often already known}
@@ -185,9 +187,9 @@
 \begin{slide}{Grouping operations}
   \begin{block}{Entry consistency: Definition}
     \begin{itemize}
-    \item Accesses to \red{locks} are sequentially consistent.
-    \item No access to a lock is allowed to be performed until all previous writes have completed everywhere.
-    \item No data access is allowed to be performed until all previous accesses to locks have been performed.
+      \item Lock operations follow a sequentially consistent order.
+      \item When a lock is acquired, all work done before the previous release is considered to have happened first.
+      \item Work done after acquiring the lock will see the results of that earlier work.
     \end{itemize}
   \end{block}
   \onslide
