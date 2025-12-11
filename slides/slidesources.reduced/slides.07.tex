@@ -273,6 +273,32 @@
     \end{itemize}
   \end{block}
 \end{slide}
+
+\begin{frame}{Granualarit Granularity of Conits Trade-offs}
+We need to pay attention to the \textbf{granularity} of our Conits:
+The trade-off is fine-grained vs. coarse-grained conits
+\begin{itemize}\tightlist
+  \item Coarse-grained conit = large data set (e.g., entire database)
+  \item Updates are aggregated over all data inside the same conit
+  \item Consequence: replicas enter inconsistent state earlier
+  \item Example: if max deviation = 1 update and conit = whole DB $\to$ one local update forces immediate propagation
+  \item Fine-grained conits (per data item) keep replicas ``up-to-date'' longer
+  \item Worst case: unrelated data items falsely share the same conit $\to$ unnecessary synchronization and staleness
+\end{itemize}
+\end{frame}
+
+\begin{slide}{Summary}
+We can arrange the consistency models from strongest to weakest:
+\begin{enumerate}\tightlist
+  \item \textbf{Linearizability}: Single atomic global timeline. Every operation appears to take effect instantly at one point in real time. All clients see the same order respecting real-time.
+  \item \textbf{Serializability}: Transactions appear as if executed in some sequential order, but that order can differ from real-time wall-clock order
+  \item \textbf{Sequential Consistency}: One global total order of all operations that respects each process's own program order, but not necessarily real-time
+  \item \textbf{Causal Consistency}: All causally related operations (happens-before via reads/writes or messages) are seen in the same order by everyone
+  \item \textbf{Entry Consistency}: Consistency guaranteed only for data protected by a lock
+  \item \textbf{Eventual Consistency}: If no new writes, all replicas eventually converge. No ordering or timeliness guarantees
+\end{enumerate}
+\end{slide}
+
 \section{Client-centric consistency models}
 \begin{slide}{Consistency for mobile users}
   \begin{exampleblock}{Example}
