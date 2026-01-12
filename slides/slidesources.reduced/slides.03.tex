@@ -2,40 +2,40 @@
 \section{Processes and Threads}
 \subsection{Introduction to Processes and Threads}
 \begin{frame}{Introduction to Processes and Threads}
-    \begin{itemize}
+  \begin{itemize}
     \item \textbf{Definition}: A process is an independent program in execution with its own memory space, while a thread is a lightweight unit of execution within a process, sharing the process's memory.
     \item \textbf{Memory}: A process has its own isolated memory space (address space), whereas threads within the same process share the same memory space, including code, data, and resources.
     \item \textbf{Overhead}: Processes are heavier, requiring more system resources and time for creation and context switching, while threads are lighter, with lower overhead for creation and switching.
-    \item \textbf{Communication}: Inter-process communication (IPC) is complex and slower (e.g., pipes, sockets), while threads communicate faster via shared memory but require synchronization (e.g., locks).      
+    \item \textbf{Communication}: Inter-process communication (IPC) is complex and slower (e.g., pipes, sockets), while threads communicate faster via shared memory but require synchronization (e.g., locks).
   \end{itemize}
 \end{frame}
 \begin{frame}{Context switching}
   \begin{block}{Observations}
     \begin{enumerate}
-    \item Threads share the same address space. Thread context switching 
-    is much faster than process context switching:
-    \begin{enumerate}
-      \item only registers and program counter need to be saved and restored
-    \end{enumerate}
-    \item Process context switching is more expensive (in time and space) as     
-    \begin{enumerate}
-      \item TLB needs to be flushed 
-      \item page table is reloaded 
-      \item address space changes
-    \end{enumerate}
-    \item Creating and destroying threads is much cheaper than doing so for processes.
+      \item Threads share the same address space. Thread context switching
+            is much faster than process context switching:
+            \begin{enumerate}
+              \item only registers and program counter need to be saved and restored
+            \end{enumerate}
+      \item Process context switching is more expensive (in time and space) as
+            \begin{enumerate}
+              \item TLB needs to be flushed
+              \item page table is reloaded
+              \item address space changes
+            \end{enumerate}
+      \item Creating and destroying threads is much cheaper than doing so for processes.
     \end{enumerate}
   \end{block}
 \end{frame}
 \begin{frame}{Why use threads}
   \begin{block}{Some simple reasons}
     \begin{itemize}
-    \item \blue{Avoid needless blocking}: a single-threaded process will \red{block} when doing I/O; in a
-      multithreaded process, the operating system can switch the CPU to another thread in that process.
-    \item \blue{Exploit parallelism}: the threads in a multithreaded process can be scheduled to run in
-      parallel on a multiprocessor or multicore processor.
-    \item \blue{Avoid process switching}: structure large applications not as a collection of processes, but
-      through multiple threads.
+      \item \blue{Avoid needless blocking}: a single-threaded process will \red{block} when doing I/O; in a
+            multithreaded process, the operating system can switch the CPU to another thread in that process.
+      \item \blue{Exploit parallelism}: the threads in a multithreaded process can be scheduled to run in
+            parallel on a multiprocessor or multicore processor.
+      \item \blue{Avoid process switching}: structure large applications not as a collection of processes, but
+            through multiple threads.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -47,41 +47,41 @@
   \end{block}
   \begin{block}{Trade-offs}
     \begin{itemize}
-    \item Threads use the same address space: more prone to errors
-    \item No support from OS/HW to protect threads using each other's memory
-    \item Thread context switching may be faster than process context switching
+      \item Threads use the same address space: more prone to errors
+      \item No support from OS/HW to protect threads using each other's memory
+      \item Thread context switching may be faster than process context switching
     \end{itemize}
   \end{block}
 \end{frame}
-  \begin{frame}{The cost of a context switch}
-    \begin{block}{Consider a simple clock-interrupt handler}
-      \begin{itemize}
-        \item \red{direct costs}: actual switch and executing code of the handler
-        \item \red{indirect costs}: other costs, notably caused by messing up the cache
-      \end{itemize}
-    \end{block}
-    \begin{block}{What a context switch may cause: indirect costs}
-      \begin{columns}
-        \begin{column}{0.5\textwidth}
-          \begin{center}
-            \begin{tabular}{c@{\hspace{24pt}}c@{\hspace{24pt}}c}
-              \includefigure{03-02a} &
-              \includefigure{03-02b} &
-              \includefigure{03-02c} \\
-              {\hspace{0.6cm}}(a) & (b) & (c)
-            \end{tabular}
-          \end{center}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-          \begin{itemize}
+\begin{frame}{The cost of a context switch}
+  \begin{block}{Consider a simple clock-interrupt handler}
+    \begin{itemize}
+      \item \red{direct costs}: actual switch and executing code of the handler
+      \item \red{indirect costs}: other costs, notably caused by messing up the cache
+    \end{itemize}
+  \end{block}
+  \begin{block}{What a context switch may cause: indirect costs}
+    \begin{columns}
+      \begin{column}{0.5\textwidth}
+        \begin{center}
+          \begin{tabular}{c@{\hspace{24pt}}c@{\hspace{24pt}}c}
+            \includefigure{03-02a} &
+            \includefigure{03-02b} &
+            \includefigure{03-02c}             \\
+            {\hspace{0.6cm}}(a)    & (b) & (c)
+          \end{tabular}
+        \end{center}
+      \end{column}
+      \begin{column}{0.5\textwidth}
+        \begin{itemize}
           \item[(a)] before the context switch
           \item[(b)] after the context switch
           \item[(c)] after accessing block \idsn{D}.
-          \end{itemize}
-        \end{column}
-      \end{columns}
-    \end{block}
-  \end{frame}
+        \end{itemize}
+      \end{column}
+    \end{columns}
+  \end{block}
+\end{frame}
 % \begin{frame}{A simple example in Python}
 %   \begin{centerfig}
 %     \includelisting{03-03/mp} 
@@ -118,101 +118,148 @@
 %     \small\code{eve sees shared x being 74} 
 %   \end{tabular}
 % \end{frame}
+\begin{frame}{Thread Switch vs Process Context Switch}
+  \begin{columns}[t]
+
+    % Left column: Thread switch
+    \begin{column}{0.48\textwidth}
+      \textbf{Thread Switch}
+
+      \begin{itemize}
+        \item Switch between threads of the \textit{same process}
+        \item Address space remains unchanged
+        \item Page tables and memory mappings are reused
+        \item Faster than process switches
+        \item Typically used for concurrency within applications
+      \end{itemize}
+
+      \vspace{0.5em}
+      \textbf{Overhead:}
+      \begin{itemize}
+        \item Save/restore registers
+        \item Update stack pointer and program counter
+      \end{itemize}
+    \end{column}
+
+    % Right column: Process switch
+    \begin{column}{0.48\textwidth}
+      \textbf{Process Context Switch}
+
+      \begin{itemize}
+        \item Switch between threads of \textit{different processes}
+        \item Address space changes
+        \item Page tables must be switched
+        \item TLB often flushed or invalidated
+        \item Slower than thread switches
+      \end{itemize}
+
+      \vspace{0.5em}
+      \textbf{Overhead:}
+      \begin{itemize}
+        \item Save/restore registers
+        \item Switch address space
+        \item Update memory management state
+      \end{itemize}
+    \end{column}
+
+  \end{columns}
+\end{frame}
+
 \begin{frame}{Threads and operating systems}
-  \begin{alertblock}{Main issue} 
+  \begin{alertblock}{Main issue}
     Should an OS kernel provide threads, or should they be implemented as user-level packages?
   \end{alertblock}
   \begin{block}{User-space solution}
     \begin{itemize}
-    \item All operations can be completely handled \blue{within a single process} \mathexpr{\Rightarrow}
-      implementations can be extremely efficient.
-    \item \blue{All} services provided by the kernel are done \blue{on behalf of the process in which a thread
-      resides} \mathexpr{\Rightarrow} if the kernel decides to block a thread, the entire process will be
-      blocked.
-    \item Threads are used when there are many external events: \blue{threads block on a per-event basis}
-      \mathexpr{\Rightarrow} if the kernel can't distinguish threads, how can it support signaling events to
-      them?
+      \item All operations can be completely handled \blue{within a single process} \mathexpr{\Rightarrow}
+            implementations can be extremely efficient.
+      \item \blue{All} services provided by the kernel are done \blue{on behalf of the process in which a thread
+              resides} \mathexpr{\Rightarrow} if the kernel decides to block a thread, the entire process will be
+            blocked.
+      \item Threads are used when there are many external events: \blue{threads block on a per-event basis}
+            \mathexpr{\Rightarrow} if the kernel can't distinguish threads, how can it support signaling events to
+            them?
     \end{itemize}
   \end{block}
 \end{frame}
 \begin{frame}{Linux Kernel Threads}
-\begin{itemize}
-  \item \textbf{Task Struct Representation}: In the Linux kernel, threads are implemented as lightweight processes, each represented by a \texttt{task\_struct} (defined in \texttt{include/linux/sched.h}), sharing memory but maintaining separate execution contexts for scheduling.
-  \item \textbf{Scheduling with CFS}: The Completely Fair Scheduler (CFS) in \texttt{kernel/sched/fair.c} manages kernel threads, treating them as virtual processors and allocating CPU time fairly using a red-black tree.
-  \item \textbf{POSIX Threads Integration}: User-space threads (e.g., via \texttt{pthread\_create}) map to kernel threads, enabling Java’s 1:1 threading model to leverage Linux’s scheduling for efficient concurrency.
-\end{itemize}
+  \begin{itemize}
+    \item \textbf{Task Struct Representation}: In the Linux kernel, threads are implemented as lightweight processes, each represented by a \texttt{task\_struct} (defined in \texttt{include/linux/sched.h}), sharing memory but maintaining separate execution contexts for scheduling.
+    \item \textbf{Scheduling with CFS}: The Completely Fair Scheduler (CFS) in \texttt{kernel/sched/fair.c} manages kernel threads, treating them as virtual processors and allocating CPU time fairly using a red-black tree.
+    \item \textbf{POSIX Threads Integration}: User-space threads (e.g., via \texttt{pthread\_create}) map to kernel threads, enabling Java’s 1:1 threading model to leverage Linux’s scheduling for efficient concurrency.
+  \end{itemize}
 \end{frame}
-  % \begin{frame}{Combining user-level and kernel-level threads}
-  %   \begin{block}{Basic idea} 
-  %     Introduce a two-level threading approach: \red{kernel threads} that can execute user-level
-  %     threads.
-  %   \end{block}
-  %   \begin{block}{}
-  %     \begin{center}
-  %       \includefigure{03-05}
-  %     \end{center}
-  %   \end{block}
-  % \end{frame}
-  % \begin{frame}{User and kernel threads combined}
-  %   \begin{block}{Principle operation}
-  %     \begin{itemize}%\tightlist
-  %     \item User thread does system call \mathexpr{\Rightarrow} \red{the kernel thread that is
-  %       executing that user thread, blocks}. The user thread remains \blue{bound} to the kernel thread.
-  %     \item The kernel can \red{schedule another kernel thread having a runnable user thread bound to
-  %       it}. Note: this user thread can switch to \blue{any} other runnable user thread currently in user
-  %       space.
-  %     \item A user thread calls a blocking user-level operation \mathexpr{\Rightarrow} do context switch
-  %       to a runnable user thread, (then bound to the same kernel thread).
-  %     \item When there are no user threads to schedule, a kernel thread may remain idle, and may even be
-  %       removed (destroyed) by the kernel.
-  %     \end{itemize}
-  %   \end{block}
-  % \end{frame}
+% \begin{frame}{Combining user-level and kernel-level threads}
+%   \begin{block}{Basic idea} 
+%     Introduce a two-level threading approach: \red{kernel threads} that can execute user-level
+%     threads.
+%   \end{block}
+%   \begin{block}{}
+%     \begin{center}
+%       \includefigure{03-05}
+%     \end{center}
+%   \end{block}
+% \end{frame}
+% \begin{frame}{User and kernel threads combined}
+%   \begin{block}{Principle operation}
+%     \begin{itemize}%\tightlist
+%     \item User thread does system call \mathexpr{\Rightarrow} \red{the kernel thread that is
+%       executing that user thread, blocks}. The user thread remains \blue{bound} to the kernel thread.
+%     \item The kernel can \red{schedule another kernel thread having a runnable user thread bound to
+%       it}. Note: this user thread can switch to \blue{any} other runnable user thread currently in user
+%       space.
+%     \item A user thread calls a blocking user-level operation \mathexpr{\Rightarrow} do context switch
+%       to a runnable user thread, (then bound to the same kernel thread).
+%     \item When there are no user threads to schedule, a kernel thread may remain idle, and may even be
+%       removed (destroyed) by the kernel.
+%     \end{itemize}
+%   \end{block}
+% \end{frame}
 \subsection{Threads in distributed systems}
 \begin{frame}{Using threads at the client side}
   \begin{block}{Multithreaded web client}
     Hiding network latencies:
     \begin{itemize}\tightlist
-    \item Web browser scans an incoming HTML page, and finds that \blue{more files need to be fetched}.
-    \item \blue{Each file is fetched by a separate thread}, each doing a (blocking) HTTP request.
-    \item As files come in, the browser displays them.
+      \item Web browser scans an incoming HTML page, and finds that \blue{more files need to be fetched}.
+      \item \blue{Each file is fetched by a separate thread}, each doing a (blocking) HTTP request.
+      \item As files come in, the browser displays them.
     \end{itemize}
   \end{block}
   \begin{block}{Multiple request-response calls to other machines (RPC)}
     \begin{itemize}\tightlist
-    \item A client does several calls at the same time, each one by a different thread.
-    \item It then waits until all results have been returned.
-    \item Note: if calls are to different servers, we may have a \blue{linear speed-up}.
+      \item A client does several calls at the same time, each one by a different thread.
+      \item It then waits until all results have been returned.
+      \item Note: if calls are to different servers, we may have a \blue{linear speed-up}.
     \end{itemize}
   \end{block}
 \end{frame}
-  \begin{frame}{Multithreaded clients: does it help?}
-    \begin{block}{Thread-level parallelism: TLP}
-      Let \mathexpr{c_i} denote the fraction of time that exactly \mathexpr{i} threads are being executed
-      simultaneously.
-      \[ TLP = \frac{\sum_{i=1}^N i \cdot c_i}{1- c_0} \]
-      with \mathexpr{N} the maximum number of threads that (can) execute at the same time. 
-    \end{block}
-    \onslide
-    \begin{block}{Practical measurements}
-      A typical Web browser has a TLP value between 1.5 and 2.5 \mathexpr{\Rightarrow} threads are primarily
-      used for \blue{logically organizing} browsers.
-    \end{block}
-  \end{frame}
+\begin{frame}{Multithreaded clients: does it help?}
+  \begin{block}{Thread-level parallelism: TLP}
+    Let \mathexpr{c_i} denote the fraction of time that exactly \mathexpr{i} threads are being executed
+    simultaneously.
+    \[ TLP = \frac{\sum_{i=1}^N i \cdot c_i}{1- c_0} \]
+    with \mathexpr{N} the maximum number of threads that (can) execute at the same time.
+  \end{block}
+  \onslide
+  \begin{block}{Practical measurements}
+    A typical Web browser has a TLP value between 1.5 and 2.5 \mathexpr{\Rightarrow} threads are primarily
+    used for \blue{logically organizing} browsers.
+  \end{block}
+\end{frame}
 \begin{frame}{Using threads at the server side}
   \begin{block}{Improve performance}
     \begin{itemize}\tightlist
-    \item Starting a thread is cheaper than starting a new process.
-    \item Having a single-threaded server prohibits simple scale-up to a \blue{multiprocessor system}.
-    \item As with clients: \blue{hide network latency} by reacting to next request while previous one is being replied.
+      \item Starting a thread is cheaper than starting a new process.
+      \item Having a single-threaded server prohibits simple scale-up to a \blue{multiprocessor system}.
+      \item As with clients: \blue{hide network latency} by reacting to next request while previous one is being replied.
     \end{itemize}
   \end{block}
   \begin{block}{Better structure}
     \begin{itemize}\tightlist
-    \item Most servers have high I/O demands. Using simple, \blue{well-understood blocking calls} simplifies
-      the structure.
-    \item Multithreaded programs tend to be \blue{smaller and easier to understand} due to \blue{simplified
-      flow of control}.
+      \item Most servers have high I/O demands. Using simple, \blue{well-understood blocking calls} simplifies
+            the structure.
+      \item Multithreaded programs tend to be \blue{smaller and easier to understand} due to \blue{simplified
+              flow of control}.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -225,7 +272,7 @@
   \begin{block}{Overview}
     \begin{center}
       \begin{tabular}{|l|l|}\hline
-        Multithreading          & Parallelism, blocking system calls \\ \hline
+        Multithreading          & Parallelism, blocking system calls    \\ \hline
         Single-threaded process & No parallelism, blocking system calls \\ \hline
       \end{tabular}
     \end{center}
@@ -233,106 +280,231 @@
 \end{frame}
 \section{Virtualization}
 \subsection{Principle of virtualization}
-\begin{frame}{Virtualization}
-    \begin{itemize}\tightlist
-      \item Equivalence: Virtual machines (VMs) provide an environment 
-      identical to physical hardware, ensuring software runs unmodified.
-      \item Resource Control: The virtual machine monitor (VMM) 
-      maintains full control over system resources, preventing VMs from accessing unauthorized resources.
-      \item Efficiency: Most instructions execute directly on 
-      hardware for near-native performance, with sensitive instructions trapped by the VMM.
-      \item Isolation: VMs are fully isolated, ensuring no 
-      interference or data leaks between VMs or the VMM, using mechanisms like memory and I/O virtualization. 
-    \end{itemize}
-    \begin{block}{Privileged instructions}
-      Privileged instructions: allowed to be executed only by the kernel.
-    \end{block}
-\end{frame}
-% \begin{frame}{Mimicking interfaces}
-%   \begin{block}{Four types of interfaces at three different levels}
-%     \begin{enumerate}\tightlist
-%     \item \red{Instruction set architecture}: the set of machine instructions, with two subsets:
-%       \begin{itemize}\tightlist
-%       \item Privileged instructions: allowed to be executed only by the operating system.
-%       \item General instructions: can be executed by any program.
-%       \end{itemize}
-%     \item \red{System calls} as offered by an operating system.
-%     \item \red{Library calls}, known as an \red{application programming interface} (API)
-%     \end{enumerate}
+% \begin{frame}{Virtualization}
+%   \begin{block}{Privileged instructions}
+%     Privileged instructions: allowed to be executed only by the kernel.
+%   \end{block}
+%   \begin{itemize}\tightlist
+%     \item Equivalence: Virtual machines (VMs) provide an environment
+%           identical to physical hardware, ensuring software runs unmodified.
+%     \item Resource Control: The virtual machine monitor (VMM)
+%           maintains full control over system resources, preventing VMs from accessing unauthorized resources.
+%     \item Efficiency: Most instructions execute directly on
+%           hardware for near-native performance, with sensitive instructions trapped by the VMM.
+%     \item Isolation: VMs are fully isolated, ensuring no
+%           interference or data leaks between VMs or the VMM, using mechanisms like memory and I/O virtualization.
+%   \end{itemize}
+% \end{frame}
+% % \begin{frame}{Mimicking interfaces}
+% %   \begin{block}{Four types of interfaces at three different levels}
+% %     \begin{enumerate}\tightlist
+% %     \item \red{Instruction set architecture}: the set of machine instructions, with two subsets:
+% %       \begin{itemize}\tightlist
+% %       \item Privileged instructions: allowed to be executed only by the operating system.
+% %       \item General instructions: can be executed by any program.
+% %       \end{itemize}
+% %     \item \red{System calls} as offered by an operating system.
+% %     \item \red{Library calls}, known as an \red{application programming interface} (API)
+% %     \end{enumerate}
+% %   \end{block}
+% % \end{frame}
+% \begin{frame}[fragile]{Three Virtualization Approaches}
+%   \begin{center}
+%     % \begin{tabular}{ccc}
+%     %   \includefigure{03-10a} &
+%     %   \includefigure{03-10b} &
+%     %   \includefigure{03-10c} \\
+%     %   \blue{(a) Process VM} & \blue{(b) Native VMM} & \blue{(c) Hosted VMM}
+%     % \end{tabular}
+%     \begin{verbatim}
+% (a) Process VM           (b) Native VMM           (c) Hosted VMM
+% ------------------       ------------------       ------------------
+%  Application             Application              Application
+%  ------------------      ------------------       ------------------
+%  Runtime system          Guest OS                 Guest OS
+%  (e.g. JVM)              ------------------       ------------------
+%  ------------------      Native VMM               Hosted VMM
+%  Host Operating          (Type 1 hypervisor)      (Type 2 hypervisor)
+%  System                  ------------------       ------------------
+%  ------------------      Hardware                 Host Operating System
+%  Hardware                                         ------------------
+%                                                   Hardware                                                 
+% \end{verbatim}
+%   \end{center}
+%   \begin{block}{Differences}
+%     \begin{itemize}\tightlist
+%       \item[(a)] Separate set of instructions, an interpreter/emulator, running atop an OS.
+%       \item[(b)] Low-level instructions, along with bare-bones minimal operating system
+%       \item[(c)] Low-level instructions, but delegating most work to a full-fledged OS.
+%     \end{itemize}
 %   \end{block}
 % \end{frame}
-\begin{frame}[fragile]{Ways of virtualization}
-  \begin{center}
-    % \begin{tabular}{ccc}
-    %   \includefigure{03-10a} &
-    %   \includefigure{03-10b} &
-    %   \includefigure{03-10c} \\
-    %   \blue{(a) Process VM} & \blue{(b) Native VMM} & \blue{(c) Hosted VMM}
-    % \end{tabular}
-  \begin{verbatim}
-(a) Process VM           (b) Native VMM           (c) Hosted VMM
-------------------       ------------------       ------------------
- Application             Application              Application
- ------------------      ------------------       ------------------
- Runtime system          Guest OS                 Guest OS
- (e.g. JVM)              ------------------       ------------------
- ------------------      Native VMM               Hosted VMM
- Host Operating          (Type 1 hypervisor)      (Type 2 hypervisor)
- System                  ------------------       ------------------
- ------------------      Hardware                 Host Operating System
- Hardware                                         ------------------
-                                                  Hardware                                                 
-\end{verbatim}  
-  \end{center}
-  \begin{block}{Differences}
-    \begin{itemize}\tightlist
-    \item[(a)] Separate set of instructions, an interpreter/emulator, running atop an OS.
-    \item[(b)] Low-level instructions, along with bare-bones minimal operating system
-    \item[(c)] Low-level instructions, but delegating most work to a full-fledged OS.
-    \end{itemize}
+
+% \begin{frame}{VM Performance}
+%   \begin{block}{Refining the organization}
+%     \begin{tabular}{@{}ll}
+%       \includefigure[0.71]{03-11}
+%       \begin{minipage}[b]{0.4\textwidth}
+%         \begin{itemize}\tightlist
+%           \item \red{Privileged instruction}: if and only if executed in user mode, it causes a \blue{trap}
+%                 to the operating system
+%           \item \red{Nonpriviliged instruction}: the rest
+%         \end{itemize}
+%       \end{minipage}
+%     \end{tabular}
+%   \end{block}
+%   \begin{block}{Special instructions}
+%     \begin{itemize}
+%       \item \red{Control-sensitive instruction}: may affect configuration of a machine (e.g., one affecting
+%             relocation register or interrupt table).
+%       \item \red{Behavior-sensitive instruction}: effect is partially determined by context (e.g., \code{POPF}
+%             sets an interrupt-enabled flag, but only in system mode).
+%     \end{itemize}
+%   \end{block}
+% \end{frame}
+% \begin{frame}{Popek and Goldberg: Condition for virtualization}
+%   \begin{alertblock}{Necessary condition}
+%     \itshape For any conventional computer, a virtual machine monitor may be constructed if the set of
+%     sensitive instructions for that computer is a subset of the set of privileged instructions.
+%   \end{alertblock}
+%   \begin{block}{Problem: condition is not always satisfied}
+%     There may be sensitive instructions that are executed in user mode without causing a trap to the
+%     operating system.
+%   \end{block}
+%   \begin{block}{Solutions}
+%     \begin{itemize}
+%       \item Emulate all instructions
+%       \item Wrap nonprivileged sensitive instructions to divert control to VMM
+%       \item \blue{Paravirtualization}: modify guest OS, either by preventing nonprivileged sensitive
+%             instructions, or making them nonsensitive (i.e., changing the context).
+%     \end{itemize}
+%   \end{block}
+% \end{frame}
+
+
+\begin{frame}{Problem Statement and Scope}
+  \begin{block}{Objective}
+    Virtualization provides multiple isolated execution environments on shared hardware
+    while preserving operating system semantics and acceptable performance.
+  \end{block}
+
+  \begin{itemize}
+    \item Motivation: consolidation, isolation, manageability, and cloud-scale deployment
+    \item Focus: virtual machines, virtual machine monitors (VMMs), and hypervisors
+    \item Perspective: contemporary hardware-assisted virtualization
+  \end{itemize}
+
+\end{frame}
+
+% Slide 3
+\begin{frame}{The Virtual Machine Abstraction}
+  \begin{block}{Definition}
+    A virtual machine is a software-defined abstraction of a physical computer,
+    including CPU, memory, devices, and firmware.
+  \end{block}
+
+  \begin{itemize}
+    \item Presents a conventional hardware interface to the guest OS
+    \item Preserves OS assumptions about privilege, memory, interrupts, and devices
+    \item Enables independent failure, security, and resource control domains
+  \end{itemize}
+
+  \begin{block}{Design requirement}
+    The abstraction must be sufficiently faithful to run unmodified operating systems.
   \end{block}
 \end{frame}
 
-  \begin{frame}{VM Performance}
-    \begin{block}{Refining the organization}
-      \begin{tabular}{@{}ll}
-        \includefigure[0.71]{03-11}
-        \begin{minipage}[b]{0.4\textwidth}
-          \begin{itemize}\tightlist
-          \item \red{Privileged instruction}: if and only if executed in user mode, it causes a \blue{trap}
-            to the operating system
-          \item \red{Nonpriviliged instruction}: the rest
-          \end{itemize}
-        \end{minipage}
-      \end{tabular}
-    \end{block}
-    \begin{block}{Special instructions}
-      \begin{itemize}
-      \item \red{Control-sensitive instruction}: may affect configuration of a machine (e.g., one affecting
-        relocation register or interrupt table).
-      \item \red{Behavior-sensitive instruction}: effect is partially determined by context (e.g., \code{POPF}
-        sets an interrupt-enabled flag, but only in system mode).
-      \end{itemize}
-    \end{block}
-  \end{frame}
-  \begin{frame}{Popek and Goldberg: Condition for virtualization}
-    \begin{alertblock}{Necessary condition}
-      \itshape For any conventional computer, a virtual machine monitor may be constructed if the set of
-      sensitive instructions for that computer is a subset of the set of privileged instructions.
-    \end{alertblock}
-    \begin{block}{Problem: condition is not always satisfied}
-      There may be sensitive instructions that are executed in user mode without causing a trap to the
-      operating system.
-    \end{block}
-    \begin{block}{Solutions}
-      \begin{itemize}
-      \item Emulate all instructions
-      \item Wrap nonprivileged sensitive instructions to divert control to VMM
-      \item \red{Paravirtualization}: modify guest OS, either by preventing nonprivileged sensitive
-        instructions, or making them nonsensitive (i.e., changing the context).
-      \end{itemize}
-    \end{block}
-  \end{frame}
+% Slide 4
+\begin{frame}{System Structure: VMM and Hypervisor}
+  \begin{block}{Component roles}
+    \begin{itemize}
+      \item \textbf{Hypervisor (core)}: CPU and memory protection, scheduling, VM entry/exit
+      \item \textbf{VMM / device model}: virtual devices, firmware, and I/O backends
+      \item \textbf{Management layer}: VM lifecycle, configuration, and policy
+    \end{itemize}
+  \end{block}
+
+  \begin{itemize}
+    \item Type-1 systems execute directly on hardware, often with a privileged service domain
+    \item Type-2 systems execute atop a general-purpose host operating system
+  \end{itemize}
+
+  \begin{block}{Key consideration}
+    The primary distinction is the size and placement of the trusted computing base (TCB).
+  \end{block}
+\end{frame}
+
+% Slide 5
+\begin{frame}{CPU Virtualization Mechanisms}
+  \begin{block}{Fundamental approach}
+    Guest code executes natively when safe; sensitive operations are intercepted by the hypervisor.
+  \end{block}
+
+  \begin{itemize}
+    \item Hardware virtualization extensions support VM entry and exit
+    \item Privileged instructions and control register updates cause traps
+    \item Hypercalls provide explicit guest-to-hypervisor interfaces
+    \item vCPU scheduling multiplexes physical cores among virtual CPUs
+  \end{itemize}
+
+  \begin{block}{Performance implication}
+    Execution cost is dominated by the frequency and cost of VM exits.
+  \end{block}
+\end{frame}
+
+% Slide 6
+\begin{frame}{Memory Virtualization Mechanisms}
+  \begin{block}{Address translation}
+    \begin{itemize}
+      \item Guest virtual address (GVA) to guest physical address (GPA)
+      \item Guest physical address (GPA) to host physical address (HPA)
+    \end{itemize}
+  \end{block}
+
+  \begin{itemize}
+    \item Nested paging implements two-dimensional translation in hardware
+    \item Enforces isolation between VMs at page granularity
+    \item Enables memory overcommit through reclamation techniques
+    \item NUMA-aware placement improves locality and predictability
+  \end{itemize}
+
+  \begin{block}{Operational concern}
+    Memory translation and locality significantly influence VM performance.
+  \end{block}
+\end{frame}
+
+% Slide 7
+\begin{frame}{I/O Virtualization Mechanisms}
+  \begin{block}{I/O virtualization approaches}
+    \begin{itemize}
+      \item Device emulation for compatibility
+      \item Paravirtual interfaces for reduced overhead
+      \item Direct device assignment using IOMMUs
+      \item SR-IOV for hardware-assisted device sharing
+    \end{itemize}
+  \end{block}
+
+  \begin{itemize}
+    \item I/O paths account for a large fraction of virtualization complexity
+    \item Trade-offs exist among performance, portability, and isolation
+  \end{itemize}
+\end{frame}
+
+% Slide 8
+\begin{frame}{Current Directions in Virtualization}
+  \begin{itemize}
+    \item MicroVMs reduce device models and trusted code size
+    \item Confidential VMs protect memory from privileged software
+    \item Virtual machines serve as isolation boundaries for containerized workloads
+    \item Integration with cluster schedulers and cloud control planes
+  \end{itemize}
+
+  \begin{block}{Summary}
+    Modern virtualization systems combine hardware support, minimal hypervisor cores,
+    and optimized I/O paths to provide strong isolation with predictable performance.
+  \end{block}
+\end{frame}
+
 \subsection{Containers}
 \begin{frame}{Containers}
   \begin{centerfig}
@@ -340,52 +512,52 @@
   \end{centerfig}
 
   \begin{itemize}\tightlist
-  \item \blue{Namespaces}: a collection of processes in a container is given their own view of identifiers
-  \item \blue{Union file system:} combine several file systems into a layered fashion with only the highest
-    layer allowing for \code{write} operations (and the one being part of a container).
-  \item \blue{Control groups}: resource restrictions can be imposed upon a collection of processes.
+    \item \blue{Namespaces}: a collection of processes in a container is given their own view of identifiers
+    \item \blue{Union file system:} combine several file systems into a layered fashion with only the highest
+          layer allowing for \code{write} operations (and the one being part of a container).
+    \item \blue{Control groups}: resource restrictions can be imposed upon a collection of processes.
   \end{itemize}
 \end{frame}
-  % \begin{frame}{Example: PlanetLab}
-  %   \begin{block}{Essence} 
-  %     Different organizations contribute machines, which they subsequently \blue{share} for various experiments.
-  %   \end{block}
-  %   \begin{alertblock}{Problem} 
-  %     We need to ensure that different distributed applications do not get into each other's way
-  %     \mathexpr{\Rightarrow} \blue{virtualization}
-  %   \end{alertblock}
-  % \end{frame}
-  % \begin{frame}{PlanetLab basic organization}
-  %   \begin{centerfig}
-  %     \includefigure{03-13}
-  %   \end{centerfig}
-  % \begin{block}{Vserver}
-  %   Independent and protected environment with its own libraries, server versions, and so on. Distributed
-  %   applications are assigned a \blue{collection of vservers} \red{distributed across multiple machines}
-  % \end{block}
-  % \end{frame}
-  % \begin{frame}{PlanetLab Vservers and slices}
-  %   \begin{block}{Essence}
-  %     \begin{itemize}\tightlist
-  %     \item Each Vserver operates in its own environment (cf.\ \code{chroot}). 
-  %     \item Linux enhancements include proper adjustment of process IDs (e.g., \code{init} having ID 0). 
-  %     \item Two processes in different Vservers may have same user ID, but does not imply the same user.
-  %     \end{itemize}
-  %   \end{block}
-  %   \begin{block}{Separation leads to slices}
-  %     \begin{center}
-  %       \includefigure[1]{03-14}
-  %     \end{center}
-  %   \end{block}
-  % \end{frame}
+% \begin{frame}{Example: PlanetLab}
+%   \begin{block}{Essence} 
+%     Different organizations contribute machines, which they subsequently \blue{share} for various experiments.
+%   \end{block}
+%   \begin{alertblock}{Problem} 
+%     We need to ensure that different distributed applications do not get into each other's way
+%     \mathexpr{\Rightarrow} \blue{virtualization}
+%   \end{alertblock}
+% \end{frame}
+% \begin{frame}{PlanetLab basic organization}
+%   \begin{centerfig}
+%     \includefigure{03-13}
+%   \end{centerfig}
+% \begin{block}{Vserver}
+%   Independent and protected environment with its own libraries, server versions, and so on. Distributed
+%   applications are assigned a \blue{collection of vservers} \red{distributed across multiple machines}
+% \end{block}
+% \end{frame}
+% \begin{frame}{PlanetLab Vservers and slices}
+%   \begin{block}{Essence}
+%     \begin{itemize}\tightlist
+%     \item Each Vserver operates in its own environment (cf.\ \code{chroot}). 
+%     \item Linux enhancements include proper adjustment of process IDs (e.g., \code{init} having ID 0). 
+%     \item Two processes in different Vservers may have same user ID, but does not imply the same user.
+%     \end{itemize}
+%   \end{block}
+%   \begin{block}{Separation leads to slices}
+%     \begin{center}
+%       \includefigure[1]{03-14}
+%     \end{center}
+%   \end{block}
+% \end{frame}
 \subsection{Comparing virtual machines and containers}
 \subsection{Application of virtual machines to distributed systems}
 \begin{frame}{VMs and cloud computing}
   \begin{block}{Three types of cloud services}
     \begin{itemize}\tightlist
-    \item \red{Infrastructure-as-a-Service} covering the basic infrastructure
-    \item \red{Platform-as-a-Service} covering system-level services
-    \item \red{Software-as-a-Service} containing actual applications
+      \item \blue{Infrastructure-as-a-Service} covering the basic infrastructure
+      \item \blue{Platform-as-a-Service} covering system-level services
+      \item \blue{Software-as-a-Service} containing actual applications
     \end{itemize}
   \end{block}
   \begin{alertblock}{IaaS}
@@ -760,13 +932,13 @@
 %   \end{frame}
 \section{Summary}
 \begin{frame}{Summary and Conclusions}
-We have discussed processes and threads
-in Distributed Systems, namely:
-\begin{itemize}
-  \item Processes and Threads
-  \item Context Switching
-  \item Multithreading
-  \item Virtualization
-  \item Containerization
-\end{itemize}  
+  We have discussed processes and threads
+  in Distributed Systems, namely:
+  \begin{itemize}
+    \item Processes and Threads
+    \item Context Switching
+    \item Multithreading
+    \item Virtualization
+    \item Containerization
+  \end{itemize}
 \end{frame}
