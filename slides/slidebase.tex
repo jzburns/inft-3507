@@ -43,6 +43,8 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit, calc}
 
 \definecolor{keywords}{RGB}{255,0,90}
 \definecolor{comments}{RGB}{0,150,0}
@@ -230,6 +232,18 @@
 \newcommand{\cix}{Security}
 
 \newtheorem{algorithm}{Algorithm}
+
+\tikzset{
+  vbox/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
+               minimum width=4.8cm, minimum height=0.9cm, align=center},
+  sbox/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
+               minimum width=4.2cm, minimum height=0.85cm, align=center},
+  tcb/.style={draw, rectangle, dashed, very thick, inner sep=7pt, rounded corners=2pt},
+  arrow/.style={-Latex, line width=0.8pt},
+  bar/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
+              minimum height=0.55cm, align=center},
+  note/.style={align=left}
+}
 
 %----------------------------------------------------------
 

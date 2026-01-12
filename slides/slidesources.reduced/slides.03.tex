@@ -382,6 +382,7 @@
 % \end{frame}
 
 
+
 \begin{frame}{Problem Statement and Scope}
   \begin{block}{Objective}
     Virtualization provides multiple isolated execution environments on shared hardware
@@ -393,10 +394,9 @@
     \item Focus: virtual machines, virtual machine monitors (VMMs), and hypervisors
     \item Perspective: contemporary hardware-assisted virtualization
   \end{itemize}
-
 \end{frame}
 
-% Slide 3
+%------------------------------------------------
 \begin{frame}{The Virtual Machine Abstraction}
   \begin{block}{Definition}
     A virtual machine is a software-defined abstraction of a physical computer,
@@ -408,89 +408,155 @@
     \item Preserves OS assumptions about privilege, memory, interrupts, and devices
     \item Enables independent failure, security, and resource control domains
   \end{itemize}
-
-  \begin{block}{Design requirement}
-    The abstraction must be sufficiently faithful to run unmodified operating systems.
-  \end{block}
 \end{frame}
 
-% Slide 4
-\begin{frame}{System Structure: VMM and Hypervisor}
-  \begin{block}{Component roles}
-    \begin{itemize}
-      \item \textbf{Hypervisor (core)}: CPU and memory protection, scheduling, VM entry/exit
-      \item \textbf{VMM / device model}: virtual devices, firmware, and I/O backends
-      \item \textbf{Management layer}: VM lifecycle, configuration, and policy
-    \end{itemize}
-  \end{block}
+%------------------------------------------------
+\begin{frame}{System Structure and Trusted Computing Base}
+  \centering
 
-  \begin{itemize}
-    \item Type-1 systems execute directly on hardware, often with a privileged service domain
-    \item Type-2 systems execute atop a general-purpose host operating system
-  \end{itemize}
+  \begin{tikzpicture}[node distance=5mm]
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=7cm, minimum height=0.9cm] (apps)
+    {Applications};
 
-  \begin{block}{Key consideration}
-    The primary distinction is the size and placement of the trusted computing base (TCB).
-  \end{block}
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=7cm, minimum height=0.9cm,
+      below=of apps] (gos)
+    {Guest Operating System};
+
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=7cm, minimum height=0.9cm,
+      below=of gos] (vmm)
+    {VMM / Device Model};
+
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=7cm, minimum height=0.9cm,
+      below=of vmm] (hyp)
+    {Hypervisor Core};
+
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=7cm, minimum height=0.9cm,
+      below=of hyp] (hw)
+    {Physical Hardware};
+
+    \draw[-Latex] (apps) -- (gos);
+    \draw[-Latex] (gos) -- (vmm);
+    \draw[-Latex] (vmm) -- (hyp);
+    \draw[-Latex] (hyp) -- (hw);
+
+    \node[draw, dashed, very thick, fit=(vmm)(hyp), inner sep=8pt] {};
+  \end{tikzpicture}
+
+  \vspace{0.6em}
+  \small
+  \textbf{Figure:} Logical layering of a virtual machine system. The trusted computing
+  base consists primarily of the hypervisor core and device model.
 \end{frame}
 
-% Slide 5
-\begin{frame}{CPU Virtualization Mechanisms}
-  \begin{block}{Fundamental approach}
-    Guest code executes natively when safe; sensitive operations are intercepted by the hypervisor.
-  \end{block}
+%------------------------------------------------
+\begin{frame}{CPU Virtualization: VM Entry and Exit}
+  \centering
 
-  \begin{itemize}
-    \item Hardware virtualization extensions support VM entry and exit
-    \item Privileged instructions and control register updates cause traps
-    \item Hypercalls provide explicit guest-to-hypervisor interfaces
-    \item vCPU scheduling multiplexes physical cores among virtual CPUs
-  \end{itemize}
+  \begin{tikzpicture}
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=7cm, minimum height=1cm] (guest)
+    at (0,3)
+    {Guest Execution (Non-root Mode)};
 
-  \begin{block}{Performance implication}
-    Execution cost is dominated by the frequency and cost of VM exits.
-  \end{block}
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=7cm, minimum height=1cm] (hyp)
+    at (0,1.2)
+    {Hypervisor Execution (Root Mode)};
+
+    \draw[-Latex] (guest.south) -- node[right] {\small VM Exit} (hyp.north);
+
+    \draw[-Latex] (hyp.north east)
+    .. controls +(2,1) and +(2,-1) ..
+    node[right] {\small VM Entry}
+    (guest.south east);
+
+    % IMPORTANT: no itemize inside node; use paragraph text with bullets
+    \node[draw, rectangle, rounded corners=2pt,
+      text width=7cm, align=left, inner sep=5pt]
+    at (0,-0.45)
+    {\small \textbf{Examples of VM exit causes:}\\
+      \(\bullet\) privileged instruction\\
+      \(\bullet\) control register update\\
+      \(\bullet\) page fault or device access};
+  \end{tikzpicture}
+
+  \vspace{0.6em}
+  \small
+  \textbf{Figure:} Hardware-supported transitions between guest and hypervisor
+  execution contexts.
 \end{frame}
 
-% Slide 6
-\begin{frame}{Memory Virtualization Mechanisms}
-  \begin{block}{Address translation}
-    \begin{itemize}
-      \item Guest virtual address (GVA) to guest physical address (GPA)
-      \item Guest physical address (GPA) to host physical address (HPA)
-    \end{itemize}
-  \end{block}
+%------------------------------------------------
+\begin{frame}{Memory Virtualization Using Nested Paging}
+  \centering
 
-  \begin{itemize}
-    \item Nested paging implements two-dimensional translation in hardware
-    \item Enforces isolation between VMs at page granularity
-    \item Enables memory overcommit through reclamation techniques
-    \item NUMA-aware placement improves locality and predictability
-  \end{itemize}
+  \begin{tikzpicture}[node distance=6mm]
+    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm] (gva)
+    {Guest Virtual Address (GVA)};
+    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm,
+      below=of gva] (gpt)
+    {Guest Page Tables};
+    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm,
+      below=of gpt] (gpa)
+    {Guest Physical Address (GPA)};
+    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm,
+      below=of gpa] (npt)
+    {Nested Page Tables (EPT / NPT)};
+    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm,
+      below=of npt] (hpa)
+    {Host Physical Address (HPA)};
 
-  \begin{block}{Operational concern}
-    Memory translation and locality significantly influence VM performance.
-  \end{block}
+    \draw[-Latex] (gva) -- (gpt);
+    \draw[-Latex] (gpt) -- (gpa);
+    \draw[-Latex] (gpa) -- (npt);
+    \draw[-Latex] (npt) -- (hpa);
+
+    \node[draw, dashed, very thick, fit=(gpt)(npt), inner sep=6pt] {};
+  \end{tikzpicture}
+
+  \vspace{0.6em}
+  \small
+  \textbf{Figure:} Two-dimensional address translation used in hardware-assisted
+  memory virtualization.
 \end{frame}
 
-% Slide 7
-\begin{frame}{I/O Virtualization Mechanisms}
-  \begin{block}{I/O virtualization approaches}
-    \begin{itemize}
-      \item Device emulation for compatibility
-      \item Paravirtual interfaces for reduced overhead
-      \item Direct device assignment using IOMMUs
-      \item SR-IOV for hardware-assisted device sharing
-    \end{itemize}
-  \end{block}
+%------------------------------------------------
+\begin{frame}{I/O Virtualization Design Space}
+  \centering
 
-  \begin{itemize}
-    \item I/O paths account for a large fraction of virtualization complexity
-    \item Trade-offs exist among performance, portability, and isolation
-  \end{itemize}
+  \begin{tikzpicture}
+    \draw[line width=0.9pt] (-4,2.2) -- (4,2.2);
+    \node at (-4,2.6) {\small Compatibility};
+    \node at (4,2.6) {\small Performance};
+
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=4.5cm] (emu) at (-3,1.4)
+    {Device Emulation};
+
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=4.5cm] (pv) at (0,1.4)
+    {Paravirtual I/O};
+
+    \node[draw, rectangle, rounded corners=2pt,
+      minimum width=4.5cm] (pas) at (3,1.4)
+    {Device Passthrough};
+
+    \draw[-Latex] (emu.north) -- (-3,2.2);
+    \draw[-Latex] (pv.north) -- (0,2.2);
+    \draw[-Latex] (pas.north) -- (3,2.2);
+  \end{tikzpicture}
+
+  \vspace{0.6em}
+  \small
+  \textbf{Figure:} Spectrum of I/O virtualization techniques and their trade-offs.
 \end{frame}
 
-% Slide 8
+%------------------------------------------------
 \begin{frame}{Current Directions in Virtualization}
   \begin{itemize}
     \item MicroVMs reduce device models and trusted code size
@@ -498,12 +564,25 @@
     \item Virtual machines serve as isolation boundaries for containerized workloads
     \item Integration with cluster schedulers and cloud control planes
   \end{itemize}
-
-  \begin{block}{Summary}
-    Modern virtualization systems combine hardware support, minimal hypervisor cores,
-    and optimized I/O paths to provide strong isolation with predictable performance.
-  \end{block}
 \end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \subsection{Containers}
 \begin{frame}{Containers}
