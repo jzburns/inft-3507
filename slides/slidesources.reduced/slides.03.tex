@@ -827,16 +827,6 @@ mount | grep ns-mount
 \end{frame}
 
 % ------------------------------------------------------------
-\begin{frame}{Takeaways}
-  \begin{itemize}
-    \item Virtualization can be done at different layers: hardware (VMs) vs. OS interfaces (containers).
-    \item \textbf{Namespaces} isolate what processes can see (views of kernel resources).
-    \item \textbf{cgroups} govern what processes can use (resource limits/accounting).
-    \item \texttt{unshare} is a minimal, direct way to see namespace isolation in action.
-  \end{itemize}
-\end{frame}
-
-
 \subsection{Containers}
 \begin{frame}{Containers}
   \begin{centerfig}
@@ -850,6 +840,16 @@ mount | grep ns-mount
     \item \blue{Control groups}: resource restrictions can be imposed upon a collection of processes.
   \end{itemize}
 \end{frame}
+
+\begin{frame}{Summary}
+  \begin{itemize}
+    \item Virtualization can be done at different layers: hardware (VMs) vs. OS interfaces (containers).
+    \item \textbf{Namespaces} isolate what processes can see (views of kernel resources).
+    \item \textbf{cgroups} govern what processes can use (resource limits/accounting).
+    \item \texttt{unshare} is a minimal, direct way to see namespace isolation in action.
+  \end{itemize}
+\end{frame}
+
 % \begin{frame}{Example: PlanetLab}
 %   \begin{block}{Essence} 
 %     Different organizations contribute machines, which they subsequently \blue{share} for various experiments.
