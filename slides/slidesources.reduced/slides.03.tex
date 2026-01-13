@@ -383,205 +383,458 @@
 
 
 
-\begin{frame}{Problem Statement and Scope}
-  \begin{block}{Objective}
-    Virtualization provides multiple isolated execution environments on shared hardware
-    while preserving operating system semantics and acceptable performance.
+\begin{frame}{Scope and Terminology}
+  \begin{itemize}
+    \item \textbf{System virtualization:} presents a virtual hardware platform capable of running an OS
+    \item \textbf{Process virtualization:} presents a virtual execution environment for a single program (e.g., a managed runtime)
+    \item \textbf{Emulation:} reproduces an ISA and/or device behavior in software
+    \item \textbf{Hypervisor / VMM:} software layer(s) that create and isolate system VMs
+  \end{itemize}
+
+  \vspace{0.4em}
+  \begin{block}{Goal}
+    Provide isolation and controllable sharing of CPU, memory, and I/O while preserving expected software semantics.
+  \end{block}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Execution Virtualization Spectrum}
+  \begin{itemize}
+    \item \textbf{Emulation} (ISA/device reproduction): maximizes compatibility across architectures, typically higher overhead
+    \item \textbf{Process VM} (language/bytecode runtime): portability and safety for applications, not a full OS boundary
+    \item \textbf{System VM} (hypervisor-based): strong isolation and full OS virtualization
+  \end{itemize}
+
+  \vspace{0.4em}
+  \begin{block}{Key distinction}
+    Process VMs virtualize a \emph{program execution model}; hypervisors virtualize a \emph{machine interface}.
+  \end{block}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Diagram: Taxonomy of Virtualization Approaches}
+  \centering
+  \begin{tikzpicture}[
+      box/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
+          minimum width=11.5cm, minimum height=1.0cm, align=left, inner sep=6pt},
+      arrow/.style={-Latex, line width=0.8pt},
+      node distance=6mm
+    ]
+    \node[box] (emu) {\textbf{Emulation}\\
+      \(\bullet\) Virtualizes an ISA and/or devices in software\\
+      \(\bullet\) Primary benefit: cross-architecture compatibility};
+
+    \node[box, below=of emu] (pvm) {\textbf{Process Virtual Machine (e.g., JVM)}\\
+      \(\bullet\) Virtualizes an application execution model (bytecode + runtime services)\\
+      \(\bullet\) Primary benefit: portability, safety properties, managed services};
+
+    \node[box, below=of pvm] (svm) {\textbf{System Virtual Machine (Hypervisor / VMM)}\\
+      \(\bullet\) Virtualizes CPU, memory, and devices to run an unmodified OS\\
+      \(\bullet\) Primary benefit: strong isolation and resource control at machine granularity};
+
+    % A light grouping annotation
+    \node[draw, dashed, very thick, rounded corners=2pt,
+      fit=(pvm), inner sep=7pt] (pvmfit) {};
+    \node[anchor=west] at ([xshift=3mm]pvmfit.east) {\small program boundary};
+
+    \node[draw, dashed, very thick, rounded corners=2pt,
+      fit=(svm), inner sep=7pt] (svmfit) {};
+    \node[anchor=west] at ([xshift=3mm]svmfit.east) {\small OS boundary};
+
+  \end{tikzpicture}
+
+  \vspace{0.6em}
+  \small
+  \textbf{Figure:} Conceptual taxonomy. Emulation targets compatibility, process VMs target portable execution for programs,
+  and system VMs target full OS virtualization and isolation.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{System VMs: Type 1 and Type 2 Hypervisors}
+  \begin{itemize}
+    \item \textbf{Type 1 (bare-metal):} hypervisor runs directly on hardware, commonly with a privileged management domain
+    \item \textbf{Type 2 (hosted):} hypervisor/VMM runs atop a general-purpose host OS and leverages host drivers/services
+  \end{itemize}
+
+  \vspace{0.4em}
+  \begin{block}{Engineering focus}
+    The practical security boundary is determined by the \textbf{trusted computing base (TCB)}: what must be trusted for isolation.
+  \end{block}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Diagram: Type 1 vs Type 2 Stack Organization}
+  \centering
+  \begin{tikzpicture}[
+      layer/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
+          minimum width=5.6cm, minimum height=0.85cm, align=center},
+      arrow/.style={-Latex, line width=0.8pt},
+      tcb/.style={draw, dashed, very thick, rounded corners=2pt, inner sep=6pt},
+      node distance=4mm
+    ]
+
+    % --- Left: Type 1 ---
+    \node at (-3.4,4.2) {\textbf{Type 1 (Bare-metal)}};
+
+    \node[layer] (t1a) at (-3.4,3.4) {Guest Apps};
+    \node[layer] (t1g) at (-3.4,2.45) {Guest OS};
+    \node[layer] (t1v) at (-3.4,1.50) {VMM / Device Model};
+    \node[layer] (t1h) at (-3.4,0.55) {Hypervisor Core};
+    \node[layer] (t1p) at (-3.4,-0.40) {Hardware};
+
+    \draw[arrow] (t1a) -- (t1g);
+    \draw[arrow] (t1g) -- (t1v);
+    \draw[arrow] (t1v) -- (t1h);
+    \draw[arrow] (t1h) -- (t1p);
+
+    \node[tcb, fit=(t1v)(t1h)] (t1tcb) {};
+    \node[anchor=west] at ([xshift=2mm]t1tcb.east) {\small TCB};
+
+    % --- Right: Type 2 ---
+    \node at (3.4,4.2) {\textbf{Type 2 (Hosted)}};
+
+    \node[layer] (t2a) at (3.4,3.4) {Guest Apps};
+    \node[layer] (t2g) at (3.4,2.45) {Guest OS};
+    \node[layer] (t2v) at (3.4,1.50) {VMM / Hypervisor Module};
+    \node[layer] (t2o) at (3.4,0.55) {Host OS (drivers, services)};
+    \node[layer] (t2p) at (3.4,-0.40) {Hardware};
+
+    \draw[arrow] (t2a) -- (t2g);
+    \draw[arrow] (t2g) -- (t2v);
+    \draw[arrow] (t2v) -- (t2o);
+    \draw[arrow] (t2o) -- (t2p);
+
+    \node[tcb, fit=(t2v)(t2o)] (t2tcb) {};
+    \node[anchor=west] at ([xshift=2mm]t2tcb.east) {\small TCB};
+
+  \end{tikzpicture}
+
+  \vspace{0.6em}
+  \small
+  \textbf{Figure:} Representative stack organizations. In Type~2 systems, the host OS becomes part of the trusted base for isolation.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Emulation vs Hypervisor-Based Virtualization}
+  \begin{itemize}
+    \item \textbf{Emulation:} can execute software for a different ISA; overhead arises from instruction translation and device modeling
+    \item \textbf{System VM with hardware assist:} guest code runs largely natively; overhead concentrates in traps/exits and I/O paths
+    \item \textbf{Process VM (e.g., JVM):} does not virtualize devices or privileged CPU state; relies on the host OS for isolation
+  \end{itemize}
+
+  \vspace{0.4em}
+  \begin{block}{Implication}
+    ISA portability and OS-level isolation are different objectives; they are frequently conflated but have different mechanisms and costs.
+  \end{block}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Resource Control: CPU and Memory}
+  \begin{block}{CPU control concepts}
+    \begin{itemize}
+      \item \textbf{Capacity:} number of vCPUs and their mapping to physical CPUs
+      \item \textbf{Shares/weights:} proportional allocation under contention
+      \item \textbf{Limits/caps:} enforce maximum CPU usage (often expressed as a percentage of a core set)
+      \item \textbf{Reservations:} minimum guaranteed CPU capacity (where supported)
+    \end{itemize}
   \end{block}
 
-  \begin{itemize}
-    \item Motivation: consolidation, isolation, manageability, and cloud-scale deployment
-    \item Focus: virtual machines, virtual machine monitors (VMMs), and hypervisors
-    \item Perspective: contemporary hardware-assisted virtualization
-  \end{itemize}
+  \begin{block}{Memory control concepts}
+    \begin{itemize}
+      \item \textbf{Static limit:} maximum assigned memory for a VM
+      \item \textbf{Ballooning:} cooperative reclamation from guests to enable overcommit
+      \item \textbf{Swapping/reclamation:} provider-side memory pressure mechanisms (risk of latency inflation)
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 %------------------------------------------------
-\begin{frame}{The Virtual Machine Abstraction}
-  \begin{block}{Definition}
-    A virtual machine is a software-defined abstraction of a physical computer,
-    including CPU, memory, devices, and firmware.
+\begin{frame}{Diagram: Resource Allocation and Enforcement Points}
+  \begin{tikzpicture}[
+      box/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
+          minimum width=9.0cm, minimum height=0.9cm, align=left, inner sep=6pt},
+      smallbox/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
+          minimum width=5.8cm, minimum height=0.85cm, align=left, inner sep=6pt},
+      arrow/.style={-Latex, line width=0.8pt},
+      node distance=6mm
+    ]
+
+    \node[box] (vm) {\textbf{Virtual Machine}\\
+      \(\bullet\) configured: vCPUs, CPU cap/share; memory limit/reservation\\
+      \(\bullet\) observed: CPU utilization, run-queue delay; memory pressure indicators};
+
+    \node[smallbox, below=of vm, xshift=-3.1cm] (cpu) {\textbf{CPU Scheduler (Hypervisor)}\\
+      \(\bullet\) enforces shares and caps\\
+      \(\bullet\) maps vCPUs \(\rightarrow\) pCPUs};
+
+    \node[smallbox, below=of vm, xshift=3.1cm] (mem) {\textbf{Memory Manager (Hypervisor)}\\
+      \(\bullet\) enforces memory limits\\
+      \(\bullet\) ballooning / reclamation};
+
+    \node[box, below=of cpu, yshift=-2mm] (hw) {\textbf{Hardware Resources}\\
+      \(\bullet\) physical cores, caches; DRAM; IOMMU/device DMA constraints};
+
+    \draw[arrow] (vm.south) -- (cpu.north);
+    \draw[arrow] (vm.south) -- (mem.north);
+    \draw[arrow] (cpu.south) -- (hw.north);
+    \draw[arrow] (mem.south) -- (hw.north);
+
+  \end{tikzpicture}
+
+  \vspace{0.6em}
+  \small
+  \textbf{Figure:} Enforcement points for CPU and memory control. Allocation policies are implemented by the hypervisor scheduler
+  and memory manager, which multiplex physical resources across VMs.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Concrete Control Examples (CPU \% and Memory \%)}
+  \begin{block}{CPU}
+    \begin{itemize}
+      \item \textbf{CPU cap (percentage):} limit a VM to (e.g.) \(60\%\) of one core or \(240\%\) of a 4-core entitlement
+      \item \textbf{Shares/weights:} if two VMs have weights \(2{:}1\), they receive that proportion under contention
+      \item \textbf{Pinning/affinity:} restrict vCPUs to selected cores to control interference and improve predictability
+    \end{itemize}
   \end{block}
 
+  \begin{block}{Memory}
+    \begin{itemize}
+      \item \textbf{Memory limit:} hard upper bound on guest-usable memory
+      \item \textbf{Reservation:} minimum memory intended to remain available (platform-dependent)
+      \item \textbf{Overcommit with ballooning:} reclaim unused guest pages before swapping at the host
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Summary}
   \begin{itemize}
-    \item Presents a conventional hardware interface to the guest OS
-    \item Preserves OS assumptions about privilege, memory, interrupts, and devices
-    \item Enables independent failure, security, and resource control domains
+    \item Emulation, process VMs, and hypervisors address different requirements and expose different boundaries
+    \item Type~1 and Type~2 hypervisors differ mainly in where the trusted base resides and how drivers are obtained
+    \item Modern platforms treat CPU and memory as first-class, policy-controlled resources: shares, caps, reservations, and limits
   \end{itemize}
 \end{frame}
 
-%------------------------------------------------
-\begin{frame}{System Structure and Trusted Computing Base}
-  \centering
+% ------------------------------------------------------------
+\begin{frame}{Virtualization and Containers}
+  Virtualization is about running workloads as if they had their own machine.
 
-  \begin{tikzpicture}[node distance=5mm]
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=7cm, minimum height=0.9cm] (apps)
-    {Applications};
-
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=7cm, minimum height=0.9cm,
-      below=of apps] (gos)
-    {Guest Operating System};
-
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=7cm, minimum height=0.9cm,
-      below=of gos] (vmm)
-    {VMM / Device Model};
-
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=7cm, minimum height=0.9cm,
-      below=of vmm] (hyp)
-    {Hypervisor Core};
-
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=7cm, minimum height=0.9cm,
-      below=of hyp] (hw)
-    {Physical Hardware};
-
-    \draw[-Latex] (apps) -- (gos);
-    \draw[-Latex] (gos) -- (vmm);
-    \draw[-Latex] (vmm) -- (hyp);
-    \draw[-Latex] (hyp) -- (hw);
-
-    \node[draw, dashed, very thick, fit=(vmm)(hyp), inner sep=8pt] {};
-  \end{tikzpicture}
-
-  \vspace{0.6em}
-  \small
-  \textbf{Figure:} Logical layering of a virtual machine system. The trusted computing
-  base consists primarily of the hypervisor core and device model.
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}{CPU Virtualization: VM Entry and Exit}
-  \centering
-
-  \begin{tikzpicture}
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=7cm, minimum height=1cm] (guest)
-    at (0,3)
-    {Guest Execution (Non-root Mode)};
-
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=7cm, minimum height=1cm] (hyp)
-    at (0,1.2)
-    {Hypervisor Execution (Root Mode)};
-
-    \draw[-Latex] (guest.south) -- node[right] {\small VM Exit} (hyp.north);
-
-    \draw[-Latex] (hyp.north east)
-    .. controls +(2,1) and +(2,-1) ..
-    node[right] {\small VM Entry}
-    (guest.south east);
-
-    % IMPORTANT: no itemize inside node; use paragraph text with bullets
-    \node[draw, rectangle, rounded corners=2pt,
-      text width=7cm, align=left, inner sep=5pt]
-    at (0,-0.45)
-    {\small \textbf{Examples of VM exit causes:}\\
-      \(\bullet\) privileged instruction\\
-      \(\bullet\) control register update\\
-      \(\bullet\) page fault or device access};
-  \end{tikzpicture}
-
-  \vspace{0.6em}
-  \small
-  \textbf{Figure:} Hardware-supported transitions between guest and hypervisor
-  execution contexts.
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}{Memory Virtualization Using Nested Paging}
-  \centering
-
-  \begin{tikzpicture}[node distance=6mm]
-    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm] (gva)
-    {Guest Virtual Address (GVA)};
-    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm,
-      below=of gva] (gpt)
-    {Guest Page Tables};
-    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm,
-      below=of gpt] (gpa)
-    {Guest Physical Address (GPA)};
-    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm,
-      below=of gpa] (npt)
-    {Nested Page Tables (EPT / NPT)};
-    \node[draw, rectangle, rounded corners=2pt, minimum width=8cm,
-      below=of npt] (hpa)
-    {Host Physical Address (HPA)};
-
-    \draw[-Latex] (gva) -- (gpt);
-    \draw[-Latex] (gpt) -- (gpa);
-    \draw[-Latex] (gpa) -- (npt);
-    \draw[-Latex] (npt) -- (hpa);
-
-    \node[draw, dashed, very thick, fit=(gpt)(npt), inner sep=6pt] {};
-  \end{tikzpicture}
-
-  \vspace{0.6em}
-  \small
-  \textbf{Figure:} Two-dimensional address translation used in hardware-assisted
-  memory virtualization.
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}{I/O Virtualization Design Space}
-  \centering
-
-  \begin{tikzpicture}
-    \draw[line width=0.9pt] (-4,2.2) -- (4,2.2);
-    \node at (-4,2.6) {\small Compatibility};
-    \node at (4,2.6) {\small Performance};
-
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=4.5cm] (emu) at (-3,1.4)
-    {Device Emulation};
-
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=4.5cm] (pv) at (0,1.4)
-    {Paravirtual I/O};
-
-    \node[draw, rectangle, rounded corners=2pt,
-      minimum width=4.5cm] (pas) at (3,1.4)
-    {Device Passthrough};
-
-    \draw[-Latex] (emu.north) -- (-3,2.2);
-    \draw[-Latex] (pv.north) -- (0,2.2);
-    \draw[-Latex] (pas.north) -- (3,2.2);
-  \end{tikzpicture}
-
-  \vspace{0.6em}
-  \small
-  \textbf{Figure:} Spectrum of I/O virtualization techniques and their trade-offs.
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}{Current Directions in Virtualization}
+  \medskip
+  In Linux container-style virtualization, two kernel features provide most of the illusion:
   \begin{itemize}
-    \item MicroVMs reduce device models and trusted code size
-    \item Confidential VMs protect memory from privileged software
-    \item Virtual machines serve as isolation boundaries for containerized workloads
-    \item Integration with cluster schedulers and cloud control planes
+    \item \textbf{Namespaces} \(\rightarrow\) \emph{isolation}: ``what you can see''
+    \item \textbf{Control groups (cgroups)} \(\rightarrow\) \emph{control}: ``what you can use''
+  \end{itemize}
+
+  \medskip
+  A \textbf{container} is typically: \textit{namespaces + cgroups} (plus filesystem + tooling).
+
+  If multiple applications share one OS kernel, we want:
+  \begin{itemize}
+    \item Strong \textbf{separation of views} (processes, network, mounts, hostnames, users)
+    \item Predictable \textbf{resource sharing} (CPU, memory, I/O) without one app starving others
+  \end{itemize}
+
+  \medskip
+  Linux containers achieve this without a hypervisor by virtualizing \emph{interfaces to the kernel}.
+\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{Namespaces: isolation of kernel resources}
+  A \textbf{namespace} gives a process a private view of a specific kernel resource.
+
+  \medskip
+  Common namespaces:
+  \begin{itemize}
+    \item \textbf{PID} (process IDs): processes see a different PID tree
+    \item \textbf{Mount} (MNT): separate mount table / filesystem view
+    \item \textbf{Network} (NET): interfaces, routes, ports isolated
+    \item \textbf{UTS}: hostname/domainname isolation
+    \item \textbf{IPC}: SysV IPC, POSIX message queues, etc.
+    \item \textbf{User} (USER): user/group ID mapping (enables unprivileged containers)
+    \item \textbf{Cgroup} namespace: hides cgroup paths
   \end{itemize}
 \end{frame}
 
+% ------------------------------------------------------------
+\begin{frame}{Control groups (cgroups): accounting and limits}
+  \textbf{cgroups} group processes and apply resource \emph{accounting, limits, and prioritization}.
 
+  \medskip
+  Typical controls:
+  \begin{itemize}
+    \item \textbf{CPU}: shares/quotas; prevent CPU hogging
+    \item \textbf{Memory}: limits; OOM behavior per group
+    \item \textbf{I/O}: throttle block I/O
+    \item \textbf{PIDs}: limit number of processes
+  \end{itemize}
 
+  \medskip
+  Key idea: \textbf{namespaces isolate}; \textbf{cgroups constrain}.
+\end{frame}
 
+% ------------------------------------------------------------
+\begin{frame}{How they fit together (container model)}
+  A container runtime typically:
+  \begin{enumerate}
+    \item Creates new \textbf{namespaces} for the process (isolation)
+    \item Places the process into \textbf{cgroups} (resource governance)
+    \item Sets up a root filesystem and mounts (often with overlayfs)
+    \item Configures networking (veth pairs, bridges, NAT, etc.)
+  \end{enumerate}
 
+  \medskip
+  The result: a process that \emph{looks} like it runs on its own system and can be \emph{limited}.
+\end{frame}
 
+% ============================================================
+% TikZ DIAGRAM SLIDE #1 (own slide + caption)
+% ============================================================
+\begin{frame}{Diagram: cgroups as a resource governance tree}
+  \centering
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}[
+        font=\small,
+        node distance=10mm,
+        box/.style={draw, rounded corners, align=center, inner sep=6pt},
+        arrow/.style={-Latex, thick}
+      ]
+      \node[box] (root) {cgroup root\\\texttt{/sys/fs/cgroup}};
+      \node[box, below left=of root, xshift=-6mm] (svcA) {serviceA\\CPU=50\%\\Mem=512MB};
+      \node[box, below right=of root, xshift=6mm] (svcB) {serviceB\\CPU=50\%\\Mem=512MB};
 
+      \node[box, below=of svcA] (a1) {proc A1};
+      \node[box, below=of a1] (a2) {proc A2};
 
+      \node[box, below=of svcB] (b1) {proc B1};
 
+      \draw[arrow] (root) -- (svcA);
+      \draw[arrow] (root) -- (svcB);
+      \draw[arrow] (svcA) -- (a1);
+      \draw[arrow] (a1) -- (a2);
+      \draw[arrow] (svcB) -- (b1);
 
+      \node[draw, dashed, rounded corners, fit=(svcA)(a2), inner sep=6pt, label={[font=\small]above:limits apply to the group}] {};
+      \node[draw, dashed, rounded corners, fit=(svcB)(b1), inner sep=6pt] {};
+    \end{tikzpicture}
+    \caption{Cgroups organize processes into a hierarchy and apply resource limits/accounting per group.}
+  \end{figure}
+\end{frame}
 
+% ============================================================
+% TikZ DIAGRAM SLIDE #2 (own slide + caption)
+% ============================================================
+\begin{frame}{Diagram: namespaces provide separate ``views''}
+  \centering
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}[
+        font=\small,
+        node distance=8mm,
+        box/.style={draw, rounded corners, align=center, inner sep=6pt},
+        layer/.style={draw, rounded corners, minimum width=3.5cm, minimum height=0.9cm, align=center},
+        arrow/.style={-Latex, thick}
+      ]
+      \node[box] (host) {Host kernel\\(shared)};
 
+      \node[layer, below=of host] (ns1) {Namespace set for Container 1: \\ PID, NET, MNT, UTS, IPC, USER};
+      \node[layer, below=of ns1] (p1) {Processes inside Container 1\\see private PID tree, mounts, hostname, network};
 
+      \node[layer, right=2.2cm of ns1] (ns2) {Namespace set for Container 2: \\PID, NET, MNT, UTS, IPC, USER};
+      \node[layer, below=of ns2] (p2) {Processes inside Container 2\\see a different private view};
 
+      \draw[arrow] (host) -- (ns1);
+      \draw[arrow] (ns1) -- (p1);
 
+      \draw[arrow] (host) -- (ns2);
+      \draw[arrow] (ns2) -- (p2);
 
+      \node[draw, dashed, rounded corners, fit=(ns1)(p1), inner sep=6pt, label={[font=\small]above:Container 1}] {};
+      \node[draw, dashed, rounded corners, fit=(ns2)(p2), inner sep=6pt, label={[font=\small]above:Container 2}] {};
+    \end{tikzpicture}
+    \caption{Namespaces isolate what processes can see; multiple containers can share one kernel while keeping distinct views.}
+  \end{figure}
+\end{frame}
 
+% ------------------------------------------------------------
+\begin{frame}{A simple isolation example with \texttt{unshare}}
+  \texttt{unshare} creates new namespaces for a process (and its children).
+
+  \medskip
+  We'll demonstrate isolation by creating:
+  \begin{itemize}
+    \item a new \textbf{UTS namespace} (private hostname)
+    \item a new \textbf{PID namespace} (PID 1 inside)
+    \item a new \textbf{mount namespace} (private mount table)
+    \item optionally a \textbf{user namespace} (run as ``root'' inside without host root)
+  \end{itemize}
+\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}[fragile]{Example: \texttt{unshare} for a private hostname + PID tree}
+  \begin{lstlisting}[style=sh]
+# Create new user, mount, UTS, and PID namespaces.
+# --map-root-user maps your user to root inside the user namespace.
+unshare --user --map-root-user --mount --uts --pid --fork /bin/bash
+\end{lstlisting}
+
+  Inside the new shell:
+  \begin{lstlisting}[style=sh]
+# UTS namespace: hostname is private
+hostname container-demo
+
+# PID namespace: this shell's child processes start a new PID tree
+echo "my pid:" $$
+
+# Compare process listing (you should see a tiny PID universe)
+ps -ef
+\end{lstlisting}
+\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}[fragile]{Example: mount namespace isolation (private mounts)}
+  In the same \texttt{unshare} shell:
+
+  \begin{lstlisting}[style=sh]
+# Make mount operations "private" to this namespace
+mount --make-rprivate /
+
+# Create a temporary mount only visible here
+mkdir -p /tmp/ns-mount
+mount -t tmpfs tmpfs /tmp/ns-mount
+
+# Observe it exists here:
+mount | grep ns-mount
+\end{lstlisting}
+
+  On the host (outside the namespace), that tmpfs mount will not appear in \texttt{mount} output.
+\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{What isolation did we get?}
+  From the example:
+  \begin{itemize}
+    \item \textbf{UTS namespace}: hostname change does not affect the host
+    \item \textbf{PID namespace}: processes see a new PID hierarchy (often with PID 1 inside)
+    \item \textbf{Mount namespace}: mounts are private to the namespace
+    \item \textbf{User namespace}: you can have root-like IDs inside without being host root
+  \end{itemize}
+
+  \medskip
+  This is the core of container isolation, and it ties directly back to virtualization:\\
+  \textbf{virtualize the process's view of the system without virtualizing the hardware.}
+\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{Takeaways}
+  \begin{itemize}
+    \item Virtualization can be done at different layers: hardware (VMs) vs. OS interfaces (containers).
+    \item \textbf{Namespaces} isolate what processes can see (views of kernel resources).
+    \item \textbf{cgroups} govern what processes can use (resource limits/accounting).
+    \item \texttt{unshare} is a minimal, direct way to see namespace isolation in action.
+  \end{itemize}
+\end{frame}
 
 
 \subsection{Containers}
