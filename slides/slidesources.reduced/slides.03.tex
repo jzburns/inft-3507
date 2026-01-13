@@ -413,10 +413,9 @@
 
 %------------------------------------------------
 \begin{frame}{Diagram: Taxonomy of Virtualization Approaches}
-  \centering
   \begin{tikzpicture}[
       box/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
-          minimum width=11.5cm, minimum height=1.0cm, align=left, inner sep=6pt},
+          minimum width=9cm, minimum height=1.0cm, align=left, inner sep=6pt},
       arrow/.style={-Latex, line width=0.8pt},
       node distance=6mm
     ]
@@ -435,11 +434,11 @@
     % A light grouping annotation
     \node[draw, dashed, very thick, rounded corners=2pt,
       fit=(pvm), inner sep=7pt] (pvmfit) {};
-    \node[anchor=west] at ([xshift=3mm]pvmfit.east) {\small program boundary};
+    \node[anchor=west] at ([xshift=2mm]pvmfit.east) {\footnotesize program boundary};
 
     \node[draw, dashed, very thick, rounded corners=2pt,
       fit=(svm), inner sep=7pt] (svmfit) {};
-    \node[anchor=west] at ([xshift=3mm]svmfit.east) {\small OS boundary};
+    \node[anchor=west] at ([xshift=2mm]svmfit.east) {\footnotesize OS boundary};
 
   \end{tikzpicture}
 
@@ -488,7 +487,7 @@
     \draw[arrow] (t1h) -- (t1p);
 
     \node[tcb, fit=(t1v)(t1h)] (t1tcb) {};
-    \node[anchor=west] at ([xshift=2mm]t1tcb.east) {\small TCB};
+    \node[anchor=west] at ([xshift=-1mm]t1tcb.east) {\small TCB};
 
     % --- Right: Type 2 ---
     \node at (3.4,4.2) {\textbf{Type 2 (Hosted)}};
@@ -801,11 +800,11 @@ ps -ef
 mount --make-rprivate /
 
 # Create a temporary mount only visible here
-mkdir -p /tmp/ns-mount
-mount -t tmpfs tmpfs /tmp/ns-mount
+mkdir -p /tmp/ns-mnt
+mount -t tmpfs tmpfs /tmp/ns-mnt
 
 # Observe it exists here:
-mount | grep ns-mount
+mount | grep ns-mnt
 \end{lstlisting}
 
   On the host (outside the namespace), that tmpfs mount will not appear in \texttt{mount} output.

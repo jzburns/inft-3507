@@ -235,12 +235,15 @@
 
 % --- listings style (simple, readable) ---
 \lstdefinestyle{sh}{
+  language=bash,
   basicstyle=\ttfamily\small,
   breaklines=true,
   columns=fullflexible,
-  commentstyle=\color{blue!50!blue}\itshape,
+  commentstyle=\color{blue!60!black}\itshape,
   frame=single,
   rulecolor=\color{black!30},
+  keywordstyle=\color{magenta},
+  morekeywords={mkdir,mount,hostname,unshare},
   backgroundcolor=\color{black!2},
   showstringspaces=false
 }
