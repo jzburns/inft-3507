@@ -291,26 +291,30 @@
 \end{frame}
 
 \begin{frame}{Availability v Reliability: Numerical Example}
-  \textbf{System 1}
-  \begin{itemize}
-    \item Fails every 10 minutes
-    \item Repair time = 1 second
-    \item \emph{Availability} $\approx$ 99.83\%
-    \item \emph{Reliability over 1 hour} $\approx$ almost zero
-  \end{itemize}
+  \begin{block}{System 1}
+    \begin{itemize}
+      \item Fails every 10 minutes
+      \item Repair time = 1 second
+      \item \emph{Availability} $\approx$ 99.83\%
+      \item \emph{Reliability over 1 hour} $\approx$ almost zero
+    \end{itemize}
+  \end{block}
 
-  \textbf{System 2}
-  \begin{itemize}
-    \item Fails every 6 months
-    \item Repair time = 6 hours
-    \item \emph{Availability} $\approx$ 99.83\%
-    \item \emph{Reliability over 1 hour} $\approx$ almost 1
-  \end{itemize}
-  Same availability. Completely different reliability.
+  \begin{block}{System 2}
+    \begin{itemize}
+      \item Fails every 6 months
+      \item Repair time = 6 hours
+      \item \emph{Availability} $\approx$ 99.83\%
+      \item \emph{Reliability over 1 hour} $\approx$ almost 1
+    \end{itemize}
+  \end{block}
+  \textbf{Conclusion}: Two systems, with the same
+  \emph{availability}, but completely different
+  \emph{reliability}.
 \end{frame}
 
 \subsection{Security}
-\begin{frame}{A Note on security}
+\begin{frame}{A Note on Security}
   \begin{alertblock}{Observation}
     A distributed system that is not secure, is not dependable
   \end{alertblock}
