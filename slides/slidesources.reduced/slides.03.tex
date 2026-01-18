@@ -54,12 +54,9 @@
   \end{block}
 \end{frame}
 \begin{frame}{The cost of a context switch}
-  \begin{block}{Consider a simple clock-interrupt handler}
-    \begin{itemize}
-      \item \textbf{direct costs}: actual switch and executing code of the handler
-      \item \textbf{indirect costs}: other costs, notably caused by messing up the cache
-    \end{itemize}
-  \end{block}
+  Suppose we have a page cache on the CPU with 4 slots. Each
+  slot can accommodate one 4k page, associated with
+  the instructions for a process (below, A,B,C,D)
   \begin{block}{What a context switch may cause: indirect costs}
     \begin{columns}
       \begin{column}{0.5\textwidth}
@@ -82,6 +79,33 @@
     \end{columns}
   \end{block}
 \end{frame}
+
+\begin{frame}{Cache Perturbation Hypothesis}
+  Ref: "The Context-Switch Overhead Inflicted by
+  Hardware Interrupts (and the Enigma of
+  Do-Nothing Loops)” by Dan Tsafrir (IBM T.J. Watson
+  Research Center), presented at the ACM
+  Workshop on Experimental Computer Science (ExpCS ’07)."
+
+  \begin{block}{Experiment}
+    \begin{itemize}
+      \item A trivial 1 ms loop is repeatedly executed.
+      \item Time measurements show perturbations due to interrupts.
+      \item Some implementations showed overheads an order of magnitude larger than expected.
+    \end{itemize}
+  \end{block}
+
+  \begin{itemize}\tightlist
+    \item Hardware counters were insufficient to isolate cause
+    \item Some effects might involve:
+    \item Instruction cache
+    \item Data cache
+    \item TLB
+    \item Branch predictors
+  \end{itemize}
+  % This is exactly the problem we see in the previous slide
+\end{frame}
+
 % \begin{frame}{A simple example in Python}
 %   \begin{centerfig}
 %     \includelisting{03-03/mp} 
