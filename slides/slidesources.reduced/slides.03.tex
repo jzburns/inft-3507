@@ -30,11 +30,11 @@
 \begin{frame}{Why use threads}
   \begin{block}{Some simple reasons}
     \begin{itemize}
-      \item \blue{Avoid needless blocking}: a single-threaded process will \red{block} when doing I/O; in a
+      \item \textbf{Avoid needless blocking}: a single-threaded process will \red{block} when doing I/O; in a
             multithreaded process, the operating system can switch the CPU to another thread in that process.
-      \item \blue{Exploit parallelism}: the threads in a multithreaded process can be scheduled to run in
+      \item \textbf{Exploit parallelism}: the threads in a multithreaded process can be scheduled to run in
             parallel on a multiprocessor or multicore processor.
-      \item \blue{Avoid process switching}: structure large applications not as a collection of processes, but
+      \item \textbf{Avoid process switching}: structure large applications not as a collection of processes, but
             through multiple threads.
     \end{itemize}
   \end{block}
@@ -56,8 +56,8 @@
 \begin{frame}{The cost of a context switch}
   \begin{block}{Consider a simple clock-interrupt handler}
     \begin{itemize}
-      \item \red{direct costs}: actual switch and executing code of the handler
-      \item \red{indirect costs}: other costs, notably caused by messing up the cache
+      \item \textbf{direct costs}: actual switch and executing code of the handler
+      \item \textbf{indirect costs}: other costs, notably caused by messing up the cache
     \end{itemize}
   \end{block}
   \begin{block}{What a context switch may cause: indirect costs}
@@ -171,12 +171,12 @@
   \end{alertblock}
   \begin{block}{User-space solution}
     \begin{itemize}
-      \item All operations can be completely handled \blue{within a single process} \mathexpr{\Rightarrow}
+      \item All operations can be completely handled \textbf{within a single process} \mathexpr{\Rightarrow}
             implementations can be extremely efficient.
-      \item \blue{All} services provided by the kernel are done \blue{on behalf of the process in which a thread
+      \item \textbf{All} services provided by the kernel are done \textbf{on behalf of the process in which a thread
               resides} \mathexpr{\Rightarrow} if the kernel decides to block a thread, the entire process will be
             blocked.
-      \item Threads are used when there are many external events: \blue{threads block on a per-event basis}
+      \item Threads are used when there are many external events: \textbf{threads block on a per-event basis}
             \mathexpr{\Rightarrow} if the kernel can't distinguish threads, how can it support signaling events to
             them?
     \end{itemize}
@@ -204,9 +204,9 @@
 %   \begin{block}{Principle operation}
 %     \begin{itemize}%\tightlist
 %     \item User thread does system call \mathexpr{\Rightarrow} \red{the kernel thread that is
-%       executing that user thread, blocks}. The user thread remains \blue{bound} to the kernel thread.
+%       executing that user thread, blocks}. The user thread remains \textbf{bound} to the kernel thread.
 %     \item The kernel can \red{schedule another kernel thread having a runnable user thread bound to
-%       it}. Note: this user thread can switch to \blue{any} other runnable user thread currently in user
+%       it}. Note: this user thread can switch to \textbf{any} other runnable user thread currently in user
 %       space.
 %     \item A user thread calls a blocking user-level operation \mathexpr{\Rightarrow} do context switch
 %       to a runnable user thread, (then bound to the same kernel thread).
@@ -220,8 +220,8 @@
   \begin{block}{Multithreaded web client}
     Hiding network latencies:
     \begin{itemize}\tightlist
-      \item Web browser scans an incoming HTML page, and finds that \blue{more files need to be fetched}.
-      \item \blue{Each file is fetched by a separate thread}, each doing a (blocking) HTTP request.
+      \item Web browser scans an incoming HTML page, and finds that \textbf{more files need to be fetched}.
+      \item \textbf{Each file is fetched by a separate thread}, each doing a (blocking) HTTP request.
       \item As files come in, the browser displays them.
     \end{itemize}
   \end{block}
@@ -229,7 +229,7 @@
     \begin{itemize}\tightlist
       \item A client does several calls at the same time, each one by a different thread.
       \item It then waits until all results have been returned.
-      \item Note: if calls are to different servers, we may have a \blue{linear speed-up}.
+      \item Note: if calls are to different servers, we may have a \textbf{linear speed-up}.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -243,22 +243,22 @@
   \onslide
   \begin{block}{Practical measurements}
     A typical Web browser has a TLP value between 1.5 and 2.5 \mathexpr{\Rightarrow} threads are primarily
-    used for \blue{logically organizing} browsers.
+    used for \textbf{logically organizing} browsers.
   \end{block}
 \end{frame}
 \begin{frame}{Using threads at the server side}
   \begin{block}{Improve performance}
     \begin{itemize}\tightlist
       \item Starting a thread is cheaper than starting a new process.
-      \item Having a single-threaded server prohibits simple scale-up to a \blue{multiprocessor system}.
-      \item As with clients: \blue{hide network latency} by reacting to next request while previous one is being replied.
+      \item Having a single-threaded server prohibits simple scale-up to a \textbf{multiprocessor system}.
+      \item As with clients: \textbf{hide network latency} by reacting to next request while previous one is being replied.
     \end{itemize}
   \end{block}
   \begin{block}{Better structure}
     \begin{itemize}\tightlist
-      \item Most servers have high I/O demands. Using simple, \blue{well-understood blocking calls} simplifies
+      \item Most servers have high I/O demands. Using simple, \textbf{well-understood blocking calls} simplifies
             the structure.
-      \item Multithreaded programs tend to be \blue{smaller and easier to understand} due to \blue{simplified
+      \item Multithreaded programs tend to be \textbf{smaller and easier to understand} due to \textbf{simplified
               flow of control}.
     \end{itemize}
   \end{block}
@@ -314,7 +314,7 @@
 %     %   \includefigure{03-10a} &
 %     %   \includefigure{03-10b} &
 %     %   \includefigure{03-10c} \\
-%     %   \blue{(a) Process VM} & \blue{(b) Native VMM} & \blue{(c) Hosted VMM}
+%     %   \textbf{(a) Process VM} & \textbf{(b) Native VMM} & \textbf{(c) Hosted VMM}
 %     % \end{tabular}
 %     \begin{verbatim}
 % (a) Process VM           (b) Native VMM           (c) Hosted VMM
@@ -346,7 +346,7 @@
 %       \includefigure[0.71]{03-11}
 %       \begin{minipage}[b]{0.4\textwidth}
 %         \begin{itemize}\tightlist
-%           \item \red{Privileged instruction}: if and only if executed in user mode, it causes a \blue{trap}
+%           \item \red{Privileged instruction}: if and only if executed in user mode, it causes a \textbf{trap}
 %                 to the operating system
 %           \item \red{Nonpriviliged instruction}: the rest
 %         \end{itemize}
@@ -375,7 +375,7 @@
 %     \begin{itemize}
 %       \item Emulate all instructions
 %       \item Wrap nonprivileged sensitive instructions to divert control to VMM
-%       \item \blue{Paravirtualization}: modify guest OS, either by preventing nonprivileged sensitive
+%       \item \textbf{Paravirtualization}: modify guest OS, either by preventing nonprivileged sensitive
 %             instructions, or making them nonsensitive (i.e., changing the context).
 %     \end{itemize}
 %   \end{block}
@@ -833,10 +833,10 @@ mount | grep ns-mnt
   \end{centerfig}
 
   \begin{itemize}\tightlist
-    \item \blue{Namespaces}: a collection of processes in a container is given their own view of identifiers
-    \item \blue{Union file system:} combine several file systems into a layered fashion with only the highest
+    \item \textbf{Namespaces}: a collection of processes in a container is given their own view of identifiers
+    \item \textbf{Union file system:} combine several file systems into a layered fashion with only the highest
           layer allowing for \code{write} operations (and the one being part of a container).
-    \item \blue{Control groups}: resource restrictions can be imposed upon a collection of processes.
+    \item \textbf{Control groups}: resource restrictions can be imposed upon a collection of processes.
   \end{itemize}
 \end{frame}
 
