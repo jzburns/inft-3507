@@ -309,42 +309,8 @@
   Same availability. Completely different reliability.
 \end{frame}
 
-
-\begin{frame}{Terminology}
-  \begin{block}{Failure, error, fault}
-    \begin{center}
-      \begin{tabular}{|l|>{\RRCOL}p{0.4\textwidth}|>{\RRCOL}p{0.3\textwidth}|}\hline
-        \textbf{Term} & \textbf{Description}                               & \textbf{Example}  \\ \whline
-        \red{Failure} & A component is not living up to its specifications & Crashed program   \\ \hline
-        \red{Error}   & Part of a component that can lead to a failure     & Programming bug   \\ \hline
-        \red{Fault}   & Cause of an error                                  & Sloppy programmer \\ \hline
-      \end{tabular}
-    \end{center}
-  \end{block}
-\end{frame}
-\begin{frame}{Terminology}
-  \begin{block}{Handling faults}
-    \begin{center}
-      \begin{tabular}{|>{\RRCOL}p{0.2\textwidth}|>{\RRCOL}p{0.3\textwidth}|>{\RRCOL}p{0.3\textwidth}|}\hline
-        \textbf{Term} & \textbf{Description}                                                         & \textbf{Example} \\ \whline
-        \red{Fault prevention}
-                      & Prevent the occurrence of a fault
-                      & Don't hire sloppy programmers                                                                   \\ \hline
-        \red{Fault tolerance}
-                      & Build a component and make it mask the occurrence of a fault
-                      & Build each component by two independent programmers                                             \\ \hline
-        \red{Fault removal}
-                      & Reduce the presence, number, or seriousness of a fault
-                      & Get rid of sloppy programmers                                                                   \\ \hline
-        \red{Fault forecasting}
-                      & Estimate current presence, future incidence, and consequences of faults
-                      & Estimate how a recruiter is doing when it comes to hiring sloppy programmers                    \\ \hline
-      \end{tabular}
-    \end{center}
-  \end{block}
-\end{frame}
 \subsection{Security}
-\begin{frame}{On security}
+\begin{frame}{A Note on security}
   \begin{alertblock}{Observation}
     A distributed system that is not secure, is not dependable
   \end{alertblock}
