@@ -1,51 +1,51 @@
 \part{Introduction}
 \section{From networked systems to distributed systems}
 \subsection{Distributed versus decentralized systems}
-\begin{slide}{Distributed versus Decentralized}
+\begin{frame}{Distributed versus Decentralized}
   \begin{block}{What many people state}
     \begin{centerfig}
       \begin{tabular}{c@{\hspace*{1cm}}c@{\hspace*{1cm}}c}
         \includefigure{01-01a} &
         \includefigure{01-01b} &
-        \includefigure{01-01c} \\
-        Centralized & Decentralized & Distributed
+        \includefigure{01-01c}                               \\
+        Centralized            & Decentralized & Distributed
       \end{tabular}
     \end{centerfig}
   \end{block}
   \onslide
   \begin{alertblock}{When does a decentralized system become distributed?}
     \begin{itemize}\tightlist
-    \item Adding 1 link between two nodes in a decentralized system?
-    \item Adding 2 links between two other nodes?
-    \item In general: adding \mathexpr{k>0} links....? 
+      \item Adding 1 link between two nodes in a decentralized system?
+      \item Adding 2 links between two other nodes?
+      \item In general: adding \mathexpr{k>0} links....?
     \end{itemize}
   \end{alertblock}
-\end{slide}
-\begin{slide}{Alternative approach}
+\end{frame}
+\begin{frame}{Alternative approach}
   \begin{block}{Theoretical Definitions}
     \begin{itemize}\tightlist
-    \item \emph{Decentralized computing} - a networked computer system in which processes and resources are
-      \emph{necessarily} spread across multiple computers.
-    \item \emph{Distributed computing} - is a networked computer system in which processes and resources are
-      \emph{sufficiently} spread across multiple computers.
+      \item \emph{Decentralized computing} - a networked computer system in which processes and resources are
+            \emph{necessarily} spread across multiple computers.
+      \item \emph{Distributed computing} - is a networked computer system in which processes and resources are
+            \emph{sufficiently} spread across multiple computers.
     \end{itemize}
   \end{block}
   \begin{alertblock}{Modern ("Cloud") Definitions}
+    \begin{itemize}\tightlist
+      \item \emph{Decentralized computing} - independent nodes operating without a central authority, making autonomous decisions
+      \item \emph{Distributed computing} - multiple interconnected nodes working collaboratively to solve a task, coordinated by a central system
+    \end{itemize}
+  \end{alertblock}
   \begin{itemize}\tightlist
-    \item \emph{Decentralized computing} - independent nodes operating without a central authority, making autonomous decisions
-    \item \emph{Distributed computing} - multiple interconnected nodes working collaboratively to solve a task, coordinated by a central system
-  \end{itemize}
-\end{alertblock}
-  \begin{itemize}\tightlist
-    \item Both use multiple nodes but differ in control structure, 
-    coordination, and application focus, balancing autonomy 
-    versus efficiency
+    \item Both use multiple nodes but differ in control structure,
+          coordination, and application focus, balancing autonomy
+          versus efficiency
     \item A \emph{node} is a compute resource with some local storage
-    eg, a process, a container, a virtual machine, a dedicated server, 
-    a cluster of servers
+          eg, a process, a container, a virtual machine, a dedicated server,
+          a cluster of servers
   \end{itemize}
-\end{slide}
-%   \begin{slide}{Some common misconceptions}
+\end{frame}
+%   \begin{frame}{Some common misconceptions}
 %     \begin{block}{Centralized solutions do not scale}
 %       Make distinction between \red{logically} and \red{physically} centralized. The root of the Domain Name
 %       System:\vspace*{-6pt}
@@ -70,43 +70,43 @@
 %       \red{security}, etc. We need to develop skills by which distributed systems can be readily understood so
 %       as to judge such misconceptions.
 %     \end{alertblock}
-%   \end{slide}
+%   \end{frame}
 % \subsection{Why making the distinction is relevant}
 \subsection{Studying distributed systems}
-\begin{slide}{Perspectives on distributed systems}
+\begin{frame}{Perspectives on distributed systems}
   \begin{block}{Distributed systems are complex: take persepctives}
     \begin{itemize}\firmlist
-    \item \blue{Architecture}: common organizations
-    \item \blue{Process}: what kind of processes, and their relationships
-    \item \blue{Communication}: facilities for exchanging data
-    \item \blue{Coordination}: application-independent algorithms
-    \item \blue{Naming}: how do you identify resources?
-    \item \blue{Consistency} and \blue{replication}: performance requires of data, which need to be \red{the
-      same}
-    \item \blue{Fault tolerance}: keep running in the presence of partial failures
-    \item \blue{Security}: ensure authorized access to resources
+      \item \blue{Architecture}: common organizations
+      \item \blue{Process}: what kind of processes, and their relationships
+      \item \blue{Communication}: facilities for exchanging data
+      \item \blue{Coordination}: application-independent algorithms
+      \item \blue{Naming}: how do you identify resources?
+      \item \blue{Consistency} and \blue{replication}: performance requires of data, which need to be \red{the
+              same}
+      \item \blue{Fault tolerance}: keep running in the presence of partial failures
+      \item \blue{Security}: ensure authorized access to resources
     \end{itemize}
   \end{block}
-\end{slide}
+\end{frame}
 \section{Design goals}
-\begin{slide}{What do we want to achieve?}
+\begin{frame}{What do we want to achieve?}
   \begin{block}{Overall design goals}
     \begin{itemize}
-    \item Support sharing of resources
-    \item Distribution transparency
-    \item Openness
-    \item Scalability
+      \item Support sharing of resources
+      \item Distribution transparency
+      \item Openness
+      \item Scalability
     \end{itemize}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{Resource sharing}
-\begin{slide}{Sharing resources}
+\begin{frame}{Sharing resources}
   \begin{exampleblock}{Canonical examples}
     \begin{itemize}\firmlist
-    \item Cloud-based shared storage and files
-    \item Peer-to-peer assisted multimedia streaming
-    \item Shared mail services (think of outsourced mail systems)
-    \item Shared Web hosting (think of content distribution networks)
+      \item Cloud-based shared storage and files
+      \item Peer-to-peer assisted multimedia streaming
+      \item Shared mail services (think of outsourced mail systems)
+      \item Shared Web hosting (think of content distribution networks)
     \end{itemize}
   \end{exampleblock}
   \begin{block}{Observation}
@@ -115,9 +115,9 @@
     \end{quote}
     (John Gage, Sun Microsystems)
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{Distribution transparency}
-\begin{slide}{Distribution transparency}
+\begin{frame}{Distribution transparency}
   \begin{centerfig}
     \includefigure{01-02}
   \end{centerfig}
@@ -133,24 +133,24 @@
     operating systems: a \red{middleware layer}
   \end{block}
 
-\end{slide}
-\begin{slide}{Distribution transparency}
+\end{frame}
+\begin{frame}{Distribution transparency}
   \begin{block}{Types}
     \begin{center}
       \sffamily\small \renewcommand{\arraystretch}{1.1}
       \begin{tabular}{|l|>{\RRCOL}p{0.7\textwidth}|} \hline
-        \blue{Transparency} & \blue{Description} \\ \whline
+        \blue{Transparency} & \blue{Description}                                                    \\ \whline
         \red{Access}        & Hide differences in data representation and how an object is accessed \\ \hline
-        \red{Location}      & Hide where an object is located \\ \hline
-        \red{Migration}     & Hide that an object may move to another location \\ \hline
-        \red{Replication}   & Hide that an object is replicated \\ \hline
-        \red{Concurrency}   & Hide that an object may be shared by several independent users \\ \hline
-        \red{Failure}       & Hide the failure and recovery of an object \\ \hline
+        \red{Location}      & Hide where an object is located                                       \\ \hline
+        \red{Migration}     & Hide that an object may move to another location                      \\ \hline
+        \red{Replication}   & Hide that an object is replicated                                     \\ \hline
+        \red{Concurrency}   & Hide that an object may be shared by several independent users        \\ \hline
+        \red{Failure}       & Hide the failure and recovery of an object                            \\ \hline
       \end{tabular}
     \end{center}
   \end{block}
-\end{slide}
-% \begin{slide}{Degree of transparency}
+\end{frame}
+% \begin{frame}{Degree of transparency}
 %   \begin{block}{Aiming at full distribution transparency may be too much}
 %     \begin{itemize}\firmlist
 %     \item There are communication latencies that cannot be hidden
@@ -167,8 +167,8 @@
 %       \end{itemize}
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Degree of transparency}
+% \end{frame}
+% \begin{frame}{Degree of transparency}
 % \begin{exampleblock}{Exposing distribution may be good}
 %     \begin{itemize}
 %     \item Making use of location-based services (finding your nearby friends)
@@ -182,9 +182,9 @@
 %     Distribution transparency is a nice goal, but achieving it is a different story, and it should often not
 %     even be aimed at.
 %   \end{block}
-% \end{slide}
+% \end{frame}
 \subsection{Openness}
-\begin{slide}{Openness of distributed systems}
+\begin{frame}{Openness of distributed systems}
   \begin{block}{Open distributed system}
     \itshape A system that \blue{offers components} that can easily be used by, or \blue{integrated into
       other systems}. An open distributed system itself will often consist of components that originate from
@@ -194,14 +194,14 @@
   \begin{block}{What are we talking about?}
     Be able to interact with services from other open systems, irrespective of the underlying environment:
     \begin{itemize}\tightlist
-    \item Systems should conform to well-defined \blue{interfaces}
-    \item Systems should easily \blue{interoperate}
-    \item Systems should support \blue{portability} of applications
-    \item Systems should be easily \blue{extensible}
+      \item Systems should conform to well-defined \blue{interfaces}
+      \item Systems should easily \blue{interoperate}
+      \item Systems should support \blue{portability} of applications
+      \item Systems should be easily \blue{extensible}
     \end{itemize}
   \end{block}
-\end{slide}
-% \begin{slide}{Policies versus mechanisms}
+\end{frame}
+% \begin{frame}{Policies versus mechanisms}
 %   \begin{block}{Implementing openness: policies}
 %     \begin{itemize}\firmlist
 %     \item What level of consistency do we require for client-cached data?
@@ -218,20 +218,20 @@
 %     \item Offer different encryption algorithms
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
-  % \begin{slide}{On strict separation}
-  %   \begin{block}{Observation}
-  %     The stricter the separation between policy and mechanism, the more we need to ensure proper
-  %     mechanisms, potentially leading to many configuration parameters and complex management.
-  %   \end{block}
+% \end{frame}
+% \begin{frame}{On strict separation}
+%   \begin{block}{Observation}
+%     The stricter the separation between policy and mechanism, the more we need to ensure proper
+%     mechanisms, potentially leading to many configuration parameters and complex management.
+%   \end{block}
 
-  %   \begin{alertblock}{Finding a balance}
-  %     Hard-coding policies often simplifies management, \red{and} reduces complexity at the price of less
-  %     flexibility. There is no obvious solution.
-  %   \end{alertblock}
-  % \end{slide}
+%   \begin{alertblock}{Finding a balance}
+%     Hard-coding policies often simplifies management, \red{and} reduces complexity at the price of less
+%     flexibility. There is no obvious solution.
+%   \end{alertblock}
+% \end{frame}
 \subsection{Dependability}
-\begin{slide}{Dependability}
+\begin{frame}{Dependability}
   \begin{block}{Basics}
     A \blue{component} provides \blue{services} to \blue{clients}.  To provide services, the component may
     require the services from other components \mathexpr{\Rightarrow} a component may \red{depend} on some
@@ -241,114 +241,139 @@
     A component \id{C} depends on \id{C^*} if the \blue{correctness} of \id{C}'s behavior depends on the
     correctness of \id{C^*}'s behavior. (Components are processes or channels.)
   \end{block}
-\end{slide}
-\begin{slide}{Dependability}
+\end{frame}
+\begin{frame}{Dependability}
   \begin{block}{Requirements related to dependability}
     \begin{center}
       \begin{tabular}{|l|l|}\hline
-        \textbf{Requirement} & \textbf{Description} \\ \whline
-        \red{Availability}	 & Readiness for usage 							\\ \hline
-        \red{Reliability}    & Continuity of service delivery				\\ \hline
-        \red{Safety}	     & Very low probability of catastrophes			\\ \hline
-        \red{Maintainability} & How easy can a failed system be repaired    \\ \hline
+        \textbf{Requirement}     & \textbf{Description}                     \\ \whline
+        \textbf{Availability}    & Readiness for usage                      \\ \hline
+        \textbf{Reliability}     & Continuity of service delivery           \\ \hline
+        \textbf{Safety}          & Very low probability of catastrophes     \\ \hline
+        \textbf{Maintainability} & How easy can a failed system be repaired \\ \hline
       \end{tabular}
     \end{center}
   \end{block}
-\end{slide}
-\begin{slide}{Reliability versus availability}
-  \begin{itemize}\firmlist
-  \item Traditional reliability measurements do not capture 
-  \emph{confidience} in a component. 
-  \item This can be modelled with negative exponential 
-  function (representing the loss in confidience over time). 
-  \item For example, timesteps 
-  $1 \leq t \leq 1000$ and the probability 
-  of a failure (availability) $p=0.05$ (ie, 95\% uptime) and $S$ is a 
-  \emph{sensitivity} measure $0 \leq S \leq 1$, where $S=0$ is
-  not sensitive and $S=1$ very sensitive:
-  \[ \hat{R} = e^{-Spt} \]
-  \item Let's look at a demonstration.
-  \item Q: Can you think of a system where S=1 and one where S=0?   
-\end{itemize}
-\end{slide}
-\begin{slide}{Traditional reliability - MTTF/MTTR}
+\end{frame}
+
+\begin{frame}{Traditional reliability - MTTF/MTTR}
   The following \emph{traditional} metrics were derived from
   shop-floor machine reliability modelling over many years.
   \begin{block}{Traditional metrics}
     \begin{itemize}\firmlist
-    \item \red{Mean Time To Failure} (\blue{\MTTF}): The average time until a component fails.
-    \item \red{Mean Time To Repair} (\blue{\MTTR}): The average time needed to repair a component.
-    \item \red{Mean Time Between Failures} (\blue{\MTBF}): Simply \MTTF\ + \MTTR.
+      \item \textbf{Mean Time To Failure} (\blue{\MTTF}): The average time until a component fails.
+      \item \textbf{Mean Time To Repair} (\blue{\MTTR}): The average time needed to repair a component.
+      \item \textbf{Mean Time Between Failures} (\blue{\MTBF}): Simply \MTTF\ + \MTTR.
     \end{itemize}
   \end{block}
-You will often see $MTTF$, $MTTR$, $MTBF$ used for modelling
-system reliability over time.  
-\end{slide}
+  You will often see $MTTF$, $MTTR$, $MTBF$ used for modelling
+  system reliability over time.
+\end{frame}
 
-\begin{slide}{Terminology}
+\begin{frame}{Reliability v Availability}
+  \begin{itemize}\firmlist
+    \item \emph{Availability} is about how much of the time the system is usable,
+          allowing multiple failures and repairs.
+    \item \emph{Availability} is measured in \emph{Uptime percentage}
+          or \emph{SLA "nines"} (eg, 5 9s)
+          \[
+            A = \lim_{T \to \infty} \frac{\text{time system is up in } [0, T]}{T}
+          \]
+    \item \emph{Reliability}: time to first failure
+    \item \emph{Reliability} is about whether failure occurs at all
+          during an interval.
+          \[
+            R(t) = \Pr\{\text{system survives without failure for time } t\}
+          \]
+    \item \emph{Reliability} is measured Failure rate
+          $\lambda$ or MTTF
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Availability v Reliability: Numerical Example}
+  \textbf{System 1}
+  \begin{itemize}
+    \item Fails every 10 minutes
+    \item Repair time = 1 second
+    \item \emph{Availability} $\approx$ 99.83\%
+    \item \emph{Reliability over 1 hour} $\approx$ almost zero
+  \end{itemize}
+
+  \textbf{System 2}
+  \begin{itemize}
+    \item Fails every 6 months
+    \item Repair time = 6 hours
+    \item \emph{Availability} $\approx$ 99.83\%
+    \item \emph{Reliability over 1 hour} $\approx$ almost 1
+  \end{itemize}
+  Same availability. Completely different reliability.
+\end{frame}
+
+
+\begin{frame}{Terminology}
   \begin{block}{Failure, error, fault}
     \begin{center}
       \begin{tabular}{|l|>{\RRCOL}p{0.4\textwidth}|>{\RRCOL}p{0.3\textwidth}|}\hline
-        \textbf{Term} & \textbf{Description} & \textbf{Example} \\ \whline
-        \red{Failure} & A component is not living up to its specifications & Crashed program \\ \hline
-        \red{Error}   & Part of a component that can lead to a failure     & Programming bug \\ \hline
+        \textbf{Term} & \textbf{Description}                               & \textbf{Example}  \\ \whline
+        \red{Failure} & A component is not living up to its specifications & Crashed program   \\ \hline
+        \red{Error}   & Part of a component that can lead to a failure     & Programming bug   \\ \hline
         \red{Fault}   & Cause of an error                                  & Sloppy programmer \\ \hline
       \end{tabular}
     \end{center}
   \end{block}
-\end{slide}
-\begin{slide}{Terminology}
+\end{frame}
+\begin{frame}{Terminology}
   \begin{block}{Handling faults}
     \begin{center}
       \begin{tabular}{|>{\RRCOL}p{0.2\textwidth}|>{\RRCOL}p{0.3\textwidth}|>{\RRCOL}p{0.3\textwidth}|}\hline
-        \textbf{Term} & \textbf{Description} & \textbf{Example} \\ \whline
-        \red{Fault prevention} 
-        & Prevent the occurrence of a fault 
-        & Don't hire sloppy programmers \\ \hline
-        \red{Fault tolerance}  
-        & Build a component and make it mask the occurrence of a fault 
-        & Build each component by two independent programmers \\ \hline
+        \textbf{Term} & \textbf{Description}                                                         & \textbf{Example} \\ \whline
+        \red{Fault prevention}
+                      & Prevent the occurrence of a fault
+                      & Don't hire sloppy programmers                                                                   \\ \hline
+        \red{Fault tolerance}
+                      & Build a component and make it mask the occurrence of a fault
+                      & Build each component by two independent programmers                                             \\ \hline
         \red{Fault removal}
-        & Reduce the presence, number, or seriousness of a fault
-        & Get rid of sloppy programmers \\ \hline
-        \red{Fault forecasting} 
-        & Estimate current presence, future incidence, and consequences of faults
-        & Estimate how a recruiter is doing when it comes to hiring sloppy programmers \\ \hline
+                      & Reduce the presence, number, or seriousness of a fault
+                      & Get rid of sloppy programmers                                                                   \\ \hline
+        \red{Fault forecasting}
+                      & Estimate current presence, future incidence, and consequences of faults
+                      & Estimate how a recruiter is doing when it comes to hiring sloppy programmers                    \\ \hline
       \end{tabular}
     \end{center}
   \end{block}
-\end{slide}
+\end{frame}
 \subsection{Security}
-\begin{slide}{On security}
+\begin{frame}{On security}
   \begin{alertblock}{Observation}
     A distributed system that is not secure, is not dependable
   \end{alertblock}
   \onslide
   \begin{block}{What we need}
     \begin{itemize}\firmlist
-    \item \red{Confidentiality}: information is disclosed only to authorized parties
-    \item \red{Integrity}: Ensure that alterations to assets of a system can be made only in an authorized way
+      \item \red{Confidentiality}: information is disclosed only to authorized parties
+      \item \red{Integrity}: Ensure that alterations to assets of a system can be made only in an authorized way
     \end{itemize}
   \end{block}
   \onslide
   \begin{block}{Authorization, Authentication, Trust}
     \begin{itemize}\firmlist
-    \item \blue{Authentication}: verifying the correctness of a claimed identity
-    \item \blue{Authorization}: does an identified entity has proper access rights?
+      \item \blue{Authentication}: verifying the correctness of a claimed identity
+      \item \blue{Authorization}: does an identified entity has proper access rights?
       \item \blue{Trust}: one entity can be assured that another will perform particular actions
-        according to a specific expectation
+            according to a specific expectation
     \end{itemize}
   \end{block}
-\end{slide}
-% \begin{slide}{Security mechanisms}
+\end{frame}
+% \begin{frame}{Security mechanisms}
 %   \begin{block}{Keeping it simple}
 %     It's all about \blue{encrypting} and \blue{decrypting} data using \blue{security keys}.
 %   \end{block}
 %   \begin{block}{Notation}
 %     \mathexpr{K(\id{data})} denotes that we \blue{use key \mathexpr{K}} to \blue{encrypt/decrypt \id{data}}.
 %   \end{block}
-% \end{slide}
-\begin{slide}{Security mechanisms}
+% \end{frame}
+\begin{frame}{Security mechanisms}
   \begin{block}{Symmetric cryptosystem}
     With \blue{encryption key \mathexpr{E_K(\id{data})}} and \blue{decryption key \mathexpr{D_K(\id{data})}}:
     \(
@@ -360,55 +385,55 @@ system reliability over time.
     Distinguish a \red{public key} \blue{\mathexpr{PK(\id{data})}} and a \red{private} (\blue{secret})
     \red{key} \blue{\mathexpr{SK(\id{data})}}.
     \begin{itemize}\tightlist
-    \item Encrypt message from \id{Alice} to \id{Bob}:
-      \(
-      \id{data} =
-      \underbrace{%
-        \red{SK_{bob}(}\overbrace{%
-          \blue{PK_{bob}(\id{data})}
-        }^{\mbox{\tiny Sent by Alice}}\red{)}
-      }_{\mbox{\tiny Action by Bob}}
-      \)
-    \item Sign message for \id{Bob} by \id{Alice}:
-      \(
-        [\id{data}, \underbrace{%
+      \item Encrypt message from \id{Alice} to \id{Bob}:
+            \(
+            \id{data} =
+            \underbrace{%
+              \red{SK_{bob}(}\overbrace{%
+                \blue{PK_{bob}(\id{data})}
+              }^{\mbox{\tiny Sent by Alice}}\red{)}
+            }_{\mbox{\tiny Action by Bob}}
+            \)
+      \item Sign message for \id{Bob} by \id{Alice}:
+            \(
+            [\id{data}, \underbrace{%
             \red{\id{data}\stackrel{?}{=}PK_{alice}(}\blue{SK_{alice}(\id{data})}\red{)}
-          }_{\mbox{\tiny Check by Bob}}
-        ] =
-        \underbrace{%
-          [\id{data}, \blue{SK_{alice}(\id{data})}]
-        }_{\mbox{\tiny Sent by Alice}}
-      \)
+            }_{\mbox{\tiny Check by Bob}}
+            ] =
+            \underbrace{%
+              [\id{data}, \blue{SK_{alice}(\id{data})}]
+            }_{\mbox{\tiny Sent by Alice}}
+            \)
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Security mechanisms}
+\end{frame}
+\begin{frame}{Security mechanisms}
   \begin{block}{Secure hashing}
     In practice, we use \blue{secure hash functions}: \mathexpr{H(\id{data})} returns a \red{fixed-length
       string}. \vspace*{-6pt}
     \begin{itemize}\tightlist
-    \item \blue{Any change} from \id{data} to \id{data^*} will lead to a \blue{completely different string}
-      \mathexpr{H(\id{data^*})}.
-    \item Given a hash value, it is computationally impossible to find a \id{data} with \mathexpr{h = H(\id{data})}
+      \item \blue{Any change} from \id{data} to \id{data^*} will lead to a \blue{completely different string}
+            \mathexpr{H(\id{data^*})}.
+      \item Given a hash value, it is computationally impossible to find a \id{data} with \mathexpr{h = H(\id{data})}
     \end{itemize}
   \end{block}
   \onslide
   \begin{block}{Practical digital signatures}
     Sign message for \id{Bob} by \id{Alice}:
-      \[
-        [\id{data}, \underbrace{%
-            \red{H(data)\stackrel{?}{=}PK_{alice}(}\blue{sgn}\red{)}
-          }_{\mbox{\tiny Check by Bob}}
-        ] =
-        \underbrace{%
-          [\id{data}, H, \blue{\id{sgn} = SK_{alice}(H(\id{data}))}]
-        }_{\mbox{\tiny Sent by Alice}}
-      \]
+    \[
+      [\id{data}, \underbrace{%
+      \red{H(data)\stackrel{?}{=}PK_{alice}(}\blue{sgn}\red{)}
+      }_{\mbox{\tiny Check by Bob}}
+      ] =
+      \underbrace{%
+        [\id{data}, H, \blue{\id{sgn} = SK_{alice}(H(\id{data}))}]
+      }_{\mbox{\tiny Sent by Alice}}
+    \]
   \end{block}
+\end{frame}
 
-\end{slide}
 \subsection{Scalability}
-\begin{slide}{Scale in distributed systems}
+\begin{frame}{Scale in distributed systems}
   \begin{block}{Observation}
     Many developers  of modern distributed systems easily  use the adjective ``scalable''  without making clear
     \red{why} their system actually scales.
@@ -416,9 +441,9 @@ system reliability over time.
   \onslide
   \begin{block}{At least three components}
     \begin{itemize}
-    \item Number of users or processes \red{(size scalability)}
-    \item Maximum distance between nodes \red{(geographical scalability)}
-    \item Number of administrative domains \red{(administrative scalability)}
+      \item Number of users or processes \red{(size scalability)}
+      \item Maximum distance between nodes \red{(geographical scalability)}
+      \item Number of administrative domains \red{(administrative scalability)}
     \end{itemize}
   \end{block}
   \onslide
@@ -427,61 +452,61 @@ system reliability over time.
     servers operating independently in parallel. Today, the challenge still lies in geographical and
     administrative scalability.
   \end{alertblock}
-\end{slide}
-\begin{slide}{Size scalability}
+\end{frame}
+\begin{frame}{Size scalability}
   \begin{block}{Root causes for scalability problems with centralized solutions}
     \begin{itemize}
-    \item The computational capacity, limited by the CPUs
-    \item The storage capacity, including the transfer rate between CPUs and disks
-    \item The network between the user and the centralized service
+      \item The computational capacity, limited by the CPUs
+      \item The storage capacity, including the transfer rate between CPUs and disks
+      \item The network between the user and the centralized service
     \end{itemize}
   \end{block}
-\end{slide}
-  \begin{slide}{Performance models}
-    \begin{block}{A centralized service can be modeled as a simple queuing system}
-      \centering\includefigure{01-05}
-    \end{block}
-    \begin{block}{Assumptions and notations}
-      \begin{itemize}\tightlist
+\end{frame}
+\begin{frame}{Performance models}
+  \begin{block}{A centralized service can be modeled as a simple queuing system}
+    \centering\includefigure{01-05}
+  \end{block}
+  \begin{block}{Assumptions and notations}
+    \begin{itemize}\tightlist
       \item The queue has infinite capacity \mathexpr{\Rightarrow} arrival rate of requests is not influenced
-        by current queue length or what is being processed.
+            by current queue length or what is being processed.
       \item Arrival rate requests: \mathexpr{\lambda}
       \item Processing capacity service: \mathexpr{\mu} requests per second
-      \end{itemize}
-    \end{block}
-    % \begin{alertblock}{Fraction of time having \mathexpr{k} requests in the system}
-    %   \[ p_k = \bigl(1 - \frac{\lambda}{\mu}\bigr)\bigl(\frac{\lambda}{\mu}\bigr)^k \]
-    % \end{alertblock}
-  \end{slide}
-  \begin{slide}{Performance models}
-    \begin{block}{Utilization \mathexpr{U} of a service is the fraction of time that it is busy}
-      %%\[ U = \frac{\lambda}{\mu} \Rightarrow p_k = (1-U) U^k \]
-      \[ U = \frac{\lambda}{\mu} \]
-    \end{block}
-    \begin{block}{Average number of requests in the system}
-      % \[ \average{N} = \sum_{k\geq 0} k \cdot p_k = \sum_{k \geq 0} k \cdot (1-U)U^k = (1-U)\sum_{k\geq 0} k\cdot U^k \]
-      \[ \average{N} = \frac{U}{1-U} \]
-    \end{block}
-    \begin{block}{Average throughput}
-      \[ X = \frac{\lambda}{\mu} \cdot \mu = \lambda \]
-      via the Principle of Equilibrium (or conservation)
-    \end{block}
-  \end{slide}
-  \begin{slide}{Performance models}
-    \begin{block}{Response time: total time take to process a request after submission}
-      From Little's Law:
-      \[ \average{N} = X \cdot R \Rightarrow R = \frac{\average{N}}{X}\]
-      \[ \Rightarrow R = \frac{1}{\mu \cdot (1-U)} \]
-    \end{block}
-    \begin{block}{Observations}
-      \begin{itemize}
+    \end{itemize}
+  \end{block}
+  % \begin{alertblock}{Fraction of time having \mathexpr{k} requests in the system}
+  %   \[ p_k = \bigl(1 - \frac{\lambda}{\mu}\bigr)\bigl(\frac{\lambda}{\mu}\bigr)^k \]
+  % \end{alertblock}
+\end{frame}
+\begin{frame}{Performance models}
+  \begin{block}{Utilization \mathexpr{U} of a service is the fraction of time that it is busy}
+    %%\[ U = \frac{\lambda}{\mu} \Rightarrow p_k = (1-U) U^k \]
+    \[ U = \frac{\lambda}{\mu} \]
+  \end{block}
+  \begin{block}{Average number of requests in the system}
+    % \[ \average{N} = \sum_{k\geq 0} k \cdot p_k = \sum_{k \geq 0} k \cdot (1-U)U^k = (1-U)\sum_{k\geq 0} k\cdot U^k \]
+    \[ \average{N} = \frac{U}{1-U} \]
+  \end{block}
+  \begin{block}{Average throughput}
+    \[ X = \frac{\lambda}{\mu} \cdot \mu = \lambda \]
+    via the Principle of Equilibrium (or conservation)
+  \end{block}
+\end{frame}
+\begin{frame}{Performance models}
+  \begin{block}{Response time: total time take to process a request after submission}
+    From Little's Law:
+    \[ \average{N} = X \cdot R \Rightarrow R = \frac{\average{N}}{X}\]
+    \[ \Rightarrow R = \frac{1}{\mu \cdot (1-U)} \]
+  \end{block}
+  \begin{block}{Observations}
+    \begin{itemize}
       \item If \mathexpr{U} is small, response-to-service time is close to 1: a request is immediately
-        processed
+            processed
       \item If \mathexpr{U} goes up to 1, the system comes to a grinding halt. \newline Solution: increase $\mu$.
-      \end{itemize}
-    \end{block}
-  \end{slide}
-% \begin{slide}{Problems with geographical scalability}
+    \end{itemize}
+  \end{block}
+\end{frame}
+% \begin{frame}{Problems with geographical scalability}
 %   \begin{block}{}
 %     \begin{itemize}
 %     \item Cannot simply go from LAN to WAN: many distributed systems assume \red{synchronous client-server
@@ -494,8 +519,8 @@ system reliability over time.
 %       scalability problems).
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Problems with administrative scalability}
+% \end{frame}
+% \begin{frame}{Problems with administrative scalability}
 %   \begin{block}{Essence}
 %     Conflicting policies concerning usage (and thus payment), management, and security
 %   \end{block}
@@ -516,100 +541,100 @@ system reliability over time.
 %     \end{itemize}\vspace*{-6pt}
 %     Note: \blue{end users} collaborate and not \blue{administrative entities}.
 %   \end{alertblock}
-% \end{slide}
-\begin{slide}{Techniques for scaling}
+% \end{frame}
+\begin{frame}{Techniques for scaling}
   \begin{block}{Hide communication latencies}
     \begin{itemize}
-    \item Make use of \blue{asynchronous communication}
-    \item Have separate handler for incoming response
-    \item \blue{Problem:} not every application fits this model
+      \item Make use of \blue{asynchronous communication}
+      \item Have separate handler for incoming response
+      \item \blue{Problem:} not every application fits this model
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Techniques for scaling}
+\end{frame}
+\begin{frame}{Techniques for scaling}
   \begin{block}{Facilitate solution by moving computations to client}
     \begin{center}
       \includefigure{01-06a} \newline
       \includefigure{01-06b} \newline
     \end{center}
   \end{block}
-\end{slide}
-\begin{slide}{Techniques for scaling}
+\end{frame}
+\begin{frame}{Techniques for scaling}
   \begin{block}{Partition data and computations across multiple machines}
     \begin{itemize}
-    \item Move computations to clients (Java/ECMA script)
-    \item Decentralized naming services (DNS)
-    \item Decentralized information systems (WWW)
+      \item Move computations to clients (Java/ECMA script)
+      \item Decentralized naming services (DNS)
+      \item Decentralized information systems (WWW)
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Techniques for scaling} 
+\end{frame}
+\begin{frame}{Techniques for scaling}
   \begin{block}{Replication and caching: Make copies of data available at different machines}
     \begin{itemize}
-    \item Replicated file servers and databases
-    \item Mirrored Websites
-    \item Web caches (in browsers and proxies)
-    \item File caching (at server and client)
+      \item Replicated file servers and databases
+      \item Mirrored Websites
+      \item Web caches (in browsers and proxies)
+      \item File caching (at server and client)
     \end{itemize}
   \end{block}
-\end{slide}
-\begin{slide}{Scaling: The problem with replication}
+\end{frame}
+\begin{frame}{Scaling: The problem with replication}
   \begin{block}{Applying replication is easy, except for one thing}
     \begin{itemize}
-	\item Having multiple copies (cached or replicated), leads to \red{inconsistencies}: modifying one copy
-      makes that copy different from the rest.
-	\item Always keeping copies consistent and in a general way requires \red{global synchronization} on
-      each modification.
-	\item Global synchronization precludes large-scale solutions.
+      \item Having multiple copies (cached or replicated), leads to \red{inconsistencies}: modifying one copy
+            makes that copy different from the rest.
+      \item Always keeping copies consistent and in a general way requires \red{global synchronization} on
+            each modification.
+      \item Global synchronization precludes large-scale solutions.
     \end{itemize}
   \end{block}
   \onslide
   \begin{block}{Observation}
-    If we can tolerate inconsistencies, we may reduce the need for global synchronization, but    
+    If we can tolerate inconsistencies, we may reduce the need for global synchronization, but
     \blue{tolerating inconsistencies is application dependent}.
   \end{block}
-\end{slide}
+\end{frame}
 \section{A simple classification of distributed systems}
 \subsection{High-performance distributed computing}
-  \begin{slide}{Parallel computing}
-    \begin{block}{Observation}
-      High-performance distributed computing started with parallel computing
-    \end{block}
-    \begin{block}{Multiprocessor and multicore versus multicomputer}
-      \begin{tabular}{cc}
-        \includefigure{01-08a} &
-        \includefigure{01-08b} 
-      \end{tabular}
-    \end{block}
-  \end{slide}
-  \begin{slide}{Distributed shared memory systems}
-    \begin{block}{Observation}
-      Multiprocessors are relatively easy to program in comparison to multicomputers, yet have problems when
-      increasing the number of processors (or cores). \blue{Solution}: Try to implement a \red{shared-memory
-        model} on top of a multicomputer.
-    \end{block}
-    \begin{exampleblock}{Example through virtual-memory techniques}
-      Map all main-memory pages (from different processors) into one \blue{single virtual address space}. If
-      a process at processor \id{A} addresses a page \id{P} located at processor \id{B}, the OS at \id{A}
-      \blue{traps and fetches \id{P}} from \id{B}, just as it would if \id{P} had been located on local disk.
-    \end{exampleblock}
-    \begin{block}{Problem}
-      Performance of distributed shared memory could never compete with that of multiprocessors, and failed to
-      meet the expectations of programmers. It has been widely abandoned by now.
-    \end{block}
-  \end{slide}
-\begin{slide}{Cluster computing}
+\begin{frame}{Parallel computing}
+  \begin{block}{Observation}
+    High-performance distributed computing started with parallel computing
+  \end{block}
+  \begin{block}{Multiprocessor and multicore versus multicomputer}
+    \begin{tabular}{cc}
+      \includefigure{01-08a} &
+      \includefigure{01-08b}
+    \end{tabular}
+  \end{block}
+\end{frame}
+\begin{frame}{Distributed shared memory systems}
+  \begin{block}{Observation}
+    Multiprocessors are relatively easy to program in comparison to multicomputers, yet have problems when
+    increasing the number of processors (or cores). \blue{Solution}: Try to implement a \red{shared-memory
+      model} on top of a multicomputer.
+  \end{block}
+  \begin{exampleblock}{Example through virtual-memory techniques}
+    Map all main-memory pages (from different processors) into one \blue{single virtual address space}. If
+    a process at processor \id{A} addresses a page \id{P} located at processor \id{B}, the OS at \id{A}
+    \blue{traps and fetches \id{P}} from \id{B}, just as it would if \id{P} had been located on local disk.
+  \end{exampleblock}
+  \begin{block}{Problem}
+    Performance of distributed shared memory could never compete with that of multiprocessors, and failed to
+    meet the expectations of programmers. It has been widely abandoned by now.
+  \end{block}
+\end{frame}
+\begin{frame}{Cluster computing}
   \begin{block}{Essentially a group of high-end systems connected through a LAN}
     \begin{itemize}\tightlist
-    \item Homogeneous: same OS, near-identical hardware
-    \item Single, or tightly coupled managing node(s)
+      \item Homogeneous: same OS, near-identical hardware
+      \item Single, or tightly coupled managing node(s)
     \end{itemize}
   \end{block}
   \begin{center}
     \includefigure{01-09}
   \end{center}
-\end{slide}
-% \begin{slide}{Grid computing}
+\end{frame}
+% \begin{frame}{Grid computing}
 
 %   \begin{block}{The next step: plenty of nodes from everywhere}
 %     \begin{itemize}
@@ -622,8 +647,8 @@ system reliability over time.
 %     To allow for collaborations, grids generally use \red{virtual organizations}. In essence, this is a
 %     grouping of users (or better: their IDs) that allows for authorization on resource allocation.
 %   \end{alertblock}
-% \end{slide}
-% \begin{slide}{Architecture for grid computing}
+% \end{frame}
+% \begin{frame}{Architecture for grid computing}
 %   \begin{tabular}{@{}cc}
 %     \begin{minipage}{0.4\textwidth}
 %       \begin{center}
@@ -644,9 +669,9 @@ system reliability over time.
 %   \end{block}
 %     \end{minipage}
 %   \end{tabular}
-% \end{slide}
+% \end{frame}
 % \subsection{Distributed information systems}
-% \begin{slide}{Integrating applications}
+% \begin{frame}{Integrating applications}
 
 %   \begin{block}{Situation}
 %     Organizations confronted with many \blue{networked applications}, but achieving interoperability was
@@ -664,8 +689,8 @@ system reliability over time.
 %       Integration}.
 %   \end{block}
 
-% \end{slide}
-% \begin{slide}{Example EAI: (nested) transactions}
+% \end{frame}
+% \begin{frame}{Example EAI: (nested) transactions}
 %   \vspace*{-6pt}
 %   \begin{block}{Transaction}
 %     \begin{center}
@@ -696,8 +721,8 @@ system reliability over time.
 %       \end{column}
 %     \end{columns}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{TPM: Transaction Processing Monitor}
+% \end{frame}
+% \begin{frame}{TPM: Transaction Processing Monitor}
 %   \begin{centerfig}
 %     \includefigure{01-13}
 %   \end{centerfig}
@@ -705,8 +730,8 @@ system reliability over time.
 %     Often, the data involved in a transaction is distributed across several servers. A \red{TP
 %       Monitor} is responsible for coordinating the execution of a transaction.
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Middleware and EAI}
+% \end{frame}
+% \begin{frame}{Middleware and EAI}
 %   \begin{centerfig}
 %     \includefigure{01-14}
 %   \end{centerfig}
@@ -718,8 +743,8 @@ system reliability over time.
 %         and forwarded to \blue{subscribed} applications.
 %     \end{description}
 %   \end{block}
-% \end{slide}
-%   \begin{slide}{How to integrate applications}
+% \end{frame}
+%   \begin{frame}{How to integrate applications}
 %     \begin{block}{}
 %       \begin{description}[xxx]
 
@@ -740,9 +765,9 @@ system reliability over time.
 
 %       \end{description}
 %     \end{block}
-%   \end{slide}
+%   \end{frame}
 % \subsection{Pervasive systems}
-% \begin{slide}{Distributed pervasive systems}
+% \begin{frame}{Distributed pervasive systems}
 %   \begin{block}{Observation} 
 %     Emerging next-generation of distributed systems in which nodes are small, mobile, and often embedded in a
 %     larger system, characterized by the fact that the system \red{naturally blends into the user's environment}.
@@ -757,8 +782,8 @@ system reliability over time.
 %       \red{sensing} and \red{actuation} of the environment.
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Ubiquitous systems}
+% \end{frame}
+% \begin{frame}{Ubiquitous systems}
 %   \begin{block}{Core elements}
 %     \begin{enumerate}\tightlist
 %     \item (\blue{Distribution}) Devices are networked, distributed, and accessible transparently
@@ -768,8 +793,8 @@ system reliability over time.
 %     \item (\blue{Intelligence}) The system as a whole can handle a wide range of dynamic actions and interactions
 %     \end{enumerate}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Mobile computing}
+% \end{frame}
+% \begin{frame}{Mobile computing}
 %   \begin{block}{Distinctive features}
 %     \begin{itemize}
 %     \item A myriad of different mobile devices (smartphones, tablets, GPS devices, remote controls, active
@@ -786,8 +811,8 @@ system reliability over time.
 %     Mobile devices set up connections to stationary servers, essentially bringing mobile computing in the
 %     position of clients of cloud-based services.
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Mobile computing}
+% \end{frame}
+% \begin{frame}{Mobile computing}
 %   \footnotesize
 %   \begin{centerfig}
 %     \includefigure{01-15a} \\
@@ -796,8 +821,8 @@ system reliability over time.
 %     \includefigure{01-15b} \\
 %     Mobile edge computing
 %   \end{centerfig}
-% \end{slide}
-% \begin{slide}{Sensor networks}
+% \end{frame}
+% \begin{frame}{Sensor networks}
 %   \begin{block}{Characteristics}
 %     The \blue{nodes} to which sensors are attached are:
 %     \begin{itemize}
@@ -806,8 +831,8 @@ system reliability over time.
 %     \item Often battery-powered (or even battery-less)
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{Sensor networks as distributed databases}
+% \end{frame}
+% \begin{frame}{Sensor networks as distributed databases}
 %   \begin{block}{Two extremes}
 %     \begin{center}
 %       \begin{tabular}{c}
@@ -816,14 +841,14 @@ system reliability over time.
 %       \end{tabular}
 %     \end{center}
 %   \end{block}
-% \end{slide}
-% \begin{slide}{The cloud-edge continuum}
+% \end{frame}
+% \begin{frame}{The cloud-edge continuum}
 %   \begin{centerfig}
 %     \includefigure{01-17}
 %   \end{centerfig}
-% \end{slide}
+% \end{frame}
 % \section{Pitfalls}
-% \begin{slide}{Developing distributed systems: Pitfalls}
+% \begin{frame}{Developing distributed systems: Pitfalls}
 %   \begin{block}{Observation}
 %     Many distributed systems are needlessly complex, caused by mistakes that required patching later on. 
 %     Many \blue{false assumptions} are often made.
@@ -841,17 +866,17 @@ system reliability over time.
 %     \item<10-> There is one administrator
 %     \end{itemize}
 %   \end{block}
-% \end{slide}
+% \end{frame}
 \section{Summary}
 
-\begin{slide}{Summary and Conclusions}
-We have discussed some important principles
-in Distributed Systems, namely:
-\begin{itemize}
-  \item Centralized, Decentralized and Distributed Types
-  \item Support sharing of resources
-  \item Distribution transparency
-  \item Openness and Security
-  \item Performance and Scalability
-\end{itemize}  
-\end{slide}
+\begin{frame}{Summary and Conclusions}
+  We have discussed some important principles
+  in Distributed Systems, namely:
+  \begin{itemize}
+    \item Centralized, Decentralized and Distributed Types
+    \item Support sharing of resources
+    \item Distribution transparency
+    \item Openness and Security
+    \item Performance and Scalability
+  \end{itemize}
+\end{frame}
