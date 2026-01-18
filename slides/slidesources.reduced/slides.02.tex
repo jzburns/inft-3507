@@ -11,7 +11,7 @@
     \end{itemize}
   \end{block}
   \begin{block}{Connector}
-    A mechanism that mediates communication, coordination, or cooperation among components. \blue{Example}:
+    A mechanism that mediates communication, coordination, or cooperation among components. \textbf{Example}:
     facilities for (remote) procedure call, messaging, or streaming.
   \end{block}
 \end{slide}
@@ -53,9 +53,9 @@
 \begin{slide}{Application Layering}
   \begin{block}{Traditional three-layered view}
     \begin{itemize}\tightlist
-      \item \blue{Application-interface layer} contains units for interfacing to users or external applications
-      \item \blue{Processing layer} contains the functions of an application, i.e., without specific data
-      \item \blue{Data layer} contains the data that a client wants to manipulate through the application
+      \item \textbf{Application-interface layer} contains units for interfacing to users or external applications
+      \item \textbf{Processing layer} contains the functions of an application, i.e., without specific data
+      \item \textbf{Data layer} contains the data that a client wants to manipulate through the application
             components
     \end{itemize}
   \end{block}
@@ -86,7 +86,7 @@
     \end{tabular}
   \end{block}
   \begin{block}{Encapsulation}
-    Objects are said to \red{encapsulate data} and offer \red{methods on that data} without revealing the
+    Objects are said to \textbf{encapsulate data} and offer \textbf{methods on that data} without revealing the
     internal implementation.
   \end{block}
 \end{slide}
@@ -121,7 +121,7 @@
 \end{slide}
 \begin{slide}{Example: Amazon's Simple Storage Service}
   \begin{block}{Essence}
-    \red{Objects} (i.e., files) are placed into \red{buckets} (i.e., directories). Buckets cannot be placed
+    \textbf{Objects} (i.e., files) are placed into \textbf{buckets} (i.e., directories). Buckets cannot be placed
     into buckets. Operations on \code{ObjectName} in bucket \code{BucketName} require the following
     identifier:
     \begin{center}
@@ -140,7 +140,7 @@
 % \begin{slide}{On interfaces}
 %   \begin{alertblock}{Issue}
 %     Many people like RESTful approaches because the interface to a service is so simple. The catch is that
-%     much needs to be done in the \blue{parameter space}.
+%     much needs to be done in the \textbf{parameter space}.
 %   \end{alertblock}
 %   \begin{block}{Amazon S3 SOAP interface}
 %     \begin{centerfig}
@@ -203,44 +203,40 @@
 %   \end{block}
 %   \begin{block}{More details}
 %     \begin{itemize}\tightlist
-%     \item Calling \codesn{out(t)} twice in a row, leads to storing \red{two} copies of tuple \codesn{t}
-%       \mathexpr{\Rightarrow} a tuple space is modeled as a \blue{multiset}.
-%     \item Both \codesn{in} and \codesn{rd} are \blue{blocking} operations: the caller will be blocked until
+%     \item Calling \codesn{out(t)} twice in a row, leads to storing \textbf{two} copies of tuple \codesn{t}
+%       \mathexpr{\Rightarrow} a tuple space is modeled as a \textbf{multiset}.
+%     \item Both \codesn{in} and \codesn{rd} are \textbf{blocking} operations: the caller will be blocked until
 %       a matching tuple is found, or has become available.
 %     \end{itemize}
 %   \end{block}
 % \end{slide}
 % \begin{slide}{Example: Linda tuple space}
 %   \begin{tabular}{l@{\hspace*{1cm}}l}
-%     \blue{Bob}:   & \includelisting{02-11/bob}   \\ \hline
-%     \blue{Alice}: & \includelisting{02-11/alice} \\ \hline
-%     \blue{Chuck}: & \includelisting{02-11/chuck} \\ 
+%     \textbf{Bob}:   & \includelisting{02-11/bob}   \\ \hline
+%     \textbf{Alice}: & \includelisting{02-11/alice} \\ \hline
+%     \textbf{Chuck}: & \includelisting{02-11/chuck} \\ 
 %   \end{tabular}
 % \end{slide}
 \begin{slide}{Publish and Subscribe}
+  \textbf{Pub-Sub Model}: Publishers send messages to topics, subscribers receive them asynchronously.
   \begin{itemize}
-    \item \textbf{Pub-Sub Model}: Publishers send messages to topics, subscribers receive them asynchronously.
     \item \textbf{Decoupling}: Publishers and subscribers operate independently, enhancing scalability.
     \item \textbf{Asynchronous Communication}: Messages are delivered without requiring immediate response.
     \item \textbf{Topics}: Messages are categorized into topics for targeted delivery.
-    \item \textbf{Scalability}: Handles large-scale systems with dynamic subscribers.
-    \item \textbf{Flexibility}: Supports multiple subscribers per topic.
-    \item \textbf{Reliability}: Message queues ensure delivery despite failures.
     \item \textbf{Loose Coupling}: Reduces dependencies between system components.
     \item \textbf{Event-Driven}: Triggers actions based on message events.
-    \item \textbf{Efficiency}: Asynchronous processing optimizes resource use.
   \end{itemize}\end{slide}
 \begin{slide}{Publish and subscribe}
   \begin{block}{Issue: how to match events?}
     \begin{itemize}\firmlist
-      \item Assume events are described by \blue{(attribute,value)} pairs
-      \item \red{topic-based subscription}: specify a ``\blue{attribute = value}'' series
-      \item \red{content-based subscription}: specify a ``\blue{attribute \mathexpr{\in} range}'' series
+      \item Assume events are described by \textbf{(attribute,value)} pairs
+      \item \textbf{topic-based subscription}: specify a ``\textbf{attribute = value}'' series
+      \item \textbf{content-based subscription}: specify a ``\textbf{attribute \mathexpr{\in} range}'' series
     \end{itemize}
   \end{block}
   \centering\includefigure{02-12}
   \begin{alertblock}{Observation}
-    Content-based subscriptions may easily have serious scalability problems (\blue{why?})
+    Content-based subscriptions may easily have serious scalability problems (\textbf{why?})
   \end{alertblock}
 \end{slide}
 % \section{Middleware and distributed systems}
@@ -256,7 +252,7 @@
 %     The interfaces offered by a legacy component are most likely not suitable for all applications.
 %   \end{block}
 %   \begin{block}{Solution}
-%     A \red{wrapper} or \red{adapter} offers an interface acceptable to a client application. Its functions are
+%     A \textbf{wrapper} or \textbf{adapter} offers an interface acceptable to a client application. Its functions are
 %     transformed into those available at the component.
 %   \end{block}
 % \end{slide}
@@ -271,14 +267,14 @@
 %   \end{block}
 %   \begin{block}{Complexity with \mathexpr{N} applications}
 %     \begin{itemize}
-%     \item \blue{1-on-1}: requires \mathexpr{N \times (N-1) = \mathcal{O}(N^2)} wrappers
-%     \item \blue{broker}: requires \mathexpr{2N = \mathcal{O}(N)} wrappers 
+%     \item \textbf{1-on-1}: requires \mathexpr{N \times (N-1) = \mathcal{O}(N^2)} wrappers
+%     \item \textbf{broker}: requires \mathexpr{2N = \mathcal{O}(N)} wrappers 
 %     \end{itemize}
 %   \end{block}
 % \end{slide}
 % \begin{slide}{Developing adaptable middleware}
 %   \begin{block}{Problem} 
-%     Middleware contains solutions that are good for \blue{most} applications \mathexpr{\Rightarrow} you may
+%     Middleware contains solutions that are good for \textbf{most} applications \mathexpr{\Rightarrow} you may
 %     want to adapt its behavior for specific applications.
 %   \end{block}
 % \end{slide}
@@ -296,8 +292,8 @@
 %   \begin{block}{Basic Client--Server Model}
 %     Characteristics:
 %     \begin{itemize}\tightlist
-%     \item There are processes offering services (\red{servers}) 
-%     \item There are processes that use services (\red{clients})
+%     \item There are processes offering services (\textbf{servers}) 
+%     \item There are processes that use services (\textbf{clients})
 %     \item Clients and servers can be on different machines
 %     \item Clients follow request/reply model regarding using services
 %     \end{itemize}
@@ -310,9 +306,9 @@
 % \begin{slide}{Multi-tiered centralized system architectures}
 %   \begin{block}{Some traditional organizations}
 %     \begin{itemize}\tightlist
-%     \item \red{Single-tiered:} dumb terminal/mainframe configuration
-%     \item \red{Two-tiered:} client/single server configuration
-%     \item \red{Three-tiered:} each layer on separate machine
+%     \item \textbf{Single-tiered:} dumb terminal/mainframe configuration
+%     \item \textbf{Two-tiered:} client/single server configuration
+%     \item \textbf{Three-tiered:} each layer on separate machine
 %     \end{itemize}
 %   \end{block}
 %   \begin{block}{Traditional two-tiered configurations}
@@ -362,7 +358,7 @@
 %   \begin{block}{...life was simple:}
 %     \begin{itemize}\firmlist
 %     \item A website consisted as a collection of HTML files
-%     \item HTML files could be referred to each other by a \blue{hyperlink}
+%     \item HTML files could be referred to each other by a \textbf{hyperlink}
 %     \item A Web server essentially needed only a hyperlink to fetch a file
 %     \item A browser took care of properly rendering the content of a file
 %     \end{itemize}
@@ -375,9 +371,9 @@
 %   \begin{block}{...life became a bit more complicated:}
 %     \begin{itemize}\firmlist
 %     \item A website was built around a database with content
-%     \item A Webpage could still be referred to by a \blue{hyperlink}
+%     \item A Webpage could still be referred to by a \textbf{hyperlink}
 %     \item A Web server essentially needed only a hyperlink to fetch a file
-%     \item A separate program (\red{Common Gateway Interface}) \blue{composed} a page
+%     \item A separate program (\textbf{Common Gateway Interface}) \textbf{composed} a page
 %     \item A browser took care of properly rendering the content of a file
 %     \end{itemize}
 %   \end{block}
@@ -396,14 +392,14 @@
   \begin{block}{Peer-to-peer architectures}
     Processes are all equal: the functions that need to be carried out are represented by every process
     \mathexpr{\Rightarrow} each process will act as a client and a server at the same time (i.e.,
-    acting as a \red{servant}).
+    acting as a \textbf{servant}).
   \end{block}
 \end{slide}
 \subsection{Structured peer-to-peer systems}
 \begin{slide}{Structured P2P}
   \begin{block}{Essence}
-    Make use of a \blue{semantic-free index}: each data item is uniquely associated with a key, in turn used
-    as an index. Common practice: use a \red{hash function}
+    Make use of a \textbf{semantic-free index}: each data item is uniquely associated with a key, in turn used
+    as an index. Common practice: use a \textbf{hash function}
     \vspace*{-6pt}
     \[ \func{key}(\func{data item}) = \func{hash}(\func{data item's value}). \vspace*{-6pt}\]
     P2P system now responsible for storing (\emph{key},\emph{value}) pairs.
@@ -412,18 +408,18 @@
     \begin{centerfig}
       \includefigure{02-23}
     \end{centerfig}
-    Looking up \mathexpr{d} with \red{key} \mathexpr{k \in \{0,1,2,\ldots,2^4-1\}} means \blue{routing}
-    request to node with \red{identifier} \mathexpr{k}.
+    Looking up \mathexpr{d} with \textbf{key} \mathexpr{k \in \{0,1,2,\ldots,2^4-1\}} means \textbf{routing}
+    request to node with \textbf{identifier} \mathexpr{k}.
   \end{exampleblock}
 \end{slide}
 \begin{slide}{Example: Chord}
   \begin{block}{Principle}
     \begin{itemize}\tightlist
-      \item Nodes are logically organized in a ring. Each node has an \mathexpr{m}-bit \red{identifier}.
-      \item Each data item is hashed to an \mathexpr{m}-bit \red{key}.
+      \item Nodes are logically organized in a ring. Each node has an \mathexpr{m}-bit \textbf{identifier}.
+      \item Each data item is hashed to an \mathexpr{m}-bit \textbf{key}.
       \item Data item with key \mathexpr{k} is stored at node with smallest identifier \mathexpr{\id{id} \geq
-              k}, called the \red{successor} of key \mathexpr{k}.
-      \item The ring is extended with various \blue{shortcut links} to other nodes.
+              k}, called the \textbf{successor} of key \mathexpr{k}.
+      \item The ring is extended with various \textbf{shortcut links} to other nodes.
     \end{itemize}
   \end{block}
 \end{slide}
@@ -438,16 +434,16 @@
 \subsection{Unstructured peer-to-peer systems}
 \begin{slide}{Unstructured P2P}
   \begin{block}{Essence}
-    Each node maintains an ad hoc list of neighbors. The resulting overlay resembles a \red{random graph}: an
+    Each node maintains an ad hoc list of neighbors. The resulting overlay resembles a \textbf{random graph}: an
     edge \mathexpr{\langle \id{u},\id{v} \rangle} exists only with a
     certain probability \mathexpr{\mathbb{P}[\langle \id{u}, \id{v} \rangle]}.
   \end{block}
   \begin{block}{Searching}
     \begin{itemize}
-      \item \red{Flooding}: issuing node \id{u} passes request for \mathexpr{d} to all neighbors. Request is
+      \item \textbf{Flooding}: issuing node \id{u} passes request for \mathexpr{d} to all neighbors. Request is
             ignored when receiving node had seen it before. Otherwise, \id{v} searches locally for \mathexpr{d}
-            (recursively). May be limited by a \red{Time-To-Live}: a maximum number of hops.
-      \item \red{Random walk}: issuing node \id{u} passes request for \mathexpr{d} to randomly chosen neighbor,
+            (recursively). May be limited by a \textbf{Time-To-Live}: a maximum number of hops.
+      \item \textbf{Random walk}: issuing node \id{u} passes request for \mathexpr{d} to randomly chosen neighbor,
             \id{v}. If \id{v} does not have \mathexpr{d}, it forwards request to one of \emph{its} randomly chosen
             neighbors, and so on.
     \end{itemize}
@@ -489,8 +485,8 @@
 %   \begin{block}{Essence}
 %     It is sometimes sensible to break the symmetry in pure peer-to-peer networks:
 %     \begin{itemize}\tightlist
-%     \item When searching in unstructured P2P systems, having \red{index servers} improves performance
-%     \item Deciding where to store data can often be done more efficiently through \red{brokers}.
+%     \item When searching in unstructured P2P systems, having \textbf{index servers} improves performance
+%     \item Deciding where to store data can often be done more efficiently through \textbf{brokers}.
 %     \end{itemize}
 %   \end{block}
 %   \begin{centerfig}
@@ -501,10 +497,10 @@
 % \begin{slide}{Collaboration: The BitTorrent case}
 %   \begin{block}{Principle: search for a file \id{F}}
 %     \begin{itemize}\tightlist
-%     \item Lookup file at a global directory \mathexpr{\Rightarrow} returns a \red{torrent file}
-%     \item Torrent file contains reference to \red{tracker}: a server keeping an accurate account of
-%       \blue{active} nodes that have (chunks of) \id{F}.
-%     \item \id{P} can join \red{swarm}, get a chunk for free, and then trade a copy of that chunk for another
+%     \item Lookup file at a global directory \mathexpr{\Rightarrow} returns a \textbf{torrent file}
+%     \item Torrent file contains reference to \textbf{tracker}: a server keeping an accurate account of
+%       \textbf{active} nodes that have (chunks of) \id{F}.
+%     \item \id{P} can join \textbf{swarm}, get a chunk for free, and then trade a copy of that chunk for another
 %       one with a peer \id{Q} also in the swarm.
 %     \end{itemize}
 %   \end{block}
@@ -522,12 +518,12 @@
 \begin{slide}{Cloud computing}
   \begin{block}{Make a distinction between four layers}
     \begin{itemize}
-      \item \red{Hardware}: Processors, routers, power and cooling systems. Customers normally never get to see these.
-      \item \red{Infrastructure}: Deploys virtualization techniques. Evolves around allocating and managing
+      \item \textbf{Hardware}: Processors, routers, power and cooling systems. Customers normally never get to see these.
+      \item \textbf{Infrastructure}: Deploys virtualization techniques. Evolves around allocating and managing
             virtual storage devices and virtual servers.
-      \item \red{Platform}: Provides higher-level abstractions for storage and such. Example: Amazon S3 storage
-            system offers an API for (locally created) files to be organized and stored in so-called \blue{buckets}.
-      \item \red{Application}: Actual applications, such as office suites (text processors, spreadsheet
+      \item \textbf{Platform}: Provides higher-level abstractions for storage and such. Example: Amazon S3 storage
+            system offers an API for (locally created) files to be organized and stored in so-called \textbf{buckets}.
+      \item \textbf{Application}: Actual applications, such as office suites (text processors, spreadsheet
             applications, presentation applications). Comparable to the suite of apps shipped with OSes.
     \end{itemize}
   \end{block}
@@ -535,7 +531,7 @@
 \subsection{The edge-cloud architecture}
 \begin{slide}{Edge-server architecture}
   \begin{block}{Essence}
-    Systems deployed on the Internet where servers are placed \blue{at the edge} of the network:
+    Systems deployed on the Internet where servers are placed \textbf{at the edge} of the network:
     the boundary between enterprise networks and the actual Internet.
   \end{block}
   \begin{centerfig}
@@ -545,13 +541,13 @@
 \begin{slide}{Reasons for having an edge infrastructure}
   \begin{block}{Commonly (and often misconceived) arguments}
     \begin{itemize}
-      \item \blue{Latency and bandwidth}: Especially important for certain real-time applications, such as
+      \item \textbf{Latency and bandwidth}: Especially important for certain real-time applications, such as
             augmented/virtual reality applications. Many people underestimate the latency and bandwidth to the
             cloud.
-      \item \blue{Reliability}: The connection to the cloud is often assumed to be unreliable, which is often a
+      \item \textbf{Reliability}: The connection to the cloud is often assumed to be unreliable, which is often a
             false assumption. There may be critical situations in which extremely high connectivity guarantees are
             needed.
-      \item \blue{Security and privacy}: The implicit assumption is often that when assets are nearby, they can
+      \item \textbf{Security and privacy}: The implicit assumption is often that when assets are nearby, they can
             be made better protected. Practice shows that this assumption is generally false. However, securely
             handling data operations in the cloud may be trickier than within your own organization.
     \end{itemize}
@@ -561,13 +557,13 @@
   \begin{block}{Managing resources at the edge may be trickier than in the cloud}
     \begin{itemize}\firmlist
 
-      \item \red{Resource allocation}: we need to guarantee the availability of the resources required to
+      \item \textbf{Resource allocation}: we need to guarantee the availability of the resources required to
             perform a service.
 
-      \item \red{Service placement}: we need to decide \blue{when} and \blue{where} to place a service. This is
+      \item \textbf{Service placement}: we need to decide \textbf{when} and \textbf{where} to place a service. This is
             notably relevant for mobile applications.
 
-      \item \red{Edge selection}: we need to decide which edge infrastructure should be
+      \item \textbf{Edge selection}: we need to decide which edge infrastructure should be
             used when a service needs to be offered. The closest one may not be the best one.
     \end{itemize}
   \end{block}
@@ -585,8 +581,8 @@
   \onslide
   \begin{block}{Observations}
     \begin{itemize}\firmlist
-      \item Blocks are organized into an unforgeable \blue{append-only} chain
-      \item Each block in the blockchain is \blue{immutable} \mathexpr{\Rightarrow} massive replication
+      \item Blocks are organized into an unforgeable \textbf{append-only} chain
+      \item Each block in the blockchain is \textbf{immutable} \mathexpr{\Rightarrow} massive replication
       \item The real snag lies in who is allowed to append a block to a chain
     \end{itemize}
 
@@ -627,7 +623,7 @@
   \end{block}
   \begin{block}{Observation}
     \begin{itemize}\firmlist
-      \item Participants collectively engage in a \red{leader election}. Only the elected leader is allowed to
+      \item Participants collectively engage in a \textbf{leader election}. Only the elected leader is allowed to
             append a block of validated transactions.
       \item Large-scale, decentralized leader election that is fair, robust, secure, and so on, is far from
             trivial.
@@ -640,11 +636,14 @@
   We have discussed architectureal principles
   in Distributed Systems, namely:
   \begin{itemize}
-    \item Layered architectures
+    \item Layered
     \item RPC and RESTful styles
     \item Publish and Subscribe
-    \item Structured and unstructured P2P
+    \item Structured and Unstructured P2P
     \item Cloud Edge Computing
-    \item Blockchain
+    \item Blockchains
   \end{itemize}
+  As with all topics on this course, please make sure
+  you understand the \emph{why}, of each of these
+  architectures, not just the \emph{how/what}
 \end{slide}
