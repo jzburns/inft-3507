@@ -21,73 +21,153 @@
     \end{itemize}
   \end{alertblock}
 \end{frame}
+
 \begin{frame}{Alternative approach}
-  \begin{block}{Theoretical Definitions}
-    \begin{itemize}\tightlist
-      \item \emph{Decentralized computing} - a networked computer system in which processes and resources are
-            \emph{necessarily} spread across multiple computers.
-      \item \emph{Distributed computing} - is a networked computer system in which processes and resources are
-            \emph{sufficiently} spread across multiple computers.
+  \begin{block}{Distributed system}
+    \begin{itemize}
+      \item A distributed system consists of multiple computers
+            (nodes) that work together to appear as a single system to
+            the user.
+      \item \textbf{Focus}: performance, scalability, fault tolerance
+      \item \textbf{Control} may still be centralized
     \end{itemize}
   \end{block}
-  \begin{alertblock}{Modern ("Cloud") Definitions}
-    \begin{itemize}\tightlist
-      \item \emph{Decentralized computing} - independent nodes operating without a central authority, making autonomous decisions
-      \item \emph{Distributed computing} - multiple interconnected nodes working collaboratively to solve a task, coordinated by a central system
+  \begin{block}{Decentralized system}
+    \begin{itemize}
+      \item A decentralized system distributes control and
+            decision-making authority across multiple independent
+            nodes rather than relying on a central authority.
+      \item \textbf{Focus}: autonomy, resilience to control, trust minimization
+      \item \textbf{Control}: No single node has ultimate authority
     \end{itemize}
+  \end{block}
+\end{frame}
+
+%----------------------------
+\begin{frame}{Control \& Authority (The Main Difference)}
+  \begin{block}{Distributed}
+    Multiple nodes \emph{compute together}, but control can still be centralized:
+    \begin{itemize}
+      \item Leader / coordinator often exists
+      \item Decisions may flow from one organization or service
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Decentralized}
+    Multiple nodes \emph{share control}:
+    \begin{itemize}
+      \item No single node (or org) has ultimate authority
+      \item Governance/decision-making spread across participants
+    \end{itemize}
+  \end{block}
+
+  \begin{alertblock}{Key takeaway}
+    A system can be \textbf{distributed yet centralized}; a \textbf{decentralized} system must distribute \emph{control}.
   \end{alertblock}
-  \begin{itemize}\tightlist
-    \item Both use multiple nodes but differ in control structure,
-          coordination, and application focus, balancing autonomy
-          versus efficiency
-    \item A \emph{node} is a compute resource with some local storage
-          eg, a process, a container, a virtual machine, a dedicated server,
-          a cluster of servers
-  \end{itemize}
 \end{frame}
-%   \begin{frame}{Some common misconceptions}
-%     \begin{block}{Centralized solutions do not scale}
-%       Make distinction between \red{logically} and \red{physically} centralized. The root of the Domain Name
-%       System:\vspace*{-6pt}
-%       \begin{itemize}\tightlist
-%       \item logically centralized
-%       \item physically (massively) distributed
-%       \item decentralized across several organizations
-%       \end{itemize}
-%     \end{block}
-%     \onslide
-%     \begin{block}{Centralized solutions have a single point of failure}
-%       Generally not true (e.g., the root of DNS). A single point of
-%       failure is often:\vspace*{-6pt}
-%       \begin{itemize}\tightlist
-%       \item easier to manage
-%       \item easier to make more robust
-%       \end{itemize}
-%     \end{block}
-%     \onslide
-%     \begin{alertblock}{Important}
-%       There are many, poorly founded, misconceptions regarding \red{scalability}, \red{fault tolerance},
-%       \red{security}, etc. We need to develop skills by which distributed systems can be readily understood so
-%       as to judge such misconceptions.
-%     \end{alertblock}
-%   \end{frame}
-% \subsection{Why making the distinction is relevant}
-\subsection{Studying distributed systems}
-\begin{frame}{Perspectives on distributed systems}
-  \begin{block}{Distributed systems are complex: take persepctives}
-    \begin{itemize}\firmlist
-      \item \blue{Architecture}: common organizations
-      \item \blue{Process}: what kind of processes, and their relationships
-      \item \blue{Communication}: facilities for exchanging data
-      \item \blue{Coordination}: application-independent algorithms
-      \item \blue{Naming}: how do you identify resources?
-      \item \blue{Consistency} and \blue{replication}: performance requires of data, which need to be \red{the
-              same}
-      \item \blue{Fault tolerance}: keep running in the presence of partial failures
-      \item \blue{Security}: ensure authorized access to resources
+
+%----------------------------
+\begin{frame}{Architecture \& Coordination}
+  \begin{block}{Typical distributed coordination}
+    \begin{itemize}
+      \item Client--server, master--worker, leader-based replication
+      \item Specialized roles (leader, replicas, workers)
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Typical decentralized coordination}
+    \begin{itemize}
+      \item Peer-to-peer style participation
+      \item Collective coordination (e.g., voting/consensus-like mechanisms)
+    \end{itemize}
+  \end{block}
+
+  \begin{exampleblock}{Intuition}
+    Distributed $\rightarrow$ ``many machines, one system'' \\
+    Decentralized $\rightarrow$ ``many owners, shared authority''
+  \end{exampleblock}
+\end{frame}
+
+%----------------------------
+\begin{frame}{Fault Tolerance \& Failure Modes}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \begin{block}{Distributed systems}
+      \begin{itemize}
+        \item Handle \textbf{node failures} (crashes, partitions)
+        \item But may have \textbf{single point of control}
+      \end{itemize}
+    \end{block}
+
+    \column{0.48\textwidth}
+    \begin{block}{Decentralized systems}
+      \begin{itemize}
+        \item Handle node failures \emph{and} control failures
+        \item Aim to avoid \textbf{single authority failure}
+      \end{itemize}
+    \end{block}
+  \end{columns}
+
+  \begin{alertblock}{Practical distinction}
+    Distributed: resilience to \textbf{hardware/service failure} \\
+    Decentralized: resilience to \textbf{control/censorship/authority failure}
+  \end{alertblock}
+\end{frame}
+
+%----------------------------
+\begin{frame}{Trust \& Security Model}
+  \begin{block}{Distributed (often)}
+    \begin{itemize}
+      \item Assumes trusted administrators / central policy
+      \item Security enforced via access control and ops processes
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Decentralized (often)}
+    \begin{itemize}
+      \item Assumes some participants may be malicious
+      \item Uses mechanisms to reduce reliance on trust in any one node
+    \end{itemize}
+  \end{block}
+
+  \begin{exampleblock}{Rule of thumb}
+    More decentralization usually means a \textbf{stronger adversarial model} (and more design complexity).
+  \end{exampleblock}
+\end{frame}
+
+%----------------------------
+\begin{frame}{Performance \& Efficiency Trade-offs}
+  \begin{block}{Distributed systems tend to optimize}
+    \begin{itemize}
+      \item Latency, throughput, operational efficiency
+      \item Coordination cost kept low via leaders / centralized control
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Decentralized systems tend to trade performance for}
+    \begin{itemize}
+      \item Independence, robustness, shared governance
+      \item Higher coordination overhead (more parties must agree)
+    \end{itemize}
+  \end{block}
+
+  \begin{alertblock}{Trade-off}
+    Decentralization often increases cost of coordination $\Rightarrow$ lower peak performance.
+  \end{alertblock}
+\end{frame}
+
+%----------------------------
+\begin{frame}{Summary Comparison}
+  \begin{block}{Quick comparison}
+    \begin{itemize}
+      \item \textbf{Goal:} Distributed $\rightarrow$ scalability/performance \quad vs \quad Decentralized $\rightarrow$ autonomy/resilience
+      \item \textbf{Control:} Distributed $\rightarrow$ may be centralized \quad vs \quad Decentralized $\rightarrow$ shared control
+      \item \textbf{Trust:} Distributed $\rightarrow$ trusted operators \quad vs \quad Decentralized $\rightarrow$ trust-minimized
+      \item \textbf{Complexity:} Distributed $\rightarrow$ moderate \quad vs \quad Decentralized $\rightarrow$ higher
     \end{itemize}
   \end{block}
 \end{frame}
+
 \section{Design goals}
 \begin{frame}{What do we want to achieve?}
   \begin{block}{Overall design goals}
@@ -139,50 +219,18 @@
     \begin{center}
       \sffamily\small \renewcommand{\arraystretch}{1.1}
       \begin{tabular}{|l|>{\RRCOL}p{0.7\textwidth}|} \hline
-        \blue{Transparency} & \blue{Description}                                                    \\ \whline
-        \red{Access}        & Hide differences in data representation and how an object is accessed \\ \hline
-        \red{Location}      & Hide where an object is located                                       \\ \hline
-        \red{Migration}     & Hide that an object may move to another location                      \\ \hline
-        \red{Replication}   & Hide that an object is replicated                                     \\ \hline
-        \red{Concurrency}   & Hide that an object may be shared by several independent users        \\ \hline
-        \red{Failure}       & Hide the failure and recovery of an object                            \\ \hline
+        \textbf{Transparency} & \blue{Description}                                                    \\ \whline
+        \textbf{Access}       & Hide differences in data representation and how an object is accessed \\ \hline
+        \textbf{Location}     & Hide where an object is located                                       \\ \hline
+        \textbf{Migration}    & Hide that an object may move to another location                      \\ \hline
+        \textbf{Replication}  & Hide that an object is replicated                                     \\ \hline
+        \textbf{Concurrency}  & Hide that an object may be shared by several independent users        \\ \hline
+        \textbf{Failure}      & Hide the failure and recovery of an object                            \\ \hline
       \end{tabular}
     \end{center}
   \end{block}
 \end{frame}
-% \begin{frame}{Degree of transparency}
-%   \begin{block}{Aiming at full distribution transparency may be too much}
-%     \begin{itemize}\firmlist
-%     \item There are communication latencies that cannot be hidden
-%     \item \red{Completely hiding failures} of networks and nodes is (theoretically and practically)
-%       \blue{impossible}
-%       \begin{itemize}\tightlist
-%       \item You cannot distinguish a slow computer from a failing one
-%       \item You can never be sure that a server actually performed an operation before a crash
-%       \end{itemize}
-%     \item Full transparency will \red{cost performance}, exposing distribution of the system
-%       \begin{itemize}\tightlist
-%       \item Keeping replicas \blue{exactly} up-to-date with the master \blue{takes time}
-%       \item Immediately flushing write operations to disk for fault tolerance
-%       \end{itemize}
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{Degree of transparency}
-% \begin{exampleblock}{Exposing distribution may be good}
-%     \begin{itemize}
-%     \item Making use of location-based services (finding your nearby friends)
-%     \item When dealing with users in different time zones
-%     \item When it makes it easier for a user to understand what's going on (when e.g., a server does not
-%       respond for a long time, report it as failing).
-%     \end{itemize}
-%   \end{exampleblock}
-%   \onslide
-%   \begin{block}{Conclusion}
-%     Distribution transparency is a nice goal, but achieving it is a different story, and it should often not
-%     even be aimed at.
-%   \end{block}
-% \end{frame}
+
 \subsection{Openness}
 \begin{frame}{Openness of distributed systems}
   \begin{block}{Open distributed system}
@@ -196,8 +244,9 @@
     \begin{itemize}\tightlist
       \item Systems should conform to well-defined \blue{interfaces}
       \item Systems should easily \blue{interoperate}
-      \item Systems should support \blue{portability} of applications
-      \item Systems should be easily \blue{extensible}
+      \item Theis means publicly documented protocols and APIs
+      \item Vendor-neutral standards
+      \item Interoperability and extensibility
     \end{itemize}
   \end{block}
 \end{frame}
