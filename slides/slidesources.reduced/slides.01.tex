@@ -1,6 +1,6 @@
 \part{Introduction}
-\section{From networked systems to distributed systems}
-\subsection{Distributed versus decentralized systems}
+\section{Distributed versus Decentralized systems}
+\subsection{Distributed versus Decentralized systems}
 \begin{frame}{Distributed versus Decentralized}
   \begin{block}{What many people state}
     \begin{centerfig}
@@ -44,7 +44,7 @@
 \end{frame}
 
 %----------------------------
-\begin{frame}{Control \& Authority (The Main Difference)}
+\begin{frame}{The Key Difference: Control \& Authority}
   \begin{block}{Distributed}
     Multiple nodes \emph{compute together}, but control can still be centralized:
     \begin{itemize}
@@ -384,14 +384,16 @@
     \end{itemize}
   \end{block}
 \end{frame}
-% \begin{frame}{Security mechanisms}
-%   \begin{block}{Keeping it simple}
-%     It's all about \blue{encrypting} and \blue{decrypting} data using \blue{security keys}.
-%   \end{block}
-%   \begin{block}{Notation}
-%     \mathexpr{K(\id{data})} denotes that we \blue{use key \mathexpr{K}} to \blue{encrypt/decrypt \id{data}}.
-%   \end{block}
-% \end{frame}
+
+\begin{frame}{Security mechanisms}
+  \begin{block}{Keeping it simple}
+    It's all about \blue{encrypting} and \blue{decrypting} data using \blue{security keys}.
+  \end{block}
+  \begin{block}{Notation}
+    \mathexpr{K(\id{data})} denotes that we \blue{use key \mathexpr{K}} to \blue{encrypt/decrypt \id{data}}.
+  \end{block}
+\end{frame}
+
 \begin{frame}{Security mechanisms}
   \begin{block}{Symmetric cryptosystem}
     With \blue{encryption key \mathexpr{E_K(\id{data})}} and \blue{decryption key \mathexpr{D_K(\id{data})}}:
@@ -451,37 +453,9 @@
   \end{block}
 \end{frame}
 
-\subsection{Scalability}
-\begin{frame}{Scale in distributed systems}
-  \begin{block}{Observation}
-    Many developers  of modern distributed systems easily  use the adjective ``scalable''  without making clear
-    \red{why} their system actually scales.
-  \end{block}
-  \onslide
-  \begin{block}{At least three components}
-    \begin{itemize}
-      \item Number of users or processes \red{(size scalability)}
-      \item Maximum distance between nodes \red{(geographical scalability)}
-      \item Number of administrative domains \red{(administrative scalability)}
-    \end{itemize}
-  \end{block}
-  \onslide
-  \begin{alertblock}{Observation}
-    Most systems account only, to a certain extent, for size scalability. Often a solution: multiple powerful
-    servers operating independently in parallel. Today, the challenge still lies in geographical and
-    administrative scalability.
-  \end{alertblock}
-\end{frame}
-\begin{frame}{Size scalability}
-  \begin{block}{Root causes for scalability problems with centralized solutions}
-    \begin{itemize}
-      \item The computational capacity, limited by the CPUs
-      \item The storage capacity, including the transfer rate between CPUs and disks
-      \item The network between the user and the centralized service
-    \end{itemize}
-  \end{block}
-\end{frame}
-\begin{frame}{Performance models}
+\section{Performance Models}
+\subsection{Performance Models}
+\begin{frame}{Performance Models}
   \begin{block}{A centralized service can be modeled as a simple queuing system}
     \centering\includefigure{01-05}
   \end{block}
@@ -525,94 +499,8 @@
     \end{itemize}
   \end{block}
 \end{frame}
-% \begin{frame}{Problems with geographical scalability}
-%   \begin{block}{}
-%     \begin{itemize}
-%     \item Cannot simply go from LAN to WAN: many distributed systems assume \red{synchronous client-server
-%       interactions}: client sends request and waits for an answer. \blue{Latency} may easily prohibit this
-%       scheme.
-%     \item WAN links are often inherently \blue{unreliable}: simply moving streaming video from LAN to WAN is
-%       bound to fail.
-%     \item \blue{Lack of multipoint communication}, so that a simple search broadcast cannot be
-%       deployed. Solution is to develop separate \red{naming} and \red{directory services} (having their own
-%       scalability problems).
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{Problems with administrative scalability}
-%   \begin{block}{Essence}
-%     Conflicting policies concerning usage (and thus payment), management, and security
-%   \end{block}
 
-%   \begin{exampleblock}{Examples}
-%     \begin{itemize}\firmlist
-%     \item \red{Computational grids}: share expensive resources between different domains. 
-%     \item \red{Shared equipment}: how to control, manage, and use a shared radio telescope constructed as
-%       large-scale shared sensor network?
-%     \end{itemize}
-%   \end{exampleblock}
 
-%   \begin{alertblock}{Exception: several peer-to-peer networks}
-%     \begin{itemize}\tightlist
-%     \item File-sharing systems (based, e.g., on BitTorrent)
-%     \item Peer-to-peer telephony (early versions of Skype)
-%     \item Peer-assisted audio streaming (Spotify)
-%     \end{itemize}\vspace*{-6pt}
-%     Note: \blue{end users} collaborate and not \blue{administrative entities}.
-%   \end{alertblock}
-% \end{frame}
-\begin{frame}{Techniques for scaling}
-  \begin{block}{Hide communication latencies}
-    \begin{itemize}
-      \item Make use of \blue{asynchronous communication}
-      \item Have separate handler for incoming response
-      \item \blue{Problem:} not every application fits this model
-    \end{itemize}
-  \end{block}
-\end{frame}
-\begin{frame}{Techniques for scaling}
-  \begin{block}{Facilitate solution by moving computations to client}
-    \begin{center}
-      \includefigure{01-06a} \newline
-      \includefigure{01-06b} \newline
-    \end{center}
-  \end{block}
-\end{frame}
-\begin{frame}{Techniques for scaling}
-  \begin{block}{Partition data and computations across multiple machines}
-    \begin{itemize}
-      \item Move computations to clients (Java/ECMA script)
-      \item Decentralized naming services (DNS)
-      \item Decentralized information systems (WWW)
-    \end{itemize}
-  \end{block}
-\end{frame}
-\begin{frame}{Techniques for scaling}
-  \begin{block}{Replication and caching: Make copies of data available at different machines}
-    \begin{itemize}
-      \item Replicated file servers and databases
-      \item Mirrored Websites
-      \item Web caches (in browsers and proxies)
-      \item File caching (at server and client)
-    \end{itemize}
-  \end{block}
-\end{frame}
-\begin{frame}{Scaling: The problem with replication}
-  \begin{block}{Applying replication is easy, except for one thing}
-    \begin{itemize}
-      \item Having multiple copies (cached or replicated), leads to \red{inconsistencies}: modifying one copy
-            makes that copy different from the rest.
-      \item Always keeping copies consistent and in a general way requires \red{global synchronization} on
-            each modification.
-      \item Global synchronization precludes large-scale solutions.
-    \end{itemize}
-  \end{block}
-  \onslide
-  \begin{block}{Observation}
-    If we can tolerate inconsistencies, we may reduce the need for global synchronization, but
-    \blue{tolerating inconsistencies is application dependent}.
-  \end{block}
-\end{frame}
 \section{A simple classification of distributed systems}
 \subsection{High-performance distributed computing}
 \begin{frame}{Parallel computing}
@@ -626,6 +514,7 @@
     \end{tabular}
   \end{block}
 \end{frame}
+
 \begin{frame}{Distributed shared memory systems}
   \begin{block}{Observation}
     Multiprocessors are relatively easy to program in comparison to multicomputers, yet have problems when
@@ -642,260 +531,39 @@
     meet the expectations of programmers. It has been widely abandoned by now.
   \end{block}
 \end{frame}
-\begin{frame}{Cluster computing}
-  \begin{block}{Essentially a group of high-end systems connected through a LAN}
-    \begin{itemize}\tightlist
-      \item Homogeneous: same OS, near-identical hardware
-      \item Single, or tightly coupled managing node(s)
+
+\section{Pitfalls}
+\begin{frame}{Developing distributed systems: Pitfalls}
+  \begin{block}{Observation}
+    Many distributed systems are needlessly complex, caused by mistakes that required patching later on.
+    Many \blue{false assumptions} are often made.
+  \end{block}
+  \onslide
+  \begin{block}{False (and often hidden) assumptions}
+    \begin{itemize}
+      \item The network is reliable
+      \item The network is secure
+      \item The network is homogeneous
+      \item The topology does not change
+      \item Latency is zero
+      \item Bandwidth is infinite
+      \item Transport cost is zero
+      \item There is one administrator
     \end{itemize}
   \end{block}
-  \begin{center}
-    \includefigure{01-09}
-  \end{center}
 \end{frame}
-% \begin{frame}{Grid computing}
 
-%   \begin{block}{The next step: plenty of nodes from everywhere}
-%     \begin{itemize}
-%     \item Heterogeneous
-%     \item Dispersed across several organizations
-%     \item Can easily span a wide-area network
-%     \end{itemize}
-%   \end{block}
-%   \begin{alertblock}{Note}
-%     To allow for collaborations, grids generally use \red{virtual organizations}. In essence, this is a
-%     grouping of users (or better: their IDs) that allows for authorization on resource allocation.
-%   \end{alertblock}
-% \end{frame}
-% \begin{frame}{Architecture for grid computing}
-%   \begin{tabular}{@{}cc}
-%     \begin{minipage}{0.4\textwidth}
-%       \begin{center}
-%         \includefigure{01-10}
-%       \end{center}
-%     \end{minipage} &
-%     \begin{minipage}{0.55\textwidth}
-%   \begin{block}{The layers}\footnotesize
-%     \begin{itemize}\firmlist
-%     \item \blue{Fabric}: Provides interfaces to local resources (for querying state and capabilities, locking,
-%       etc.)
-%     \item \blue{Connectivity}: Communication/transaction protocols, e.g., for moving data between
-%       resources. Also various authentication protocols.
-%     \item \blue{Resource}: Manages a single resource, such as creating processes or reading data.
-%     \item \blue{Collective}: Handles access to multiple resources: discovery, scheduling, replication.
-%     \item \blue{Application}: Contains actual grid applications in a single organization.
-%     \end{itemize}
-%   \end{block}
-%     \end{minipage}
-%   \end{tabular}
-% \end{frame}
-% \subsection{Distributed information systems}
-% \begin{frame}{Integrating applications}
-
-%   \begin{block}{Situation}
-%     Organizations confronted with many \blue{networked applications}, but achieving interoperability was
-%     painful.
-%   \end{block}
-
-%   \begin{block}{Basic approach}
-%     A networked application is one that runs on a \red{server} making its services available to remote
-%     \red{clients}. Simple integration: clients combine requests for (different) applications; send that off;
-%     collect responses, and present a coherent result to the user.
-%   \end{block}
-
-%   \begin{block}{Next step}
-%     Allow direct application-to-application communication, leading to \red{Enterprise Application
-%       Integration}.
-%   \end{block}
-
-% \end{frame}
-% \begin{frame}{Example EAI: (nested) transactions}
-%   \vspace*{-6pt}
-%   \begin{block}{Transaction}
-%     \begin{center}
-%       \sffamily\footnotesize
-%       \renewcommand{\arraystretch}{1.1}
-%       \begin{tabular}{|l|l|} \hline
-%         \textbf{Primitive} & \textbf{Description} \\ \whline
-%         \idsn{BEGIN\_TRANSACTION} & Mark the start of a transaction  \\ \hline
-%         \id{END\_TRANSACTION} & Terminate the transaction and try to commit  \\ \hline
-%         \id{ABORT\_TRANSACTION} & Kill the transaction and restore the old values  \\ \hline
-%         \id{READ} & Read data from a file, a table, or otherwise  \\ \hline
-%         \id{WRITE} & Write data to a file, a table, or otherwise  \\ \hline
-%       \end{tabular}
-%     \end{center}
-%   \end{block}
-%   \begin{block}{Issue: all-or-nothing}
-%     \begin{columns}[T]
-%       \begin{column}{0.3\textwidth}
-%         \includefigure[0.7]{01-12}
-%       \end{column}
-%       \begin{column}{0.65\textwidth}\footnotesize
-%         \begin{itemize}\tightlist
-%         \item \blue{Atomic}: happens indivisibly (seemingly)
-%         \item \blue{Consistent}: does not violate system invariants
-%         \item \blue{Isolated}: not mutual interference
-%         \item \blue{Durable}: commit means changes are permanent
-%         \end{itemize}
-%       \end{column}
-%     \end{columns}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{TPM: Transaction Processing Monitor}
-%   \begin{centerfig}
-%     \includefigure{01-13}
-%   \end{centerfig}
-%   \begin{block}{Observation} 
-%     Often, the data involved in a transaction is distributed across several servers. A \red{TP
-%       Monitor} is responsible for coordinating the execution of a transaction.
-%   \end{block}
-% \end{frame}
-% \begin{frame}{Middleware and EAI}
-%   \begin{centerfig}
-%     \includefigure{01-14}
-%   \end{centerfig}
-%   \begin{block}{Middleware offers communication facilities for integration}
-%     \begin{description}[xxx]
-%       \item[\blue{Remote Procedure Call (RPC)}:] Requests are sent through local procedure call,
-%         packaged as message, processed, responded through message, and result returned as return from call.
-%       \item[\blue{Message Oriented Middleware (MOM)}:] Messages are sent to logical contact point (\blue{published}),
-%         and forwarded to \blue{subscribed} applications.
-%     \end{description}
-%   \end{block}
-% \end{frame}
-%   \begin{frame}{How to integrate applications}
-%     \begin{block}{}
-%       \begin{description}[xxx]
-
-%       \item[\blue{File transfer}:] Technically simple, but not flexible:
-%         \begin{itemize}\firmlist
-%         \item Figure out file format and layout
-%         \item Figure out file management
-%         \item Update propagation, and update notifications.
-%         \end{itemize}
-
-%       \item[\blue{Shared database}:] Much more flexible, but still requires common data scheme next to risk of
-%         bottleneck.
-
-%       \item[\blue{Remote procedure call}:] Effective when execution of a series of actions is needed.
-
-%       \item[\blue{Messaging}:] RPCs require caller and callee to be up and running at the same time. Messaging allows
-%         decoupling in time and space.
-
-%       \end{description}
-%     \end{block}
-%   \end{frame}
-% \subsection{Pervasive systems}
-% \begin{frame}{Distributed pervasive systems}
-%   \begin{block}{Observation} 
-%     Emerging next-generation of distributed systems in which nodes are small, mobile, and often embedded in a
-%     larger system, characterized by the fact that the system \red{naturally blends into the user's environment}.
-%   \end{block}
-%   \begin{block}{Three (overlapping) subtypes}
-%     \begin{itemize}
-%     \item \blue{Ubiquitous computing systems}: pervasive and \red{continuously present}, i.e., there is a
-%       continuous interaction between system and user.
-%     \item \blue{Mobile computing systems}: pervasive, but emphasis is on the fact that devices are
-%       \red{inherently mobile}. 
-%     \item \blue{Sensor (and actuator) networks}: pervasive, with emphasis on the actual (collaborative)
-%       \red{sensing} and \red{actuation} of the environment.
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{Ubiquitous systems}
-%   \begin{block}{Core elements}
-%     \begin{enumerate}\tightlist
-%     \item (\blue{Distribution}) Devices are networked, distributed, and accessible transparently
-%     \item (\blue{Interaction}) Interaction between users and devices is highly unobtrusive
-%     \item (\blue{Context awareness}) The system is aware of a user's context to optimize interaction
-%     \item (\blue{Autonomy}) Devices operate autonomously without human intervention, and are thus highly self-managed
-%     \item (\blue{Intelligence}) The system as a whole can handle a wide range of dynamic actions and interactions
-%     \end{enumerate}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{Mobile computing}
-%   \begin{block}{Distinctive features}
-%     \begin{itemize}
-%     \item A myriad of different mobile devices (smartphones, tablets, GPS devices, remote controls, active
-%       badges).
-%     \item Mobile implies that a device's location is expected to change over time \mathexpr{\Rightarrow}
-%       change of local services, reachability, etc. Keyword: \red{discovery}.
-%     \item Maintaining stable communication can introduce serious problems.
-%     \item For a long time, research has focused on directly sharing resources between mobile devices. It never
-%       became popular and is by now considered to be a fruitless path for research.
-%     \end{itemize}
-%   \end{block}
-%   \onslide
-%   \begin{block}{Bottomline}
-%     Mobile devices set up connections to stationary servers, essentially bringing mobile computing in the
-%     position of clients of cloud-based services.
-%   \end{block}
-% \end{frame}
-% \begin{frame}{Mobile computing}
-%   \footnotesize
-%   \begin{centerfig}
-%     \includefigure{01-15a} \\
-%     Mobile cloud computing \\
-%     \ \\
-%     \includefigure{01-15b} \\
-%     Mobile edge computing
-%   \end{centerfig}
-% \end{frame}
-% \begin{frame}{Sensor networks}
-%   \begin{block}{Characteristics}
-%     The \blue{nodes} to which sensors are attached are:
-%     \begin{itemize}
-%     \item Many (10s-1000s)
-%     \item Simple (small memory/compute/communication capacity)
-%     \item Often battery-powered (or even battery-less)
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{Sensor networks as distributed databases}
-%   \begin{block}{Two extremes}
-%     \begin{center}
-%       \begin{tabular}{c}
-%         \includefigure{01-16a} \\
-%         \includefigure{01-16b} \\
-%       \end{tabular}
-%     \end{center}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{The cloud-edge continuum}
-%   \begin{centerfig}
-%     \includefigure{01-17}
-%   \end{centerfig}
-% \end{frame}
-% \section{Pitfalls}
-% \begin{frame}{Developing distributed systems: Pitfalls}
-%   \begin{block}{Observation}
-%     Many distributed systems are needlessly complex, caused by mistakes that required patching later on. 
-%     Many \blue{false assumptions} are often made.
-%   \end{block}
-%   \onslide
-%   \begin{block}{False (and often hidden) assumptions}
-%     \begin{itemize}
-%     \item The network is reliable
-%     \item The network is secure
-%     \item The network is homogeneous
-%     \item The topology does not change
-%     \item Latency is zero
-%     \item Bandwidth is infinite
-%     \item Transport cost is zero
-%     \item<10-> There is one administrator
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
 \section{Summary}
-
 \begin{frame}{Summary and Conclusions}
   We have discussed some important principles
   in Distributed Systems, namely:
   \begin{itemize}
-    \item Centralized, Decentralized and Distributed Types
-    \item Support sharing of resources
-    \item Distribution transparency
+    \item Distributed and Decentralized Systems
+    \item Resource Sharing
+    \item Distribution Transparency
     \item Openness and Security
-    \item Performance and Scalability
+    \item Performance Models
+    \item Classification of Distributed Systems
+    \item Pitfalls of Distributed Systems Development
   \end{itemize}
 \end{frame}
