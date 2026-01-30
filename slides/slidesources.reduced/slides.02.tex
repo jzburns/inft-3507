@@ -246,33 +246,33 @@
   \end{exampleblock}
 \end{slide}
 \subsection{Hierarchically organized peer-to-peer networks}
-% \begin{slide}{Super-peer networks}
-%   \begin{block}{Essence}
-%     It is sometimes sensible to break the symmetry in pure peer-to-peer networks:
-%     \begin{itemize}\tightlist
-%     \item When searching in unstructured P2P systems, having \textbf{index servers} improves performance
-%     \item Deciding where to store data can often be done more efficiently through \textbf{brokers}.
-%     \end{itemize}
-%   \end{block}
-%   \begin{centerfig}
-%     \includefigure{02-25}
-%   \end{centerfig}
-% \end{slide}
-% \subsection{Example: BitTorrent}
-% \begin{slide}{Collaboration: The BitTorrent case}
-%   \begin{block}{Principle: search for a file \id{F}}
-%     \begin{itemize}\tightlist
-%     \item Lookup file at a global directory \mathexpr{\Rightarrow} returns a \textbf{torrent file}
-%     \item Torrent file contains reference to \textbf{tracker}: a server keeping an accurate account of
-%       \textbf{active} nodes that have (chunks of) \id{F}.
-%     \item \id{P} can join \textbf{swarm}, get a chunk for free, and then trade a copy of that chunk for another
-%       one with a peer \id{Q} also in the swarm.
-%     \end{itemize}
-%   \end{block}
-%   \begin{centerfig}
-%     \includefigure{02-26}
-%   \end{centerfig}
-% \end{slide}
+\begin{slide}{Super-peer networks}
+  \begin{block}{Essence}
+    It is sometimes sensible to break the symmetry in pure peer-to-peer networks:
+    \begin{itemize}\tightlist
+      \item When searching in unstructured P2P systems, having \textbf{index servers} improves performance
+      \item Deciding where to store data can often be done more efficiently through \textbf{brokers}.
+    \end{itemize}
+  \end{block}
+  \begin{centerfig}
+    \includefigure{02-25}
+  \end{centerfig}
+\end{slide}
+\subsection{Example: BitTorrent}
+\begin{slide}{Collaboration: The BitTorrent case}
+  \begin{block}{Principle: search for a file \id{F}}
+    \begin{itemize}\tightlist
+      \item Lookup file at a global directory \mathexpr{\Rightarrow} returns a \textbf{torrent file}
+      \item Torrent file contains reference to \textbf{tracker}: a server keeping an accurate account of
+            \textbf{active} nodes that have (chunks of) \id{F}.
+      \item \id{P} can join \textbf{swarm}, get a chunk for free, and then trade a copy of that chunk for another
+            one with a peer \id{Q} also in the swarm.
+    \end{itemize}
+  \end{block}
+  \begin{centerfig}
+    \includefigure{02-26}
+  \end{centerfig}
+\end{slide}
 \section{Hybrid system architectures}
 \subsection{Cloud computing}
 \begin{slide}{Cloud computing}
