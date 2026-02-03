@@ -72,6 +72,16 @@
     internal implementation.
   \end{block}
 \end{slide}
+
+\begin{slide}{Why RPC faded away}
+  \begin{itemize}
+    \item \textbf{Tight coupling} between clients and servers made traditional RPC systems difficult to evolve, increasing maintenance and versioning complexity.
+    \item \textbf{Limited abstraction} of distributed system boundaries led developers to treat remote calls as local, resulting in poor handling of latency, failures, and partial outages.
+    \item \textbf{Security concerns}, including excessive exposure of internal methods and weaker alignment with standardized authentication and authorization mechanisms, reduced suitability for public APIs.
+    \item \textbf{Debugging and observability} challenges arose from opaque payloads and tooling that was less compatible with standard web diagnostics and monitoring practices.
+    \item \textbf{RESTful architectures} aligned more effectively with web infrastructure, enabling better scalability, interoperability, and long-term API stability, leading to broader adoption.
+  \end{itemize}
+\end{slide}
 \begin{slide}{RESTful architectures}
   \begin{block}{Essence}
     \begin{enumerate}\tightlist
@@ -265,7 +275,7 @@
       \item Lookup file at a global directory \mathexpr{\Rightarrow} returns a \textbf{torrent file}
       \item Torrent file contains reference to \textbf{tracker}: a server keeping an accurate account of
             \textbf{active} nodes that have (chunks of) \id{F}.
-      \item \id{P} can join \textbf{swarm}, get a chunk for free, and then trade a copy of that chunk for another
+      \item \id{P}  can join \textbf{swarm}, get a chunk for free, and then trade a copy of that chunk for another
             one with a peer \id{Q} also in the swarm.
     \end{itemize}
   \end{block}
