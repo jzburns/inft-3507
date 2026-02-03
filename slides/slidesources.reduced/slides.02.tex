@@ -74,13 +74,15 @@
 \end{slide}
 
 \begin{slide}{Why RPC faded away}
-  \begin{itemize}
-    \item \textbf{Tight coupling} between clients and servers made traditional RPC systems difficult to evolve, increasing maintenance and versioning complexity.
-    \item \textbf{Limited abstraction} of distributed system boundaries led developers to treat remote calls as local, resulting in poor handling of latency, failures, and partial outages.
-    \item \textbf{Security concerns}, including excessive exposure of internal methods and weaker alignment with standardized authentication and authorization mechanisms, reduced suitability for public APIs.
-    \item \textbf{Debugging and observability} challenges arose from opaque payloads and tooling that was less compatible with standard web diagnostics and monitoring practices.
-    \item \textbf{RESTful architectures} aligned more effectively with web infrastructure, enabling better scalability, interoperability, and long-term API stability, leading to broader adoption.
-  \end{itemize}
+  \begin{block}{It didn't \textbf{modernize} well}
+    \begin{itemize}
+      \item \textbf{Tight coupling} between clients and servers made traditional RPC systems difficult to evolve, increasing maintenance and versioning complexity.
+      \item \textbf{Limited abstraction} of distributed system boundaries led developers to treat remote calls as local, resulting in poor handling of latency, failures, and partial outages.
+      \item \textbf{Security concerns}, including excessive exposure of internal methods and weaker alignment with standardized authentication and authorization mechanisms, reduced suitability for public APIs.
+      \item \textbf{Debugging and observability} challenges arose from opaque payloads and tooling that was less compatible with standard web diagnostics and monitoring practices.
+      \item \textbf{RESTful architectures} aligned more effectively with web infrastructure, enabling better scalability, interoperability, and long-term API stability, leading to broader adoption.
+    \end{itemize}
+  \end{block}
 \end{slide}
 \begin{slide}{RESTful architectures}
   \begin{block}{Essence}
