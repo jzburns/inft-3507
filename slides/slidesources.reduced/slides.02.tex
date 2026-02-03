@@ -75,7 +75,7 @@
 
 \begin{slide}{Why RPC faded away}
   \begin{block}{It didn't \textbf{modernize} well}
-    \begin{itemize}
+    \begin{itemize}\tightlist
       \item \textbf{Tight coupling} between clients and servers made traditional RPC systems difficult to evolve, increasing maintenance and versioning complexity.
       \item \textbf{Limited abstraction} of distributed system boundaries led developers to treat remote calls as local, resulting in poor handling of latency, failures, and partial outages.
       \item \textbf{Security concerns}, including excessive exposure of internal methods and weaker alignment with standardized authentication and authorization mechanisms, reduced suitability for public APIs.
@@ -86,13 +86,13 @@
 \end{slide}
 \begin{slide}{RESTful architectures}
   \begin{block}{Essence}
-    \begin{enumerate}\tightlist
+    \begin{itemize}\tightlist
       \item \textbf{Architectural Style}: REST is an architectural style for networked applications, focusing on stateless, client-server communication over HTTP, designed for scalability and simplicity.
       \item \textbf{Resource-Based}: Resources in REST are uniquely identified by URIs and manipulated using standard HTTP methods such as GET, POST, PUT, DELETE, and PATCH.
       \item \textbf{Statelessness}: Each client request to the server is independent, containing all necessary information, eliminating server-side session state to enhance scalability.
       \item \textbf{Layered System}: REST employs a layered architecture, allowing intermediaries like proxies or load balancers to improve performance and security transparently.
       \item \textbf{Cacheability}: REST responses can be cached when explicitly defined, improving performance by reducing server load and latency for frequently accessed resources.
-    \end{enumerate}
+    \end{itemize}
   \end{block}
 \end{slide}
 \begin{slide}{REST Services}
