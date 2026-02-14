@@ -30,7 +30,7 @@
 \begin{frame}{Why use threads}
   \begin{block}{Some simple reasons}
     \begin{itemize}
-      \item \textbf{Avoid needless blocking}: a single-threaded process will \red{block} when doing I/O; in a
+      \item \textbf{Avoid needless blocking}: a single-threaded process will \textbf{block} when doing I/O; in a
             multithreaded process, the operating system can switch the CPU to another thread in that process.
       \item \textbf{Exploit parallelism}: the threads in a multithreaded process can be scheduled to run in
             parallel on a multiprocessor or multicore processor.
@@ -107,42 +107,6 @@
   % This is exactly the problem we see in the previous slide
 \end{frame}
 
-% \begin{frame}{A simple example in Python}
-%   \begin{centerfig}
-%     \includelisting{03-03/mp} 
-%   \end{centerfig}
-%   \begin{tabular}{l}
-%     \small\code{40:23 eve is going to sleep for 14 seconds} \\
-%     \small\code{40:23 bob is going to sleep for 4 seconds} \\
-%     \small\code{40:27 bob has woken up} \\
-%     \small\code{40:37 eve has woken up}
-%   \end{tabular}
-% \end{frame}
-% \begin{frame}{A simple example in Python}
-%   \begin{centerfig}
-%     \includelisting{03-04/mpthread-slide} 
-%   \end{centerfig}
-% \end{frame}
-% \begin{frame}{A simple example in Python}
-%   \begin{tabular}{l}
-%     \small\code{eve sees shared x being 71} \\
-%     \small\code{53:21 eve 0 is going to sleep for 20 seconds} \\
-%     \small\code{bob sees shared x being 84} \\
-%     \small\code{53:21 eve 1 is going to sleep for 15 seconds} \\
-%     \small\code{53:21 eve 2 is going to sleep for 3 seconds} \\
-%     \small\code{53:21 bob 0 is going to sleep for 8 seconds} \\
-%     \small\code{53:21 bob 1 is going to sleep for 16 seconds} \\
-%     \small\code{53:21 bob 2 is going to sleep for 8 seconds} \\
-%     \small\code{53:24 eve 2 has woken up, seeing shared x being 72} \\
-%     \small\code{53:29 bob 0 has woken up, seeing shared x being 85} \\
-%     \small\code{53:29 bob 2 has woken up, seeing shared x being 86} \\
-%     \small\code{53:36 eve 1 has woken up, seeing shared x being 73} \\
-%     \small\code{53:37 bob 1 has woken up, seeing shared x being 87} \\
-%     \small\code{bob sees shared x being 87} \\
-%     \small\code{53:41 eve 0 has woken up, seeing shared x being 74} \\
-%     \small\code{eve sees shared x being 74} 
-%   \end{tabular}
-% \end{frame}
 \begin{frame}{Thread Switch vs Process Context Switch}
   \begin{columns}[t]
 
@@ -190,56 +154,17 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Threads and operating systems}
-  \begin{alertblock}{Main issue}
-    Should an OS kernel provide threads, or should they be implemented as user-level packages?
-  \end{alertblock}
-  \begin{block}{User-space solution}
-    \begin{itemize}
-      \item All operations can be completely handled \textbf{within a single process} \mathexpr{\Rightarrow}
-            implementations can be extremely efficient.
-      \item \textbf{All} services provided by the kernel are done \textbf{on behalf of the process in which a thread
-              resides} \mathexpr{\Rightarrow} if the kernel decides to block a thread, the entire process will be
-            blocked.
-      \item Threads are used when there are many external events: \textbf{threads block on a per-event basis}
-            \mathexpr{\Rightarrow} if the kernel can't distinguish threads, how can it support signaling events to
-            them?
-    \end{itemize}
-  \end{block}
-\end{frame}
 \begin{frame}{Linux Kernel Threads}
+  Threads created by the user (for example, using \texttt{pthreads}) are visible 1:1 by the kernel.
+  If you create 10 threads using \texttt{pthreads}, the kernel
+  sees all 10 threads.
   \begin{itemize}
     \item \textbf{Task Struct Representation}: In the Linux kernel, threads are implemented as lightweight processes, each represented by a \texttt{task\_struct} (defined in \texttt{include/linux/sched.h}), sharing memory but maintaining separate execution contexts for scheduling.
     \item \textbf{Scheduling with CFS}: The Completely Fair Scheduler (CFS) in \texttt{kernel/sched/fair.c} manages kernel threads, treating them as virtual processors and allocating CPU time fairly using a red-black tree.
     \item \textbf{POSIX Threads Integration}: User-space threads (e.g., via \texttt{pthread\_create}) map to kernel threads, enabling Java’s 1:1 threading model to leverage Linux’s scheduling for efficient concurrency.
   \end{itemize}
 \end{frame}
-% \begin{frame}{Combining user-level and kernel-level threads}
-%   \begin{block}{Basic idea} 
-%     Introduce a two-level threading approach: \red{kernel threads} that can execute user-level
-%     threads.
-%   \end{block}
-%   \begin{block}{}
-%     \begin{center}
-%       \includefigure{03-05}
-%     \end{center}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{User and kernel threads combined}
-%   \begin{block}{Principle operation}
-%     \begin{itemize}%\tightlist
-%     \item User thread does system call \mathexpr{\Rightarrow} \red{the kernel thread that is
-%       executing that user thread, blocks}. The user thread remains \textbf{bound} to the kernel thread.
-%     \item The kernel can \red{schedule another kernel thread having a runnable user thread bound to
-%       it}. Note: this user thread can switch to \textbf{any} other runnable user thread currently in user
-%       space.
-%     \item A user thread calls a blocking user-level operation \mathexpr{\Rightarrow} do context switch
-%       to a runnable user thread, (then bound to the same kernel thread).
-%     \item When there are no user threads to schedule, a kernel thread may remain idle, and may even be
-%       removed (destroyed) by the kernel.
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
+
 \subsection{Threads in distributed systems}
 \begin{frame}{Using threads at the client side}
   \begin{block}{Multithreaded web client}
@@ -258,7 +183,7 @@
     \end{itemize}
   \end{block}
 \end{frame}
-\begin{frame}{Multithreaded clients: does it help?}
+\begin{frame}{Multithreading: does it help?}
   \begin{block}{Thread-level parallelism: TLP}
     Let \mathexpr{c_i} denote the fraction of time that exactly \mathexpr{i} threads are being executed
     simultaneously.
@@ -267,8 +192,8 @@
   \end{block}
   \onslide
   \begin{block}{Practical measurements}
-    A typical Web browser has a TLP value between 1.5 and 2.5 \mathexpr{\Rightarrow} threads are primarily
-    used for \textbf{logically organizing} browsers.
+    A typical Web Server has a TLP value between 5 and 8 \mathexpr{\Rightarrow}
+    threads are primarily used for \textbf{throughput scaling}.
   \end{block}
 \end{frame}
 \begin{frame}{Using threads at the server side}
@@ -288,7 +213,7 @@
     \end{itemize}
   \end{block}
 \end{frame}
-\begin{frame}{Why multithreading is popular: organization}
+\begin{frame}{Multithreading - Typical Server Approach}
   \begin{block}{Dispatcher/worker model}
     \begin{center}
       \includefigure{03-06}
@@ -297,128 +222,25 @@
   \begin{block}{Overview}
     \begin{center}
       \begin{tabular}{|l|l|}\hline
-        Multithreading          & Parallelism, blocking system calls    \\ \hline
-        Single-threaded process & No parallelism, blocking system calls \\ \hline
+        Multithreading          & Concurrency, blocking system calls    \\ \hline
+        Single-threaded process & No concurrency, blocking system calls \\ \hline
       \end{tabular}
     \end{center}
   \end{block}
 \end{frame}
+
 \section{Virtualization}
-\subsection{Principle of virtualization}
-% \begin{frame}{Virtualization}
-%   \begin{block}{Privileged instructions}
-%     Privileged instructions: allowed to be executed only by the kernel.
-%   \end{block}
-%   \begin{itemize}\tightlist
-%     \item Equivalence: Virtual machines (VMs) provide an environment
-%           identical to physical hardware, ensuring software runs unmodified.
-%     \item Resource Control: The virtual machine monitor (VMM)
-%           maintains full control over system resources, preventing VMs from accessing unauthorized resources.
-%     \item Efficiency: Most instructions execute directly on
-%           hardware for near-native performance, with sensitive instructions trapped by the VMM.
-%     \item Isolation: VMs are fully isolated, ensuring no
-%           interference or data leaks between VMs or the VMM, using mechanisms like memory and I/O virtualization.
-%   \end{itemize}
-% \end{frame}
-% % \begin{frame}{Mimicking interfaces}
-% %   \begin{block}{Four types of interfaces at three different levels}
-% %     \begin{enumerate}\tightlist
-% %     \item \red{Instruction set architecture}: the set of machine instructions, with two subsets:
-% %       \begin{itemize}\tightlist
-% %       \item Privileged instructions: allowed to be executed only by the operating system.
-% %       \item General instructions: can be executed by any program.
-% %       \end{itemize}
-% %     \item \red{System calls} as offered by an operating system.
-% %     \item \red{Library calls}, known as an \red{application programming interface} (API)
-% %     \end{enumerate}
-% %   \end{block}
-% % \end{frame}
-% \begin{frame}[fragile]{Three Virtualization Approaches}
-%   \begin{center}
-%     % \begin{tabular}{ccc}
-%     %   \includefigure{03-10a} &
-%     %   \includefigure{03-10b} &
-%     %   \includefigure{03-10c} \\
-%     %   \textbf{(a) Process VM} & \textbf{(b) Native VMM} & \textbf{(c) Hosted VMM}
-%     % \end{tabular}
-%     \begin{verbatim}
-% (a) Process VM           (b) Native VMM           (c) Hosted VMM
-% ------------------       ------------------       ------------------
-%  Application             Application              Application
-%  ------------------      ------------------       ------------------
-%  Runtime system          Guest OS                 Guest OS
-%  (e.g. JVM)              ------------------       ------------------
-%  ------------------      Native VMM               Hosted VMM
-%  Host Operating          (Type 1 hypervisor)      (Type 2 hypervisor)
-%  System                  ------------------       ------------------
-%  ------------------      Hardware                 Host Operating System
-%  Hardware                                         ------------------
-%                                                   Hardware                                                 
-% \end{verbatim}
-%   \end{center}
-%   \begin{block}{Differences}
-%     \begin{itemize}\tightlist
-%       \item[(a)] Separate set of instructions, an interpreter/emulator, running atop an OS.
-%       \item[(b)] Low-level instructions, along with bare-bones minimal operating system
-%       \item[(c)] Low-level instructions, but delegating most work to a full-fledged OS.
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
+\subsection{Principles of virtualization}
 
-% \begin{frame}{VM Performance}
-%   \begin{block}{Refining the organization}
-%     \begin{tabular}{@{}ll}
-%       \includefigure[0.71]{03-11}
-%       \begin{minipage}[b]{0.4\textwidth}
-%         \begin{itemize}\tightlist
-%           \item \red{Privileged instruction}: if and only if executed in user mode, it causes a \textbf{trap}
-%                 to the operating system
-%           \item \red{Nonpriviliged instruction}: the rest
-%         \end{itemize}
-%       \end{minipage}
-%     \end{tabular}
-%   \end{block}
-%   \begin{block}{Special instructions}
-%     \begin{itemize}
-%       \item \red{Control-sensitive instruction}: may affect configuration of a machine (e.g., one affecting
-%             relocation register or interrupt table).
-%       \item \red{Behavior-sensitive instruction}: effect is partially determined by context (e.g., \code{POPF}
-%             sets an interrupt-enabled flag, but only in system mode).
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
-% \begin{frame}{Popek and Goldberg: Condition for virtualization}
-%   \begin{alertblock}{Necessary condition}
-%     \itshape For any conventional computer, a virtual machine monitor may be constructed if the set of
-%     sensitive instructions for that computer is a subset of the set of privileged instructions.
-%   \end{alertblock}
-%   \begin{block}{Problem: condition is not always satisfied}
-%     There may be sensitive instructions that are executed in user mode without causing a trap to the
-%     operating system.
-%   \end{block}
-%   \begin{block}{Solutions}
-%     \begin{itemize}
-%       \item Emulate all instructions
-%       \item Wrap nonprivileged sensitive instructions to divert control to VMM
-%       \item \textbf{Paravirtualization}: modify guest OS, either by preventing nonprivileged sensitive
-%             instructions, or making them nonsensitive (i.e., changing the context).
-%     \end{itemize}
-%   \end{block}
-% \end{frame}
-
-
-
-\begin{frame}{Scope and Terminology}
-  \begin{itemize}
-    \item \textbf{System virtualization:} presents a virtual hardware platform capable of running an OS
-    \item \textbf{Process virtualization:} presents a virtual execution environment for a single program (e.g., a managed runtime)
-    \item \textbf{Emulation:} reproduces an ISA and/or device behavior in software
-    \item \textbf{Hypervisor / VMM:} software layer(s) that create and isolate system VMs
-  \end{itemize}
-
+\begin{frame}{Goals}
   \vspace{0.4em}
   \begin{block}{Goal}
-    Provide isolation and controllable sharing of CPU, memory, and I/O while preserving expected software semantics.
+    The primary goal of virtualization is to provide
+    strong isolation and policy-controlled
+    sharing of CPU, memory, and I/O resources,
+    while preserving the expected functional and performance
+    semantics of the software running within the
+    virtualized environment.
   \end{block}
 \end{frame}
 
@@ -432,12 +254,15 @@
 
   \vspace{0.4em}
   \begin{block}{Key distinction}
-    Process VMs virtualize a \emph{program execution model}; hypervisors virtualize a \emph{machine interface}.
+    Process virtual machines virtualize the \textbf{execution environment}
+    of a \textbf{single program}, whereas hypervisors virtualize the underlying
+    hardware interface, enabling \textbf{entire operating systems} to run as if
+    on a physical machine.
   \end{block}
 \end{frame}
 
 %------------------------------------------------
-\begin{frame}{Diagram: Taxonomy of Virtualization Approaches}
+\begin{frame}{Taxonomy of Virtualization Approaches}
   \begin{tikzpicture}[
       box/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
           minimum width=9cm, minimum height=1.0cm, align=left, inner sep=6pt},
@@ -487,7 +312,7 @@
 \end{frame}
 
 %------------------------------------------------
-\begin{frame}{Diagram: Type 1 vs Type 2 Stack Organization}
+\begin{frame}{Type 1 vs Type 2 Stack Organization}
   \centering
   \begin{tikzpicture}[
       layer/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
@@ -552,8 +377,28 @@
   \end{block}
 \end{frame}
 
-%------------------------------------------------
+\begin{frame}{Virtualization in Cloud Computing}
+  Virtualization is the foundational technology that enables modern cloud platforms.
+
+  \medskip
+  In cloud computing, virtualization:
+  \begin{itemize}
+    \item Allows multiple \textbf{virtual machines (VMs)} to run on a single physical server
+    \item Provides strong \textbf{isolation} between tenants for security and fault containment
+    \item Enables \textbf{elastic resource allocation} (CPU, memory, storage) on demand
+    \item Makes infrastructure \textbf{hardware-agnostic}, simplifying scaling and migration
+  \end{itemize}
+
+  \medskip
+  Cloud providers rely on virtualization to offer Infrastructure-as-a-Service (IaaS), where users deploy full operating systems without managing physical hardware.
+\end{frame}
+
+\section{Resource Controls}
+\subsection{Management of Finite Resources}
 \begin{frame}{Resource Control: CPU and Memory}
+  \textbf{Resource Control} refers to mechanisms used to \textbf{allocate} and \textbf{limit} finite resources
+  according to defined policies. The goal is \textbf{predictable performance},
+  \textbf{isolation}, and \textbf{stability} across competing workloads.
   \begin{block}{CPU control concepts}
     \begin{itemize}
       \item \textbf{Capacity:} number of vCPUs and their mapping to physical CPUs
@@ -562,57 +407,29 @@
       \item \textbf{Reservations:} minimum guaranteed CPU capacity (where supported)
     \end{itemize}
   \end{block}
-
-  \begin{block}{Memory control concepts}
-    \begin{itemize}
-      \item \textbf{Static limit:} maximum assigned memory for a VM
-      \item \textbf{Ballooning:} cooperative reclamation from guests to enable overcommit
-      \item \textbf{Swapping/reclamation:} provider-side memory pressure mechanisms (risk of latency inflation)
-    \end{itemize}
-  \end{block}
 \end{frame}
 
 %------------------------------------------------
-\begin{frame}{Diagram: Resource Allocation and Enforcement Points}
-  \begin{tikzpicture}[
-      box/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
-          minimum width=9.0cm, minimum height=0.9cm, align=left, inner sep=6pt},
-      smallbox/.style={draw, rectangle, rounded corners=2pt, line width=0.7pt,
-          minimum width=5.8cm, minimum height=0.85cm, align=left, inner sep=6pt},
-      arrow/.style={-Latex, line width=0.8pt},
-      node distance=6mm
-    ]
 
-    \node[box] (vm) {\textbf{Virtual Machine}\\
-      \(\bullet\) configured: vCPUs, CPU cap/share; memory limit/reservation\\
-      \(\bullet\) observed: CPU utilization, run-queue delay; memory pressure indicators};
+\begin{frame}{Control groups (\texttt{cgroups}): accounting and limits}
+  \textbf{cgroups} group processes and apply resource \emph{accounting, limits, and prioritization}.
 
-    \node[smallbox, below=of vm, xshift=-3.1cm] (cpu) {\textbf{CPU Scheduler (Hypervisor)}\\
-      \(\bullet\) enforces shares and caps\\
-      \(\bullet\) maps vCPUs \(\rightarrow\) pCPUs};
+  \medskip
+  Typical controls:
+  \begin{itemize}
+    \item \textbf{CPU}: shares/quotas; prevent CPU hogging
+    \item \textbf{Memory}: limits; OOM behavior per group
+    \item \textbf{I/O}: throttle block I/O
+    \item \textbf{PIDs}: limit number of processes
+  \end{itemize}
 
-    \node[smallbox, below=of vm, xshift=3.1cm] (mem) {\textbf{Memory Manager (Hypervisor)}\\
-      \(\bullet\) enforces memory limits\\
-      \(\bullet\) ballooning / reclamation};
-
-    \node[box, below=of cpu, yshift=-2mm] (hw) {\textbf{Hardware Resources}\\
-      \(\bullet\) physical cores, caches; DRAM; IOMMU/device DMA constraints};
-
-    \draw[arrow] (vm.south) -- (cpu.north);
-    \draw[arrow] (vm.south) -- (mem.north);
-    \draw[arrow] (cpu.south) -- (hw.north);
-    \draw[arrow] (mem.south) -- (hw.north);
-
-  \end{tikzpicture}
-
-  \vspace{0.6em}
-  \small
-  \textbf{Figure:} Enforcement points for CPU and memory control. Allocation policies are implemented by the hypervisor scheduler
-  and memory manager, which multiplex physical resources across VMs.
+  \medskip
+  Key idea: \textbf{namespaces isolate}; \textbf{cgroups constrain}.
 \end{frame}
 
 %------------------------------------------------
-\begin{frame}{Concrete Control Examples (CPU \% and Memory \%)}
+
+\begin{frame}{Control Group Examples (CPU \% and Memory \%)}
   \begin{block}{CPU}
     \begin{itemize}
       \item \textbf{CPU cap (percentage):} limit a VM to (e.g.) \(60\%\) of one core or \(240\%\) of a 4-core entitlement
@@ -630,91 +447,9 @@
   \end{block}
 \end{frame}
 
-%------------------------------------------------
-\begin{frame}{Summary}
-  \begin{itemize}
-    \item Emulation, process VMs, and hypervisors address different requirements and expose different boundaries
-    \item Type~1 and Type~2 hypervisors differ mainly in where the trusted base resides and how drivers are obtained
-    \item Modern platforms treat CPU and memory as first-class, policy-controlled resources: shares, caps, reservations, and limits
-  \end{itemize}
-\end{frame}
-
 % ------------------------------------------------------------
-\begin{frame}{Virtualization and Containers}
-  Virtualization is about running workloads as if they had their own machine.
 
-  \medskip
-  In Linux container-style virtualization, two kernel features provide most of the illusion:
-  \begin{itemize}
-    \item \textbf{Namespaces} \(\rightarrow\) \emph{isolation}: ``what you can see''
-    \item \textbf{Control groups (cgroups)} \(\rightarrow\) \emph{control}: ``what you can use''
-  \end{itemize}
-
-  \medskip
-  A \textbf{container} is typically: \textit{namespaces + cgroups} (plus filesystem + tooling).
-
-  If multiple applications share one OS kernel, we want:
-  \begin{itemize}
-    \item Strong \textbf{separation of views} (processes, network, mounts, hostnames, users)
-    \item Predictable \textbf{resource sharing} (CPU, memory, I/O) without one app starving others
-  \end{itemize}
-
-  \medskip
-  Linux containers achieve this without a hypervisor by virtualizing \emph{interfaces to the kernel}.
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Namespaces: isolation of kernel resources}
-  A \textbf{namespace} gives a process a private view of a specific kernel resource.
-
-  \medskip
-  Common namespaces:
-  \begin{itemize}
-    \item \textbf{PID} (process IDs): processes see a different PID tree
-    \item \textbf{Mount} (MNT): separate mount table / filesystem view
-    \item \textbf{Network} (NET): interfaces, routes, ports isolated
-    \item \textbf{UTS}: hostname/domainname isolation
-    \item \textbf{IPC}: SysV IPC, POSIX message queues, etc.
-    \item \textbf{User} (USER): user/group ID mapping (enables unprivileged containers)
-    \item \textbf{Cgroup} namespace: hides cgroup paths
-  \end{itemize}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Control groups (cgroups): accounting and limits}
-  \textbf{cgroups} group processes and apply resource \emph{accounting, limits, and prioritization}.
-
-  \medskip
-  Typical controls:
-  \begin{itemize}
-    \item \textbf{CPU}: shares/quotas; prevent CPU hogging
-    \item \textbf{Memory}: limits; OOM behavior per group
-    \item \textbf{I/O}: throttle block I/O
-    \item \textbf{PIDs}: limit number of processes
-  \end{itemize}
-
-  \medskip
-  Key idea: \textbf{namespaces isolate}; \textbf{cgroups constrain}.
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{How they fit together (container model)}
-  A container runtime typically:
-  \begin{enumerate}
-    \item Creates new \textbf{namespaces} for the process (isolation)
-    \item Places the process into \textbf{cgroups} (resource governance)
-    \item Sets up a root filesystem and mounts (often with overlayfs)
-    \item Configures networking (veth pairs, bridges, NAT, etc.)
-  \end{enumerate}
-
-  \medskip
-  The result: a process that \emph{looks} like it runs on its own system and can be \emph{limited}.
-\end{frame}
-
-% ============================================================
-% TikZ DIAGRAM SLIDE #1 (own slide + caption)
-% ============================================================
-\begin{frame}{Diagram: cgroups as a resource governance tree}
+\begin{frame}{\texttt{cgroups} as a resource governance tree}
   \centering
   \begin{figure}
     \centering
@@ -746,10 +481,27 @@
   \end{figure}
 \end{frame}
 
-% ============================================================
-% TikZ DIAGRAM SLIDE #2 (own slide + caption)
-% ============================================================
-\begin{frame}{Diagram: namespaces provide separate ``views''}
+% ------------------------------------------------------------
+
+\begin{frame}{Namespaces: isolation of kernel resources}
+  A \textbf{namespace} gives a process a private view of a specific kernel resource.
+
+  \medskip
+  Common namespaces:
+  \begin{itemize}
+    \item \textbf{PID} (process IDs): processes see a different PID tree
+    \item \textbf{Mount} (MNT): separate mount table / filesystem view
+    \item \textbf{Network} (NET): interfaces, routes, ports isolated
+    \item \textbf{UTS}: hostname/domainname isolation
+    \item \textbf{IPC}: SysV IPC, POSIX message queues, etc.
+    \item \textbf{User} (USER): user/group ID mapping (enables unprivileged containers)
+    \item \textbf{Cgroup} namespace: hides cgroup paths
+  \end{itemize}
+\end{frame}
+
+% ------------------------------------------------------------
+
+\begin{frame}{Namespaces provide separate ``views''}
   \centering
   \begin{figure}
     \centering
@@ -786,7 +538,7 @@
   \texttt{unshare} creates new namespaces for a process (and its children).
 
   \medskip
-  We'll demonstrate isolation by creating:
+  This demonstrate isolation by creating:
   \begin{itemize}
     \item a new \textbf{UTS namespace} (private hostname)
     \item a new \textbf{PID namespace} (PID 1 inside)
@@ -796,6 +548,22 @@
 \end{frame}
 
 % ------------------------------------------------------------
+
+\begin{frame}{How they fit together (container model)}
+  A container runtime typically:
+  \begin{enumerate}
+    \item Creates new \textbf{namespaces} for the process (isolation)
+    \item Places the process into \textbf{cgroups} (resource governance)
+    \item Sets up a root filesystem and mounts (often with overlayfs)
+    \item Configures networking (veth pairs, bridges, NAT, etc.)
+  \end{enumerate}
+
+  \medskip
+  The result: a process that \emph{looks} like it runs on its own system and can be \emph{limited}.
+\end{frame}
+
+% ------------------------------------------------------------
+
 \begin{frame}[fragile]{Example: \texttt{unshare} for a private hostname + PID tree}
   \begin{lstlisting}[style=sh]
 # Create new user, mount, UTS, and PID namespaces.
@@ -836,7 +604,7 @@ mount | grep ns-mnt
 \end{frame}
 
 % ------------------------------------------------------------
-\begin{frame}{What isolation did we get?}
+\begin{frame}{The Isolation Achieved}
   From the example:
   \begin{itemize}
     \item \textbf{UTS namespace}: hostname change does not affect the host
@@ -850,50 +618,10 @@ mount | grep ns-mnt
   \textbf{virtualize the process's view of the system without virtualizing the hardware.}
 \end{frame}
 
-% ------------------------------------------------------------
+\section{Containers}
 \subsection{Containers}
-\begin{frame}{Containers}
-  \begin{centerfig}
-    \includefigure{03-12}
-  \end{centerfig}
-
-  \begin{itemize}\tightlist
-    \item \textbf{Namespaces}: a collection of processes in a container is given their own view of identifiers
-    \item \textbf{Union file system:} combine several file systems into a layered fashion with only the highest
-          layer allowing for \code{write} operations (and the one being part of a container).
-    \item \textbf{Control groups}: resource restrictions can be imposed upon a collection of processes.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Summary}
-  \begin{itemize}
-    \item Virtualization can be done at different layers: hardware (VMs) vs. OS interfaces (containers).
-    \item \textbf{Namespaces} isolate what processes can see (views of kernel resources).
-    \item \textbf{cgroups} govern what processes can use (resource limits/accounting).
-    \item \texttt{unshare} is a minimal, direct way to see namespace isolation in action.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Virtualization in Cloud Computing}
-  Virtualization is the foundational technology that enables modern cloud platforms.
-
-  \medskip
-  In cloud computing, virtualization:
-  \begin{itemize}
-    \item Allows multiple \textbf{virtual machines (VMs)} to run on a single physical server
-    \item Provides strong \textbf{isolation} between tenants for security and fault containment
-    \item Enables \textbf{elastic resource allocation} (CPU, memory, storage) on demand
-    \item Makes infrastructure \textbf{hardware-agnostic}, simplifying scaling and migration
-  \end{itemize}
-
-  \medskip
-  Cloud providers rely on virtualization to offer Infrastructure-as-a-Service (IaaS), where users deploy full operating systems without managing physical hardware.
-\end{frame}
 
 \begin{frame}{Containerization in Cloud Computing}
-  Containerization builds on virtualization to improve efficiency and agility.
-
-  \medskip
   In cloud environments, containers:
   \begin{itemize}
     \item Package applications with their dependencies for \textbf{portable deployment}
@@ -901,20 +629,36 @@ mount | grep ns-mnt
     \item Start quickly, supporting \textbf{rapid scaling} and auto-healing services
     \item Integrate naturally with orchestration systems (e.g., Kubernetes)
   \end{itemize}
-
-  \medskip
+  A \textbf{container} is typically: \textit{namespaces + cgroups} (plus filesystem + tooling).
   As a result, containerization is central to Platform-as-a-Service (PaaS) and microservice-based architectures, enabling fast iteration and efficient use of cloud resources.
+\end{frame}
+% ------------------------------------------------------------
+
+\begin{frame}{Containers}
+  \begin{centerfig}
+    \includefigure{03-12}
+  \end{centerfig}
+
+  If multiple applications share one OS kernel, we want:
+  \begin{itemize}
+    \item Strong \textbf{separation of views} (processes, network, mounts, hostnames, users)
+    \item Predictable \textbf{resource sharing} (CPU, memory, I/O) without one app starving others
+  \end{itemize}
+
+  The \textbf{Union file system:} combine several file systems into a layered fashion with only the highest
+  layer allowing for \code{write} operations (and the one being part of a container).
 \end{frame}
 
 \section{Summary}
 \begin{frame}{Summary and Conclusions}
-  We have discussed processes and threads
-  in Distributed Systems, namely:
+  We have discussed the following topics in
+  this part of the course, namely:
   \begin{itemize}
     \item Processes and Threads
     \item Context Switching
     \item Multithreading
     \item Virtualization
+    \item Resource Management and Isolaiton
     \item Containerization
   \end{itemize}
 \end{frame}
