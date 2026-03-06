@@ -365,21 +365,21 @@
 \subsection{Overview}
 \begin{frame}[fragile]{Process Critical Sections}
   \begin{alertblock}{Problem}
-    Several processes in a distributed system want exclusive access to 
+    Several processes in a distributed system want exclusive access to
     some resource - and we want to avoid concurrent access to this
     resource: The processes all have a region of code
-    where the concurrency takes place. This is called the 
+    where the concurrency takes place. This is called the
     \textbf{Critical Section}
-  \end{alertblock}  
+  \end{alertblock}
   \begin{block}{Critical Section}
-    A \textbf{critical section} is a code segment within a process (or thread) 
-    that accesses or modifies shared resources (e.g., variables, data structures, 
-    files, database or devices) and must be executed atomically — as an indivisible 
-    unit—by at most one \textbf{one concurrent process or thread} at a time.    
+    A \textbf{critical section} is a code segment within a process (or thread)
+    that accesses or modifies shared resources (e.g., variables, data structures,
+    files, database or devices) and must be executed atomically — as an indivisible
+    unit—by at most one \textbf{one concurrent process or thread} at a time.
   \end{block}
- \end{frame}
-  
- \begin{frame}[fragile]{Mutual exclusion: Example} 
+\end{frame}
+
+\begin{frame}[fragile]{Mutual exclusion: Example}
   \begin{verbatim}
     do {
         // Non-critical section (local work, safe for concurrency)
@@ -403,9 +403,9 @@
   \begin{block}{Basic solutions}
     \begin{description}
       \item[Permission-based:] A process wanting to enter its critical region, or access a resource, needs
-        permission from other processes.
+            permission from other processes.
       \item[Token-based:] A token is passed between processes. The one who has the token may proceed in its
-        critical region, or pass it on when not interested.
+            critical region, or pass it on when not interested.
     \end{description}
   \end{block}
 \end{frame}
@@ -416,15 +416,15 @@
       \begin{tabular}{ccc}
         \includefigure{05-14a} &
         \includefigure{05-14b} &
-        \includefigure{05-14c} \\
-        (a) & (b) & (c)
+        \includefigure{05-14c}             \\
+        (a)                    & (b) & (c)
       \end{tabular}
     \end{centerfig}
     \begin{itemize}
-    \item[(a)] Process \id{P_1} asks the coordinator for permission to access a shared resource. Permission is
-      granted.
-    \item[(b)] Process \id{P_2} then asks permission to access the same resource. The coordinator does not reply.
-    \item[(c)] When \id{P_1} releases the resource, it tells the coordinator, which then replies to \id{P_2}.
+      \item[(a)] Process \id{P_1} asks the coordinator for permission to access a shared resource. Permission is
+            granted.
+      \item[(b)] Process \id{P_2} then asks permission to access the same resource. The coordinator does not reply.
+      \item[(c)] When \id{P_1} releases the resource, it tells the coordinator, which then replies to \id{P_2}.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -433,9 +433,9 @@
   \begin{block}{Acknowledgments are not sent (the caller blocks)}
     Return a response to a request only when:
     \begin{itemize}\tightlist
-    \item The receiving process has no interest in the shared resource; or
-    \item The receiving process is waiting for the resource, but has lower priority (known through comparison
-      of time\-stamps).
+      \item The receiving process has no interest in the shared resource; or
+      \item The receiving process is waiting for the resource, but has lower priority (known through comparison
+            of time\-stamps).
     \end{itemize}
     In all other cases, reply is \blue{deferred}, implying some more local administration.
   \end{block}
@@ -446,20 +446,20 @@
       \begin{tabular}{@{}c@{\hspace*{36pt}}c@{\hspace*{36pt}}c@{}}
         \includefigure{05-15a} &
         \includefigure{05-15b} &
-        \includefigure{05-15c} \\
-        (a) & (b) & (c)
+        \includefigure{05-15c}             \\
+        (a)                    & (b) & (c)
       \end{tabular}
     \end{center}
     \begin{itemize}\tightlist
-     \item[(a)] Two processes want to access a shared resource at the same moment.
-     \item[(b)] \id{P_0} has the lowest timestamp, so it wins.
-     \item[(c)] When process \id{P_0} is done, it sends an \id{OK} also, so \id{P_2} can now go ahead.
+      \item[(a)] Two processes want to access a shared resource at the same moment.
+      \item[(b)] \id{P_0} has the lowest timestamp, so it wins.
+      \item[(c)] When process \id{P_0} is done, it sends an \id{OK} also, so \id{P_2} can now go ahead.
     \end{itemize}
   \end{block}
 \end{frame}
 \subsection{A token-ring algorithm}
 \begin{frame}{Mutual exclusion: Token ring algorithm}
-  \begin{block}{Essence} 
+  \begin{block}{Essence}
     Organize processes in a \blue{logical} ring, and let a token be passed between them. The one that holds
     the token is allowed to enter the critical region (if it wants to).
   \end{block}
@@ -476,7 +476,7 @@
     \mathexpr{\Rightarrow} access requires a \blue{majority vote} from \mathexpr{m > N/2} coordinators. A
     coordinator always responds immediately to a request.
   \end{block}
-  \begin{block}{Assumption} 
+  \begin{block}{Assumption}
     When a coordinator crashes, it will recover quickly, but will have forgotten about permissions it had
     granted.
   \end{block}
@@ -484,17 +484,17 @@
 \begin{frame}{Decentralized mutual exclusion}
   \begin{block}{How robust is this system?}
     \begin{itemize}
-    \item Let \mathexpr{p = \Delta t / T} be the probability that a coordinator resets during a time interval
-      \mathexpr{\Delta t}, while having a lifetime of \mathexpr{T}.
-    \item The probability \mathexpr{\mathbb{P}[k]} that
-    \mathexpr{k} out of \mathexpr{m} coordinators reset during the same interval is
-    \[
-    \mathbb{P}[k] = \binom{m}{k} p^k (1 - p)^{m-k}
-    \]
-    \item for \mathexpr{m > N/2}, if \mathexpr{f} coordinators reset \mathexpr{\Rightarrow} \blue{correctness is violated when there is
-      only a minority of nonfaulty coordinators}: when \red{\mathexpr{N-(m-f) \geq m}}, or, \red{\mathexpr{f
-        \geq 2m-N}}.
-    \item The probability of a violation is \mathexpr{\sum_{k=2m-N}^m \mathbb{P}[k]}.
+      \item Let \mathexpr{p = \Delta t / T} be the probability that a coordinator resets during a time interval
+            \mathexpr{\Delta t}, while having a lifetime of \mathexpr{T}.
+      \item The probability \mathexpr{\mathbb{P}[k]} that
+            \mathexpr{k} out of \mathexpr{m} coordinators reset during the same interval is
+            \[
+              \mathbb{P}[k] = \binom{m}{k} p^k (1 - p)^{m-k}
+            \]
+      \item for \mathexpr{m > N/2}, if \mathexpr{f} coordinators reset \mathexpr{\Rightarrow} \blue{correctness is violated when there is
+              only a minority of nonfaulty coordinators}: when \red{\mathexpr{N-(m-f) \geq m}}, or, \red{\mathexpr{f
+                \geq 2m-N}}.
+      \item The probability of a violation is \mathexpr{\sum_{k=2m-N}^m \mathbb{P}[k]}.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -506,30 +506,30 @@
       \begin{tabular}{cc}
         \begin{minipage}{0.4\textwidth}
           \[
-          \begin{array}{|c|c|c|c|}\hline
-            \mathbf{N}  & \mathbf{m} & \mathbf{p}        & \mbox{\textbf{Violation}} \\ \whline
-            8           & 5          & \mbox{3 sec/hour} & < 10^{-5} \\ \hline
-            8           & 6          & \mbox{3 sec/hour} & < 10^{-11} \\ \hline
-            16          & 9          & \mbox{3 sec/hour} & < 10^{-4} \\ \hline
-            16          & 12         & \mbox{3 sec/hour} & < 10^{-21} \\ \hline
-            32          & 17         & \mbox{3 sec/hour} & < 10^{-4} \\ \hline
-            32          & 24         & \mbox{3 sec/hour} & < 10^{-43} \\ \hline
-          \end{array}
+            \begin{array}{|c|c|c|c|}\hline
+              \mathbf{N} & \mathbf{m} & \mathbf{p}        & \mbox{\textbf{Violation}} \\ \whline
+              8          & 5          & \mbox{3 sec/hour} & < 10^{-5}                 \\ \hline
+              8          & 6          & \mbox{3 sec/hour} & < 10^{-11}                \\ \hline
+              16         & 9          & \mbox{3 sec/hour} & < 10^{-4}                 \\ \hline
+              16         & 12         & \mbox{3 sec/hour} & < 10^{-21}                \\ \hline
+              32         & 17         & \mbox{3 sec/hour} & < 10^{-4}                 \\ \hline
+              32         & 24         & \mbox{3 sec/hour} & < 10^{-43}                \\ \hline
+            \end{array}
           \]
         \end{minipage} &
         \begin{minipage}{0.4\textwidth}
           \[
-          \begin{array}{|c|c|c|c|}\hline
-            \mathbf{N}  & \mathbf{m} & \mathbf{p}        & \mbox{\textbf{Violation}} \\ \whline
-            8           & 5          & \mbox{30 sec/hour} & < 10^{-3} \\ \hline
-            8           & 6          & \mbox{30 sec/hour} & < 10^{-7} \\ \hline
-            16          & 9          & \mbox{30 sec/hour} & < 10^{-2} \\ \hline
-            16          & 12         & \mbox{30 sec/hour} & < 10^{-13} \\ \hline
-            32          & 17         & \mbox{30 sec/hour} & < 10^{-2} \\ \hline
-            32          & 24         & \mbox{30 sec/hour} & < 10^{-27} \\ \hline
-          \end{array}
+            \begin{array}{|c|c|c|c|}\hline
+              \mathbf{N} & \mathbf{m} & \mathbf{p}         & \mbox{\textbf{Violation}} \\ \whline
+              8          & 5          & \mbox{30 sec/hour} & < 10^{-3}                 \\ \hline
+              8          & 6          & \mbox{30 sec/hour} & < 10^{-7}                 \\ \hline
+              16         & 9          & \mbox{30 sec/hour} & < 10^{-2}                 \\ \hline
+              16         & 12         & \mbox{30 sec/hour} & < 10^{-13}                \\ \hline
+              32         & 17         & \mbox{30 sec/hour} & < 10^{-2}                 \\ \hline
+              32         & 24         & \mbox{30 sec/hour} & < 10^{-27}                \\ \hline
+            \end{array}
           \]
-        \end{minipage} 
+        \end{minipage}
       \end{tabular}
     \end{center}
   \end{block}
@@ -537,39 +537,39 @@
     What can we conclude?
   \end{alertblock}
 \end{frame}
-  \begin{frame}{Mutual exclusion: comparison}
-    \begin{block}{}
-      \begin{center}
-        \footnotesize
-        \renewcommand{\arraystretch}{1.2}
-        \begin{tabular}{|l|l|l|} \hline
-                             & \textbf{Messages per}      & \textbf{Delay before entry} \\ 
-          \textbf{Algorithm} & \textbf{entry/exit}        & \textbf{(in message times)} \\ \whline
-          Centralized   & 3                               & 2                       \\ \hline
-          Distributed   & \mathexpr{2(N-1)}         & \mathexpr{2(N-1)} \\ \hline
-          Token ring    & \mathexpr{1,\ldots,\infty}      & \mathexpr{0,\ldots,N-1} \\ \hline
-          Decentralized & \mathexpr{2kN + (k-1)N/2 + N, k = 1,2,\ldots}
-                        & \mathexpr{2kN + (k-1)N/2}        \\ \hline
-        \end{tabular}
-      \end{center}
-    \end{block}
-    Decentralized Case messages per entry/exit for \mathexpr{k \ge 1} attempts:
-    \begin{itemize}\firmlist
-      \item send \mathexpr{N} messages to coordinators receive N responses. 
-      \item If it does not get a majority, release \mathexpr{N/2} votes. 
-      \item If it did get enough votes, send \mathexpr{N} release messages later. 
-      \item A process may need to go through \mathexpr{k \ge 1} attempts
-    \end{itemize}
-  \end{frame}
+\begin{frame}{Mutual exclusion: comparison}
+  \begin{block}{}
+    \begin{center}
+      \footnotesize
+      \renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{|l|l|l|} \hline
+                           & \textbf{Messages per}                         & \textbf{Delay before entry} \\
+        \textbf{Algorithm} & \textbf{entry/exit}                           & \textbf{(in message times)} \\ \whline
+        Centralized        & 3                                             & 2                           \\ \hline
+        Distributed        & \mathexpr{2(N-1)}                             & \mathexpr{2(N-1)}           \\ \hline
+        Token ring         & \mathexpr{1,\ldots,\infty}                    & \mathexpr{0,\ldots,N-1}     \\ \hline
+        Decentralized      & \mathexpr{2kN + (k-1)N/2 + N, k = 1,2,\ldots}
+                           & \mathexpr{2kN + (k-1)N/2}                                                   \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{block}
+  Decentralized Case messages per entry/exit for \mathexpr{k \ge 1} attempts:
+  \begin{itemize}\firmlist
+    \item send \mathexpr{N} messages to coordinators receive N responses.
+    \item If it does not get a majority, release \mathexpr{N/2} votes.
+    \item If it did get enough votes, send \mathexpr{N} release messages later.
+    \item A process may need to go through \mathexpr{k \ge 1} attempts
+  \end{itemize}
+\end{frame}
 \subsection{Example: Simple locking with ZooKeeper}
 \begin{frame}{Example: ZooKeeper}
   \begin{block}{Basics (and keeping it simple)}
     \begin{itemize}\firmlist
-    \item Centralized server setup
-    \item Distributed Nodes
-    \item All client-server communication is \blue{nonblocking}: a client immediately gets a response
-    \item ZooKeeper maintains a \blue{tree-based namespace}, akin to that of a filesystem
-    \item Clients can \blue{create}, \blue{delete}, or \blue{update} nodes, as well as \blue{check existence}. 
+      \item Centralized server setup
+      \item Distributed Nodes
+      \item All client-server communication is \blue{nonblocking}: a client immediately gets a response
+      \item ZooKeeper maintains a \blue{tree-based namespace}, akin to that of a filesystem
+      \item Clients can \blue{create}, \blue{delete}, or \blue{update} nodes, as well as \blue{check existence}.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -580,53 +580,53 @@
 
   \begin{block}{Notations}
     \begin{itemize}\firmlist
-    \item \red{\id{W(n,k)a}}: request to write \id{a} to node \id{n}, assuming current version is \id{k}.
-    \item \red{\id{R(n,k)}}: current version of node \id{n} is \id{k}. 
-    \item \red{\id{R(n)}}: client wants to know the current value of node \id{n}
-    \item \red{\id{R(n,k)a}}: value \id{a} from node \id{n} is returned with its current version \id{k}.
+      \item \red{\id{W(n,k)a}}: request to write \id{a} to node \id{n}, assuming current version is \id{k}.
+      \item \red{\id{R(n,k)}}: current version of node \id{n} is \id{k}.
+      \item \red{\id{R(n)}}: client wants to know the current value of node \id{n}
+      \item \red{\id{R(n,k)a}}: value \id{a} from node \id{n} is returned with its current version \id{k}.
     \end{itemize}
   \end{block}
 \end{frame}
 \begin{frame}{ZooKeeper locking protocol}
   \begin{block}{It is now very simple}
     \begin{enumerate}\firmlist
-    \item \red{lock}: A client \id{C_1} creates a node \id{/lock}.
-    \item \red{lock}: A client \id{C_2} wants to acquire the lock but is notified that the associated node
-      already exists \mathexpr{\Rightarrow} \id{C_2} subscribes to notification on changes of \id{/lock}.
-    \item \red{unlock}: Client \id{C_1} deletes node \id{/lock} \mathexpr{\Rightarrow} all subscribers to
-      changes are notified.
+      \item \red{lock}: A client \id{C_1} creates a node \id{/lock}.
+      \item \red{lock}: A client \id{C_2} wants to acquire the lock but is notified that the associated node
+            already exists \mathexpr{\Rightarrow} \id{C_2} subscribes to notification on changes of \id{/lock}.
+      \item \red{unlock}: Client \id{C_1} deletes node \id{/lock} \mathexpr{\Rightarrow} all subscribers to
+            changes are notified.
     \end{enumerate}
 
-    
+
   \end{block}
 \end{frame}
 \section{Election algorithms}
 \begin{frame}{Election algorithms}
-  \begin{block}{Principle} 
+  \begin{block}{Principle}
     An algorithm requires that some process acts as a coordinator. The question is how to select this special
     process \blue{dynamically}.
   \end{block}
-  \begin{block}{Note} 
+  \begin{block}{Note}
     In many systems, the coordinator is chosen manually (e.g.,\ file servers). This leads to centralized
     solutions \mathexpr{\Rightarrow} single point of failure.
   \end{block}
   \begin{block}{Teasers}
     \begin{enumerate}
-    \item If a coordinator is chosen dynamically, to what extent can we speak about a centralized or
-      distributed solution? 
-      % Having a central coordinator does not necessarily make an algorithm nondistributed
-    \item Is a fully distributed solution, i.e.\ one without a coordinator, always more robust than any
-      centralized/coordinated solution?
-      % Fully distributed solutions are not necessarily better (think of Ricart-Agrawala)
+      \item If a coordinator is chosen dynamically, to what extent can we speak about a centralized or
+            distributed solution?
+            % Having a central coordinator does not necessarily make an algorithm nondistributed
+      \item Is a fully distributed solution, i.e.\ one without a coordinator, always more robust than any
+            centralized/coordinated solution?
+            % Fully distributed solutions are not necessarily better (think of Ricart-Agrawala)
     \end{enumerate}
   \end{block}
 \end{frame}
 \begin{frame}{Basic assumptions}
   \begin{block}{}
     \begin{itemize}
-    \item All processes have unique id's
-    \item All processes know id's of all processes in the system (but not if they are up or down)
-    \item Election means identifying the process with the highest id that is up
+      \item All processes have unique id's
+      \item All processes know id's of all processes in the system (but not if they are up or down)
+      \item Election means identifying the process with the highest id that is up
     \end{itemize}
   \end{block}
 \end{frame}
@@ -637,10 +637,10 @@
     \mathexpr{id(\id{P_k}) = k}. When a process \id{P_k} notices that the coordinator is no longer responding to
     requests, it initiates an election:
     \begin{enumerate}
-    \item \id{P_k} sends an \id{ELECTION} message to all processes with higher identifiers:
-      \mathexpr{\id{P_{k+1}},\id{P_{k+2}},\ldots,\id{P_{N-1}}}. 
-    \item If no one responds, \id{P_k} wins the election and becomes coordinator.
-    \item If one of the higher-ups answers, it takes over and \mathexpr{P_k}'s job is done.
+      \item \id{P_k} sends an \id{ELECTION} message to all processes with higher identifiers:
+            \mathexpr{\id{P_{k+1}},\id{P_{k+2}},\ldots,\id{P_{N-1}}}.
+      \item If no one responds, \id{P_k} wins the election and becomes coordinator.
+      \item If one of the higher-ups answers, it takes over and \mathexpr{P_k}'s job is done.
     \end{enumerate}
   \end{block}
 \end{frame}
@@ -650,11 +650,11 @@
       \begin{tabular}{ccc}
         \includefigure[0.71]{05-20a} &
         \includefigure[0.71]{05-20b} &
-        \includefigure[0.71]{05-20c} 
+        \includefigure[0.71]{05-20c}
       \end{tabular}
       \begin{tabular}{c@{\hspace*{48pt}}c}
         \includefigure[0.71]{05-20d} &
-        \includefigure[0.71]{05-20e} 
+        \includefigure[0.71]{05-20e}
       \end{tabular}
     \end{center}
     %% \begin{itemize}\tightlist
@@ -672,12 +672,12 @@
     Process priority is obtained by organizing processes into a (logical) ring. The process with the highest
     priority should be elected as coordinator.
     \begin{itemize}
-    \item Any process can start an election by sending an election message to its successor. If a successor is
-      down, the message is passed on to the next successor.
-    \item If a message is passed on, the sender adds itself to the list. When it gets back to the initiator,
-      everyone had a chance to make its presence known.
-    \item The initiator sends a coordinator message around the ring containing a list of all living
-      processes. The one with the highest priority is elected as coordinator.
+      \item Any process can start an election by sending an election message to its successor. If a successor is
+            down, the message is passed on to the next successor.
+      \item If a message is passed on, the sender adds itself to the list. When it gets back to the initiator,
+            everyone had a chance to make its presence known.
+      \item The initiator sends a coordinator message around the ring containing a list of all living
+            processes. The one with the highest priority is elected as coordinator.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -687,52 +687,52 @@
       \includefigure{05-21}
     \end{center}
     \begin{itemize}
-    \item The solid line shows the election messages initiated by \id{P_6}
-    \item The dashed one, the messages by \id{P_3}
+      \item The solid line shows the election messages initiated by \id{P_6}
+      \item The dashed one, the messages by \id{P_3}
     \end{itemize}
   \end{block}
 \end{frame}
 \subsection{Example: Leader election in ZooKeeper}
-\begin{frame}{Example: Leader election \red{in} ZooKeeper server group}
+\begin{frame}{Example: Leader election in ZooKeeper server group}
   \begin{block}{Basics}
     \begin{itemize}\firmlist
-    \item Each server \id{s} in the server group has an identifier \blue{\func{id}(\id{s})}
-    \item Each server has a monotonically increasing counter \blue{\func{tx}(\id{s})} of the latest transaction it
-      handled (i.e., series of operations on the namespace).
-    \item When follower \id{s} suspects leader crashed, it broadcasts an \id{ELECTION} message, along with the pair
-      (\id{voteID},\id{voteTX}). Initially,
-      \begin{itemize}\firmlist
-      \item \mathexpr{\id{voteID} \leftarrow \func{id}(\id{s})}
-      \item \mathexpr{\id{voteTX} \leftarrow \func{tx}(\id{s})}
-      \end{itemize}
-    \item Each server \id{s} maintains two variables:
-      \begin{itemize}
-      \item \blue{\func{leader}(\id{s})}: records the server that \id{s} believes may be final
-        leader. \newline
-        Initially, \mathexpr{\func{leader}(\id{s}) \leftarrow \func{id}(\id{s})}.
-      \item \blue{\func{lastTX}(\id{s})}: what \id{s} knows to be the most recent transaction. \newline
-        Initially, \mathexpr{\func{lastTX}(\id{s}) \leftarrow \func{tx}(\id{s})}.
-      \end{itemize}
+      \item Each server \id{s} in the server group has an identifier \blue{\func{id}(\id{s})}
+      \item Each server has a monotonically increasing counter \blue{\func{tx}(\id{s})} of the latest transaction it
+            handled (i.e., series of operations on the namespace).
+      \item When follower \id{s} suspects leader crashed, it broadcasts an \id{ELECTION} message, along with the pair
+            (\id{voteID},\id{voteTX}). Initially,
+            \begin{itemize}\firmlist
+              \item \mathexpr{\id{voteID} \leftarrow \func{id}(\id{s})}
+              \item \mathexpr{\id{voteTX} \leftarrow \func{tx}(\id{s})}
+            \end{itemize}
+      \item Each server \id{s} maintains two variables:
+            \begin{itemize}
+              \item \blue{\func{leader}(\id{s})}: records the server that \id{s} believes may be final
+                    leader. \newline
+                    Initially, \mathexpr{\func{leader}(\id{s}) \leftarrow \func{id}(\id{s})}.
+              \item \blue{\func{lastTX}(\id{s})}: what \id{s} knows to be the most recent transaction. \newline
+                    Initially, \mathexpr{\func{lastTX}(\id{s}) \leftarrow \func{tx}(\id{s})}.
+            \end{itemize}
     \end{itemize}
   \end{block}
 \end{frame}
-\begin{frame}{Example: Leader election \red{in} ZooKeeper server group}
+\begin{frame}{Example: Leader election in ZooKeeper server group}
   \begin{block}{When \id{s^*} receives (\id{voteID},\id{voteTX})}
     \begin{itemize}%\firmlist
 
-    \item If \mathexpr{\func{lastTX}(\id{s^*}) < \id{voteTX}}, then \id{s^*} just received more up-to-date
-      information on the most recent transaction, and sets
-      \begin{itemize}\firmlist
-      \item \mathexpr{\func{leader}(\id{s^*}) \leftarrow \id{voteID}}
-      \item \mathexpr{\func{lastTX}(\id{s^*}) \leftarrow \id{voteTX}}
-      \end{itemize}
+      \item If \mathexpr{\func{lastTX}(\id{s^*}) < \id{voteTX}}, then \id{s^*} just received more up-to-date
+            information on the most recent transaction, and sets
+            \begin{itemize}\firmlist
+              \item \mathexpr{\func{leader}(\id{s^*}) \leftarrow \id{voteID}}
+              \item \mathexpr{\func{lastTX}(\id{s^*}) \leftarrow \id{voteTX}}
+            \end{itemize}
 
-    \item If \mathexpr{\func{lastTX}(\id{s^*}) = \id{voteTX}} \emph{and} \mathexpr{\func{leader}(\id{s^*}) <
-      \id{voteID}}, then \id{s^*} knows as much about the most recent transaction as what it was just sent, but
-      its perspective on which server will be the next leader needs to be updated:
-      \begin{itemize}\firmlist
-      \item \mathexpr{\func{leader}(\id{s^*}) \leftarrow \id{voteID}}
-      \end{itemize}
+      \item If \mathexpr{\func{lastTX}(\id{s^*}) = \id{voteTX}} \emph{and} \mathexpr{\func{leader}(\id{s^*}) <
+              \id{voteID}}, then \id{s^*} knows as much about the most recent transaction as what it was just sent, but
+            its perspective on which server will be the next leader needs to be updated:
+            \begin{itemize}\firmlist
+              \item \mathexpr{\func{leader}(\id{s^*}) \leftarrow \id{voteID}}
+            \end{itemize}
     \end{itemize}
   \end{block}
   \begin{alertblock}{Note}
@@ -744,11 +744,11 @@
 \begin{frame}{Example: Leader election in Raft}
   \begin{block}{Basics}
     \begin{itemize}\firmlist
-    \item We have a (relatively small) group of servers
-    \item A server is in one of three states: \red{\id{follower}}, \red{\id{candidate}}, or \red{\id{leader}}
-    \item The protocol works in \red{terms}, starting with term 0
-    \item Each server starts in the \id{follower} state.
-    \item A leader is to regularly broadcast messages (perhaps just a simple \blue{heartbeat})
+      \item We have a (relatively small) group of servers
+      \item A server is in one of three states: \id{follower}, \id{candidate}, or \id{leader}
+      \item The protocol works in terms, starting with term 0
+      \item Each server starts in the \id{follower} state.
+      \item A leader is to regularly broadcast messages (perhaps just a simple \blue{heartbeat})
     \end{itemize}
   \end{block}
 \end{frame}
@@ -756,14 +756,14 @@
   \begin{block}{Selecting a new leader}
     When follower \id{s^*} hasn't received anything from the alleged leader \id{s} for some time, \id{s^*}
     broadcasts that it volunteers to be the next leader, increasing the term by 1. \id{s^*} enters the
-    \red{candidate} state. Then:
+    candidate state. Then:
     \begin{itemize}\firmlist
-    \item If leader \id{s} receives the message, it responds by acknowledging that it is still the
-      leader. \id{s^*} returns to the \red{follower} state.
-    \item If another follower \id{s^{**}} gets the election message from \id{s^*}, and it is the first
-      election message during the current term, \id{s^{**}} votes for \id{s^*}. Otherwise, it simply ignores
-      the election message from \id{s^*}. When \id{s^*} has collected a majority of votes, a new term starts
-      with a new leader.
+      \item If leader \id{s} receives the message, it responds by acknowledging that it is still the
+            leader. \id{s^*} returns to the follower state.
+      \item If another follower \id{s^{**}} gets the election message from \id{s^*}, and it is the first
+            election message during the current term, \id{s^{**}} votes for \id{s^*}. Otherwise, it simply ignores
+            the election message from \id{s^*}. When \id{s^*} has collected a majority of votes, a new term starts
+            with a new leader.
     \end{itemize}
   \end{block}
 
@@ -777,38 +777,38 @@
 \begin{frame}{Elections by proof of work}
   \begin{block}{Basics}
     \begin{itemize}\firmlist
-    \item Consider a potentially large group of processes
-    \item Each process is required to solve a computational puzzle
-    \item When a process solves the puzzle, it broadcasts its victory to the group
-    \item We assume there is a conflict resolution procedure when more than one process claims victory
+      \item Consider a potentially large group of processes
+      \item Each process is required to solve a computational puzzle
+      \item When a process solves the puzzle, it broadcasts its victory to the group
+      \item We assume there is a conflict resolution procedure when more than one process claims victory
     \end{itemize}
   \end{block}
   \begin{block}{Solving a computational puzzle}
     \begin{itemize}
-    \item Make use of a \red{secure hashing function} \mathexpr{H(m)}:
-      \begin{itemize}
-      \item \mathexpr{m} is some data; \mathexpr{H(m)} returns a \blue{fixed-length bit string}
-      \item computing \mathexpr{h = H(m)} is computationally efficient
-      \item finding a function \mathexpr{H^{-1}} such that \mathexpr{m = H^{-1}(H(m))} is computationally
-        extremely difficult
-      \end{itemize}
-    \item \blue{Practice}: finding \mathexpr{H^{-1}} boils down to an extensive \blue{trial-and-error}
-      procedure
+      \item Make use of a \red{secure hashing function} \mathexpr{H(m)}:
+            \begin{itemize}
+              \item \mathexpr{m} is some data; \mathexpr{H(m)} returns a \blue{fixed-length bit string}
+              \item computing \mathexpr{h = H(m)} is computationally efficient
+              \item finding a function \mathexpr{H^{-1}} such that \mathexpr{m = H^{-1}(H(m))} is computationally
+                    extremely difficult
+            \end{itemize}
+      \item \blue{Practice}: finding \mathexpr{H^{-1}} boils down to an extensive \blue{trial-and-error}
+            procedure
     \end{itemize}
   \end{block}
 \end{frame}
 \begin{frame}{Elections by proof of work}
   \begin{block}{Controlled race}
     \begin{itemize}
-    \item Assume a globally known secure hash function \mathexpr{H^*}. Let \mathexpr{H_i} be the hash function
-      used by process \mathexpr{P_i}.
-    \item Task: given a bit string \mathexpr{h = H_i(m)}, find a bit string \mathexpr{\tilde{h}} such that
-      \mathexpr{h^* = H^*(H_i(\tilde{h} \odot h))} where:
-      \begin{itemize}
-      \item \mathexpr{h^*} is a bit string with \mathexpr{K} leading zeroes
-      \item \mathexpr{\tilde{h} \odot h} denotes some predetermined bitwise operation on \mathexpr{\tilde{h}}
-        and \mathexpr{h} 
-      \end{itemize}
+      \item Assume a globally known secure hash function \mathexpr{H^*}. Let \mathexpr{H_i} be the hash function
+            used by process \mathexpr{P_i}.
+      \item Task: given a bit string \mathexpr{h = H_i(m)}, find a bit string \mathexpr{\tilde{h}} such that
+            \mathexpr{h^* = H^*(H_i(\tilde{h} \odot h))} where:
+            \begin{itemize}
+              \item \mathexpr{h^*} is a bit string with \mathexpr{K} leading zeroes
+              \item \mathexpr{\tilde{h} \odot h} denotes some predetermined bitwise operation on \mathexpr{\tilde{h}}
+                    and \mathexpr{h}
+            \end{itemize}
     \end{itemize}
   \end{block}
 
@@ -816,12 +816,12 @@
     By controlling \mathexpr{K}, we control the difficulty of finding \mathexpr{\tilde{h}}. If \mathexpr{p}
     is the probability that a random guess for \mathexpr{\tilde{h}} will suffice: \mathexpr{p=(1/2)^{K}}.
   \end{alertblock}
-  
+
   \begin{block}{Current practice}
     In many PoW-based blockchain systems, \mathexpr{K=64}
     \begin{itemize}%\firmlist
-    \item With \mathexpr{K=64}, it takes about 10 minutes on a supercomputer to find \mathexpr{\tilde{h}}
-    \item With \mathexpr{K=64}, it takes about 100 years on a laptop to find \mathexpr{\tilde{h}}
+      \item With \mathexpr{K=64}, it takes about 10 minutes on a supercomputer to find \mathexpr{\tilde{h}}
+      \item With \mathexpr{K=64}, it takes about 100 years on a laptop to find \mathexpr{\tilde{h}}
     \end{itemize}
   \end{block}
 \end{frame}
@@ -829,16 +829,16 @@
   \begin{block}{Basics}
     We assume a blockchain system in which \mathexpr{N} \red{secure tokens} are used:
     \begin{itemize}
-    \item Each token has a unique \blue{owner}
-    \item Each token has a uniquely associated \blue{index} \mathexpr{1 \leq k \leq N}
-    \item A token cannot be modified or copied without this going unnoticed
+      \item Each token has a unique \blue{owner}
+      \item Each token has a uniquely associated \blue{index} \mathexpr{1 \leq k \leq N}
+      \item A token cannot be modified or copied without this going unnoticed
     \end{itemize}
   \end{block}
   \begin{block}{Principle}
     \begin{itemize}
-    \item Draw a random number \mathexpr{k \in \{1, \ldots, N\}}
-    \item Look up the process \mathexpr{P} that owns the token with index \mathexpr{k}. \mathexpr{P} is the
-      next leader.
+      \item Draw a random number \mathexpr{k \in \{1, \ldots, N\}}
+      \item Look up the process \mathexpr{P} that owns the token with index \mathexpr{k}. \mathexpr{P} is the
+            next leader.
     \end{itemize}
   \end{block}
   \begin{alertblock}{Observation}
@@ -851,7 +851,7 @@
     \begin{center}
       \begin{tabular}{cc}
         \includefigure{05-24a} &
-        \includefigure{05-24b} \\
+        \includefigure{05-24b}   \\
       \end{tabular}
     \end{center}
   \end{block}
@@ -864,7 +864,7 @@
     \begin{center}
       \begin{tabular}{cc}
         \includefigure{05-24c} &
-        \includefigure{05-24d} \\
+        \includefigure{05-24d}   \\
       \end{tabular}
     \end{center}
   \end{block}
@@ -874,7 +874,7 @@
     \begin{center}
       \begin{tabular}{cc}
         \includefigure{05-24e} &
-        \includefigure{05-24f} \\
+        \includefigure{05-24f}   \\
       \end{tabular}
     \end{center}
   \end{block}
@@ -886,31 +886,31 @@
 \subsection{Aggregation}
 \begin{slide}{Gossip-based coordination}
   \begin{itemize}
-    \item Nodes randomly select a few other nodes (peers) periodically and 
-    exchange state information (e.g., membership, failure detection, key-value updates, 
-    or metadata). 
-    \item Information spreads exponentially fast, similar to how gossip or a 
-    virus spreads in a population, achieving eventual consistency with very high probability 
-    in logarithmic rounds.
-    \item Advantages: Extremely robust to network partitions, node failures, 
-    and churn; no single point of failure; low coordination overhead; scales to thousands or tens of thousands of nodes with minimal latency impact; self-healing membership and failure detection (e.g., SWIM, HyParView, or Lifeguard protocols).
-    \item Trade-offs \& Common Uses: Provides only probabilistic guarantees 
-    (not strict consistency); latency of propagation is O(log N); 
-    widely used for failure detection (accrual detectors), 
-    \item Lightweight broadcast instead of heavy consensus protocols 
-    like Paxos or Raft when strong consistency isnt required.
+    \item Nodes randomly select a few other nodes (peers) periodically and
+          exchange state information (e.g., membership, failure detection, key-value updates,
+          or metadata).
+    \item Information spreads exponentially fast, similar to how gossip or a
+          virus spreads in a population, achieving eventual consistency with very high probability
+          in logarithmic rounds.
+    \item Advantages: Extremely robust to network partitions, node failures,
+          and churn; no single point of failure; low coordination overhead; scales to thousands or tens of thousands of nodes with minimal latency impact; self-healing membership and failure detection (e.g., SWIM, HyParView, or Lifeguard protocols).
+    \item Trade-offs \& Common Uses: Provides only probabilistic guarantees
+          (not strict consistency); latency of propagation is O(log N);
+          widely used for failure detection (accrual detectors),
+    \item Lightweight broadcast instead of heavy consensus protocols
+          like Paxos or Raft when strong consistency isnt required.
   \end{itemize}
 \end{slide}
 
 \begin{frame}{Gossip-based coordination: aggregation}
   \begin{block}{Typical apps}
     \begin{itemize}
-    \item \red{Data dissemination}: Perhaps the most important one. Note that there are many variants of
-      dissemination.
-    \item \red{Aggregation Function (Average)}: Let every node \id{P_i} maintain a variable \mathexpr{v_i}. When two nodes gossip, they
-      each reset their variable to\[{v_i},{v_j} \leftarrow ({v_i} + {v_j}) /2\] Result: in the end
-      each node will have computed the average \mathexpr{\bar{v} = \sum_i {v_i} / N}.
-    \item What happens in the case that initially \mathexpr{{v_i} = 1} and \mathexpr{{v_j} = 0, j \neq i}?
+      \item \red{Data dissemination}: Perhaps the most important one. Note that there are many variants of
+            dissemination.
+      \item \red{Aggregation Function (Average)}: Let every node \id{P_i} maintain a variable \mathexpr{v_i}. When two nodes gossip, they
+            each reset their variable to\[{v_i},{v_j} \leftarrow ({v_i} + {v_j}) /2\] Result: in the end
+            each node will have computed the average \mathexpr{\bar{v} = \sum_i {v_i} / N}.
+      \item What happens in the case that initially \mathexpr{{v_i} = 1} and \mathexpr{{v_j} = 0, j \neq i}?
     \end{itemize}
   \end{block}
 \end{frame}
@@ -922,11 +922,11 @@
   \end{block}
   \begin{block}{Basics}
     \begin{itemize}
-    \item Each node maintains a list of \mathexpr{c} references to other nodes
-    \item \red{Regularly}, pick another node at random (from the list), and \blue{exchange} roughly
-      \mathexpr{c/2} references
-    \item When the \red{application} needs to select a node at random, it also picks a random one from from
-      its local list.
+      \item Each node maintains a list of \mathexpr{c} references to other nodes
+      \item \red{Regularly}, pick another node at random (from the list), and \blue{exchange} roughly
+            \mathexpr{c/2} references
+      \item When the \red{application} needs to select a node at random, it also picks a random one from from
+            its local list.
     \end{itemize}
   \end{block}
   \begin{alertblock}{Observation}
@@ -947,27 +947,27 @@
 \begin{frame}{Gossip-based overlay construction: a 2D torus}
   Consider a logical \mathexpr{N \times N} grid, with a node on each point of the grid.
   \begin{itemize}
-  \item Every node must maintain a list of \mathexpr{c} nearest neighbors
-  \item Distance between node at \mathexpr{(a_1, a_2)} and \mathexpr{(b_1, b_2)} is \mathexpr{d_1 + d_2},
-    with \mathexpr{d_i = \min(N - |a_i - b_i|, |a_i - b_i|)}
-  \item Every node picks a random other node from its lowest-level list, and keeps only the closest one in
-    its top-level list.
-  \item Once every node has picked and selected a random node, we move to the next \blue{round}
+    \item Every node must maintain a list of \mathexpr{c} nearest neighbors
+    \item Distance between node at \mathexpr{(a_1, a_2)} and \mathexpr{(b_1, b_2)} is \mathexpr{d_1 + d_2},
+          with \mathexpr{d_i = \min(N - |a_i - b_i|, |a_i - b_i|)}
+    \item Every node picks a random other node from its lowest-level list, and keeps only the closest one in
+          its top-level list.
+    \item Once every node has picked and selected a random node, we move to the next \blue{round}
   \end{itemize}
   \begin{centerfig}
     \begin{tabular}{ccc}
-      \includefigure{05-27a} &
-      \includefigure{05-27b} &
-      \includefigure{05-27c} \\
-      start (\mathexpr{N=50})& after 5 rounds & after 20 rounds
+      \includefigure{05-27a}  &
+      \includefigure{05-27b}  &
+      \includefigure{05-27c}                                     \\
+      start (\mathexpr{N=50}) & after 5 rounds & after 20 rounds
     \end{tabular}
   \end{centerfig}
 \end{frame}
-  % \begin{frame}{A gossip-based 2D torus in Python (outline)}
-  %   \begin{centerfig}
-  %     \includelisting{05-28/outline}
-  %   \end{centerfig}
-  % \end{frame}
+% \begin{frame}{A gossip-based 2D torus in Python (outline)}
+%   \begin{centerfig}
+%     \includelisting{05-28/outline}
+%   \end{centerfig}
+% \end{frame}
 \subsection{Secure gossiping}
 \begin{frame}{Secure gossiping}
   \begin{alertblock}{Dramatic attack}
@@ -990,11 +990,11 @@
     \newcommand{\idscale}{0.6}
     \begin{tabular}{ccc}
       \includefigure[\idscale]{05-30a} &
-%      \includefigure[\idscale]{05-30b} &
+      %      \includefigure[\idscale]{05-30b} &
       \includefigure[\idscale]{05-30c} &
-%      \includefigure[\idscale]{05-30d} &
-      \includefigure[\idscale]{05-30e} 
-%      \includefigure[\idscale]{05-30f} 
+      %      \includefigure[\idscale]{05-30d} &
+      \includefigure[\idscale]{05-30e}
+      %      \includefigure[\idscale]{05-30f} 
     \end{tabular}
   \end{centerfig}
   \begin{block}{Basic approach}
@@ -1002,7 +1002,7 @@
     updating its local list. An attacker is in limbo: will its response be used for statistical purposes or
     for functional purposes?
   \end{block}
-  
+
   \begin{alertblock}{Observation}
     When gathering statistics may reveal colluders, a colluding node will be \red{forced} to behave according
     to the protocol.
@@ -1016,12 +1016,12 @@
   \end{centerfig}
   \begin{block}{Principle}
     \begin{itemize}%\firmlist
-    \item A process specifies in which events it is interested (\red{subscription} \id{S})
-    \item When a process \red{publishes a notification} \id{N} we need to see whether \id{S} \blue{matches}
-      \id{N}.
+      \item A process specifies in which events it is interested (\red{subscription} \id{S})
+      \item When a process \red{publishes a notification} \id{N} we need to see whether \id{S} \blue{matches}
+            \id{N}.
     \end{itemize}
   \end{block}
-  
+
   \begin{alertblock}{Hard part}
     Implementing the \blue{match} function in a scalable manner.
   \end{alertblock}
@@ -1030,24 +1030,24 @@
 \begin{frame}{General approach}
   \begin{block}{What is needed}
     \begin{itemize}\firmlist
-    \item \red{\mathexpr{\func{sub2node}(\id{S})}}: map a subscription \id{S} to a nonempty subset \set{S} of servers
-    \item \red{\mathexpr{\func{not2node}(\id{N})}}: map a notification \id{N} to a nonempty subset \set{N} of servers
+      \item \red{\mathexpr{\func{sub2node}(\id{S})}}: map a subscription \id{S} to a nonempty subset \set{S} of servers
+      \item \red{\mathexpr{\func{not2node}(\id{N})}}: map a notification \id{N} to a nonempty subset \set{N} of servers
     \end{itemize}
     Make sure that \mathexpr{\set{S} \cap \set{N} \neq \emptyset}.
   \end{block}
   \begin{alertblock}{Observations}
     \begin{itemize}
-    \item Centralized solution is simple: \mathexpr{\set{S} = \set{N} = \{s\}}, i.e. a single server.
-    \item \blue{Topic-based publish-subscribe} is also simple: each \id{S} and \id{N} is tagged with a
-      \blue{single topic}; each topic is handled by a single server (a \blue{rendezevous node}). Several
-      topics may be handled by same server).
-    \item \blue{Content-based publish-subscribe} is \red{tough}: a subscription takes the form
-      (\emph{attribute},~\emph{value}) pair, with example values:
-      \begin{itemize}\tightlist
-      \item \blue{range}: ``\mathexpr{1 \leq x < 10}''
-      \item \blue{containment}: ``\mathexpr{x \in \{\id{red}, \id{blue}\}}''
-      \item \blue{prefix and suffix expressions}: ``\code{url.startswith(\char34 https\char34)}''
-      \end{itemize}
+      \item Centralized solution is simple: \mathexpr{\set{S} = \set{N} = \{s\}}, i.e. a single server.
+      \item \blue{Topic-based publish-subscribe} is also simple: each \id{S} and \id{N} is tagged with a
+            \blue{single topic}; each topic is handled by a single server (a \blue{rendezevous node}). Several
+            topics may be handled by same server).
+      \item \blue{Content-based publish-subscribe} is \red{tough}: a subscription takes the form
+            (\emph{attribute},~\emph{value}) pair, with example values:
+            \begin{itemize}\tightlist
+              \item \blue{range}: ``\mathexpr{1 \leq x < 10}''
+              \item \blue{containment}: ``\mathexpr{x \in \{\id{red}, \id{blue}\}}''
+              \item \blue{prefix and suffix expressions}: ``\code{url.startswith(\char34 https\char34)}''
+            \end{itemize}
     \end{itemize}
   \end{alertblock}
 \end{frame}
@@ -1055,24 +1055,24 @@
   \begin{centerfig}
     \begin{tabular}{cc}
       \includefigure{05-32a} &
-      \includefigure{05-32b} \\
-      (a) & (b)
+      \includefigure{05-32b}       \\
+      (a)                    & (b)
     \end{tabular}
   \end{centerfig}
   \begin{itemize}
-  \item[(a)]~first broadcast subscriptions
-  \item[(b)]~forward notifications only to relevant rendezvous nodes
+    \item[(a)]~first broadcast subscriptions
+    \item[(b)]~forward notifications only to relevant rendezvous nodes
   \end{itemize}
-  
+
   \begin{block}{Example of a (partially filled) routing table}
     \begin{centerfig}
       \sffamily\footnotesize
       \renewcommand{\arraystretch}{1.1}
       \begin{tabular}{|l|l|} \hline
-        \textbf{Interface} & \textbf{Filter} \\ \whline 
-        To node 3                & \mathexpr{\idsn{a} \in [0,3]} \\ \hline 
-        To node 4                & \mathexpr{\idsn{a} \in [2,5]} \\ \hline 
-        Toward router \idsn{R_1} & (unspecified) \\ \hline
+        \textbf{Interface}       & \textbf{Filter}               \\ \whline
+        To node 3                & \mathexpr{\idsn{a} \in [0,3]} \\ \hline
+        To node 4                & \mathexpr{\idsn{a} \in [2,5]} \\ \hline
+        Toward router \idsn{R_1} & (unspecified)                 \\ \hline
       \end{tabular}
     \end{centerfig}
   \end{block}
@@ -1080,30 +1080,30 @@
 \begin{frame}{Gossiping: Sub-2-Sub}
   \begin{block}{Basics}
     \begin{itemize}\tightlist
-    \item \red{Goal}: To realize scalability, make sure that subscribers with the same interests form just a
-      single group
-    \item \red{Model}: There are \mathexpr{N} attributes \mathexpr{\id{a_1},\ldots,\id{a_N}}. An attribute
-      value is always (mappable to) a floating-point number.
-    \item \red{Subscription}: Takes forms such as \mathexpr{\id{S} = \langle \id{a_1} \rightarrow 3.0,
-      \id{a_4} \rightarrow [0.0, ~0.5) \rangle}: \id{a_1} should be 3.0; \id{a_4} should lie between 0.0 and
-      0.5; other attribute values don't matter.
+      \item \red{Goal}: To realize scalability, make sure that subscribers with the same interests form just a
+            single group
+      \item \red{Model}: There are \mathexpr{N} attributes \mathexpr{\id{a_1},\ldots,\id{a_N}}. An attribute
+            value is always (mappable to) a floating-point number.
+      \item \red{Subscription}: Takes forms such as \mathexpr{\id{S} = \langle \id{a_1} \rightarrow 3.0,
+            \id{a_4} \rightarrow [0.0, ~0.5) \rangle}: \id{a_1} should be 3.0; \id{a_4} should lie between 0.0 and
+            0.5; other attribute values don't matter.
     \end{itemize}
   \end{block}
   \begin{block}{Observations}
     \begin{itemize}\tightlist
-    \item A subscription \id{S_i} specifies a subset \set{S_i} in a \mathexpr{N}-dimensional space.
-    \item We are interested only in notifications that fall into \mathexpr{\set{\overline{S}} = \cup \set{S_i}}.
+      \item A subscription \id{S_i} specifies a subset \set{S_i} in a \mathexpr{N}-dimensional space.
+      \item We are interested only in notifications that fall into \mathexpr{\set{\overline{S}} = \cup \set{S_i}}.
     \end{itemize}
   \end{block}
-  
+
   \begin{alertblock}{Goal}
     Partition \set{\overline{S}} into \mathexpr{M} disjoint subspaces
     \mathexpr{\set{\overline{S}_1},\ldots,\set{\overline{S}_M}} such that
     \begin{itemize}\tightlist
-    \item \blue{Partitioning}: \( \forall k\neq m: \set{\overline{S}_k} \cap \set{\overline{S}_m} = \emptyset \mbox{\ and\ }
-        \cup_m\set{\overline{S}_m} = \set{\overline{S}} \)
-    \item \blue{Subscription coverage}: \( (\set{\overline{S}_m} \cap \set{S_i} \neq \emptyset ) \Rightarrow
-      (\set{\overline{S}_m} \subseteq \set{S_i}) \)
+      \item \blue{Partitioning}: \( \forall k\neq m: \set{\overline{S}_k} \cap \set{\overline{S}_m} = \emptyset \mbox{\ and\ }
+            \cup_m\set{\overline{S}_m} = \set{\overline{S}} \)
+      \item \blue{Subscription coverage}: \( (\set{\overline{S}_m} \cap \set{S_i} \neq \emptyset ) \Rightarrow
+            (\set{\overline{S}_m} \subseteq \set{S_i}) \)
     \end{itemize}
   \end{alertblock}
 \end{frame}
@@ -1113,15 +1113,15 @@
   \end{centerfig}
   \begin{block}{Consider a single attribute}
     \begin{itemize}
-    \item Nodes regularly exchange their subscriptions through gossiping
-    \item An intersection between two nodes leads to a mutual reference
-    \item If \mathexpr{\set{S_{ijk}} = \set{S_i} \cap \set{S_j} \cap \set{S_k} \neq \emptyset} \blue{and}
-      \mathexpr{\set{S_{ij}}-\set{S_{ijk}} \neq \emptyset}, then:
-      \begin{itemize}
-      \item nodes \id{i}, \id{j}, \id{k} are grouped into a \red{single overlay network} (for \red{\set{S_{ijk}}})
-      \item nodes \id{i}, \id{j} are grouped into a \red{single overlay network} (for
-        \red{\mathexpr{\set{S_{ij}}-\set{S_{ijk}}}})
-      \end{itemize}
+      \item Nodes regularly exchange their subscriptions through gossiping
+      \item An intersection between two nodes leads to a mutual reference
+      \item If \mathexpr{\set{S_{ijk}} = \set{S_i} \cap \set{S_j} \cap \set{S_k} \neq \emptyset} \blue{and}
+            \mathexpr{\set{S_{ij}}-\set{S_{ijk}} \neq \emptyset}, then:
+            \begin{itemize}
+              \item nodes \id{i}, \id{j}, \id{k} are grouped into a \red{single overlay network} (for \red{\set{S_{ijk}}})
+              \item nodes \id{i}, \id{j} are grouped into a \red{single overlay network} (for
+                    \red{\mathexpr{\set{S_{ij}}-\set{S_{ijk}}}})
+            \end{itemize}
     \end{itemize}
   \end{block}
 \end{frame}
@@ -1130,58 +1130,58 @@
 \begin{frame}{Secure publish-subscribe}
   \begin{alertblock}{We are facing nasty dilemma's}
     \begin{itemize}
-    \item \red{Referential decoupling}: messages should be able to flow from a publisher to subscribers while
-      guaranteeing mutual anonymity \mathexpr{\Rightarrow} we cannot set up a secure channel.
-    \item Not knowing where messages come from imposes \red{integrity problems}.
-    \item Assuming a \blue{trusted broker} may easily be practically impossible, certainly when dealing with
-      sensitive information \mathexpr{\Rightarrow} we now have a \red{routing problem}.
+      \item \red{Referential decoupling}: messages should be able to flow from a publisher to subscribers while
+            guaranteeing mutual anonymity \mathexpr{\Rightarrow} we cannot set up a secure channel.
+      \item Not knowing where messages come from imposes \red{integrity problems}.
+      \item Assuming a \blue{trusted broker} may easily be practically impossible, certainly when dealing with
+            sensitive information \mathexpr{\Rightarrow} we now have a \red{routing problem}.
     \end{itemize}
   \end{alertblock}
-  This is a real concern when the broker / message bus is untrusted or 
-  semi-trusted (e.g., cloud provider, third-party MQTT broker, 
+  This is a real concern when the broker / message bus is untrusted or
+  semi-trusted (e.g., cloud provider, third-party MQTT broker,
   Kafka cluster you don’t fully control)
-  \end{frame}
+\end{frame}
 
-  \begin{frame}{Secure publish-subscribe}
-    Some real world examples:
-    \begin{itemize}\tightlist
-      \item Financial market data feeds: Bloomberg, Refinitiv, or cloud feeds cannot let the 
-      provider see which banks are interested in ``Argentina default"
-      \item Privacy-preserving: ride-sharing / location pub-subDrivers publish encrypted location blocks; 
-      riders only want their 1 km grid square
-      \item Military / classified pub-sub: Topics themselves are 
-      classified (\textbf{DRONE-STRIKE-X17})
-    \end{itemize}
+\begin{frame}{Secure publish-subscribe}
+  Some real world examples:
+  \begin{itemize}\tightlist
+    \item Financial market data feeds: Bloomberg, Refinitiv, or cloud feeds cannot let the
+          provider see which banks are interested in ``Argentina default"
+    \item Privacy-preserving: ride-sharing / location pub-subDrivers publish encrypted location blocks;
+          riders only want their 1 km grid square
+    \item Military / classified pub-sub: Topics themselves are
+          classified (\textbf{DRONE-STRIKE-X17})
+  \end{itemize}
   \textbf{We must use secure pub/sub whenever}:
-    \begin{itemize}\tightlist
-      \item The broker is not fully trusted with message confidentiality, and
-      \item Subscriptions are fine-grained (keywords, topics, attributes), and
-      \item Publishers and subscribers are not in the same closed trust domain (open or Internet-facing system).  
-    \end{itemize}
-  \end{frame}
+  \begin{itemize}\tightlist
+    \item The broker is not fully trusted with message confidentiality, and
+    \item Subscriptions are fine-grained (keywords, topics, attributes), and
+    \item Publishers and subscribers are not in the same closed trust domain (open or Internet-facing system).
+  \end{itemize}
+\end{frame}
 
-  \begin{frame}{Encrypted Everything?}
-    Why "just encrypt everything" doesn't work
-    If you encrypt messages (using asymmetric key encryption):
-    \begin{itemize}
-      \item Broker can't read them
-      \item But the broker also can't route them,
-      because:
-      \item It doesn't know which subscription matches
-      which message
-      \item So the broker either:
-      \item Sees everything (bad for security), or
-      \item Sees nothing (bad for routing)
-    \end{itemize}
-    This is the core dilemma.
-  \end{frame}
+\begin{frame}{Encrypted Everything?}
+  Why "just encrypt everything" doesn't work
+  If you encrypt messages (using asymmetric key encryption):
+  \begin{itemize}
+    \item Broker can't read them
+    \item But the broker also can't route them,
+          because:
+    \item It doesn't know which subscription matches
+          which message
+    \item So the broker either:
+    \item Sees everything (bad for security), or
+    \item Sees nothing (bad for routing)
+  \end{itemize}
+  This is the core dilemma.
+\end{frame}
 
-  \begin{frame}[fragile]{Use Encrypted Search}
+\begin{frame}[fragile]{Use Encrypted Search}
   \begin{block}{Solution}
     \begin{itemize}\tightlist
-    \item Allow for searching (and matching) on encrypted data, without the need for decryption.
-    \item \textbf{PEKS}: accompany encryptyed messages with a collection of
-    (again encrypted) keywords and search for matches on keywords.
+      \item Allow for searching (and matching) on encrypted data, without the need for decryption.
+      \item \textbf{PEKS}: accompany encryptyed messages with a collection of
+            (again encrypted) keywords and search for matches on keywords.
     \end{itemize}
   \end{block}
   \begin{verbatim}
@@ -1194,19 +1194,19 @@
 \end{frame}
 
 \begin{frame}[fragile]{PEKS}
-  \begin{block}{Broker (Router/Server) tasks:}  
-  \begin{verbatim}
+  \begin{block}{Broker (Router/Server) tasks:}
+    \begin{verbatim}
   for each stored ciphertext C_i:
     if Test(public_key, C_i, trapdoor_bytes) == True:
         return this document to the Subscriber
   \end{verbatim}
-\end{block}
-    \begin{itemize}\tightlist
-      \item No encryption of the trapdoor is required,
-      \item No shared secret between the Subscriber and the server is needed beyond 
-      normal transport-layer security (TLS).
-      \item In this way, \textbf{PEKS} trapdoors are passed in all real systems.
-    \end{itemize}  
+  \end{block}
+  \begin{itemize}\tightlist
+    \item No encryption of the trapdoor is required,
+    \item No shared secret between the Subscriber and the server is needed beyond
+          normal transport-layer security (TLS).
+    \item In this way, \textbf{PEKS} trapdoors are passed in all real systems.
+  \end{itemize}
 \end{frame}
 
 % \begin{frame}{Public-Key Encryption with Keyword Search (PEKS)}
@@ -1378,14 +1378,14 @@
 % \end{frame}
 \section{Summary}
 \begin{frame}{Summary}
-The topics discussed in the \emph{coordination} section 
-of the lecture notes include
-\begin{enumerate}
-  \item Mutual Exclusion
-  \item Election Algorithms
-  \item Gossip-based Coordination
-  \item Distributed Event Matching
-  \item Gossip-based Pub-Sub
-  \item Secure Gossip-based Pub-Sub
-\end{enumerate}
+  The topics discussed in the \emph{coordination} section
+  of the lecture notes include
+  \begin{enumerate}
+    \item Mutual Exclusion
+    \item Election Algorithms
+    \item Gossip-based Coordination
+    \item Distributed Event Matching
+    \item Gossip-based Pub-Sub
+    \item Secure Gossip-based Pub-Sub
+  \end{enumerate}
 \end{frame}
